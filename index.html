@@ -95,6 +95,39 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
 .wish-empty-icon{font-size:2.5rem;margin-bottom:.6rem}
 /* OFFLINE INDICATOR */
 .offline-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(90deg,#92400e,#78350f);padding:.5rem 1rem;text-align:center;font-size:.8rem}
+/* ── PHOTO FRAME ─────────────────────────── */
+.photo-frame-wrap{display:flex;justify-content:center;margin:.75rem 0}
+.photo-frame{width:110px;height:110px;border-radius:50%;border:4px solid #f5c842;background:rgba(255,255,255,.08);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;cursor:pointer;transition:transform .2s}
+.photo-frame:hover{transform:scale(1.04)}
+.photo-frame img{width:100%;height:100%;object-fit:cover}
+.photo-upload-hint{font-size:.6rem;color:rgba(255,255,255,.3);text-align:center;margin-top:.25rem}
+.photo-badge{position:absolute;bottom:2px;right:2px;width:26px;height:26px;border-radius:50%;background:#f5c842;display:flex;align-items:center;justify-content:center;font-size:.8rem;border:2px solid #0f0c1d}
+/* ── GAME ────────────────────────────────── */
+.game-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
+.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.game-title-text{font-size:.95rem;font-weight:500;color:#fff}
+.game-score{font-size:.72rem;color:var(--gold);background:rgba(245,200,66,.1);border-radius:20px;padding:.2rem .7rem}
+.quiz-question{background:rgba(255,255,255,.06);border-radius:10px;padding:.75rem 1rem;font-size:.85rem;color:#fff;margin-bottom:.75rem;line-height:1.5}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.quiz-opt{padding:.55rem .75rem;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.7);font-family:'Kanit',sans-serif;font-size:.8rem;cursor:pointer;text-align:left;transition:all .15s}
+.quiz-opt:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+.quiz-opt.correct{background:rgba(0,229,204,.15);border-color:#00e5cc;color:#00e5cc}
+.quiz-opt.wrong{background:rgba(255,107,157,.15);border-color:#ff6b9d;color:#ff6b9d}
+.quiz-opt:disabled{cursor:default}
+.quiz-next{margin-top:.75rem;width:100%;padding:.6rem;background:linear-gradient(135deg,#f5c842,#f7a621);border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer}
+.quiz-result{text-align:center;padding:1rem;font-size:.9rem;color:#fff}
+/* ── VOTE ────────────────────────────────── */
+.vote-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
+.vote-header{font-size:.95rem;font-weight:500;color:#fff;margin-bottom:.85rem;display:flex;align-items:center;gap:.4rem}
+.vote-card{display:flex;align-items:center;gap:.65rem;padding:.55rem .75rem;border-radius:10px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);margin-bottom:.4rem;cursor:pointer;transition:border-color .15s}
+.vote-card:hover{border-color:rgba(245,200,66,.3)}
+.vote-card.voted{border-color:var(--gold)}
+.vote-msg{flex:1;min-width:0;font-size:.78rem;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vote-bar-wrap{width:80px;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;flex-shrink:0}
+.vote-bar{height:100%;background:var(--gold);border-radius:3px;transition:width .4s}
+.vote-pct{font-size:.68rem;color:var(--gold);min-width:28px;text-align:right;flex-shrink:0}
+.vote-heart{font-size:.85rem;flex-shrink:0}
+.vote-empty{font-size:.78rem;color:rgba(255,255,255,.3);text-align:center;padding:.75rem}
 .admin-bar{display:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,200,66,.2);border-radius:12px;padding:.75rem 1rem;margin-bottom:1.25rem;gap:.5rem;align-items:center}
 .admin-bar.show{display:flex}
 .admin-bar input{flex:1;background:transparent;border:none;color:rgba(255,255,255,.6);font-family:'Kanit',sans-serif;font-size:.75rem;outline:none}
@@ -182,6 +215,17 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
       <div class="hero-tag" style="margin:0">🎂 Happy Birthday</div>
       <span class="admin-badge">ADMIN MODE</span>
     </div>
+    <div class="photo-frame-wrap">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.2rem">
+        <div class="photo-frame" id="empPhotoFrame" onclick="adminUploadPhoto()">
+          <span id="empPhotoEmoji">🎂</span>
+          <img id="empPhoto" src="" style="display:none;position:absolute;inset:0">
+          <div class="photo-badge">🎉</div>
+        </div>
+        <div class="photo-upload-hint admin-mode-only" id="photoUploadHint" style="display:none">📷 คลิกเพื่ออัปโหลดรูป</div>
+        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
+      </div>
+    </div>
     <div class="hero-name" id="hero-name">เลือกพนักงาน</div>
     <div class="hero-pos" id="hero-pos">—</div>
     <div class="hero-date" id="hero-date"><span>🎂</span><span>เกิดเดือน...</span></div>
@@ -212,6 +256,23 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
     <div class="emoji-row" id="emojiRow"></div>
     <button class="send-btn" id="send-btn" onclick="submitWish()">🎊 ส่งคำอวยพร!</button>
     <div class="success-msg" id="success-msg">🎉 ส่งคำอวยพรสำเร็จแล้ว! ขอบคุณนะ ❤️</div>
+  </div>
+
+  <!-- GAME SECTION -->
+  <div class="game-section" id="gameSection" style="display:none">
+    <div class="game-header">
+      <div class="game-title-text">🎯 ทายสิ! เกี่ยวกับเจ้าของวันเกิด</div>
+      <div class="game-score" id="gameScore">0 คะแนน</div>
+    </div>
+    <div id="gameBody">
+      <div style="text-align:center;color:rgba(255,255,255,.3);font-size:.82rem;padding:1rem">เลือกพนักงานก่อนเล่นเกม</div>
+    </div>
+  </div>
+
+  <!-- VOTE SECTION -->
+  <div class="vote-section" id="voteSection" style="display:none">
+    <div class="vote-header">❤️ คำอวยพรยอดฮิต — กดไลก์คำอวยพรที่ชอบ</div>
+    <div id="voteList"><div class="vote-empty">ยังไม่มีคำอวยพรให้โหวต</div></div>
   </div>
 
   <!-- WISH WALL -->
@@ -407,6 +468,12 @@ function selectPerson(code){
   document.getElementById('hero-name').textContent='คุณ'+curEmp.name;
   document.getElementById('hero-pos').textContent=(curEmp.pos||'')+(curEmp.faction?' | '+curEmp.faction:'')+(curEmp.code?' | รหัส '+curEmp.code:'');
   document.getElementById('hero-date').innerHTML=`<span>🎂</span><span>เกิดเดือน${MTH[curEmp.month]}</span>`;
+  // Load saved photo for this employee
+  loadEmpPhoto(curEmp.code||curEmp.name);
+  // Show game section
+  const gs=document.getElementById('gameSection');
+  if(gs) gs.style.display='block';
+  startGame();
   loadWishes();
 }
 
@@ -431,15 +498,15 @@ async function loadWishes(){
 function renderWishes(wishes){
   const grid=document.getElementById('wish-grid');
   const isAdmin=document.body.classList.contains('admin-mode');
-  // load hidden list
   const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
-
   const visible=isAdmin ? wishes : wishes.filter(w=>!hidden.includes(String(w.ts||w.timestamp||w.senderName)));
 
   if(!visible.length){
     grid.innerHTML='<div class="wish-empty"><div class="wish-empty-icon">💭</div><div>ยังไม่มีคำอวยพร<br><span style="font-size:.75rem">เป็นคนแรกที่ส่งคำอวยพร!</span></div></div>';
+    document.getElementById('voteSection').style.display='none';
     return;
   }
+
   grid.innerHTML=wishes.map((w,i)=>{
     const wid=String(w.ts||w.timestamp||w.senderName||i);
     const isHidden=hidden.includes(wid);
@@ -458,6 +525,9 @@ function renderWishes(wishes){
       </div>
     </div>`;
   }).join('');
+
+  // Update vote list with visible wishes
+  renderVoteList(visible.slice(0,10));
 }
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
@@ -758,6 +828,216 @@ async function reloadPersons(){
   } else {
     showToast('โหลดไม่ได้ — ตรวจสอบ Script URL','warn');
   }
+}
+
+
+// ══════════════════════════════════════════════════
+// PHOTO FEATURE
+// ══════════════════════════════════════════════════
+function loadEmpPhoto(empKey) {
+  const saved = localStorage.getItem('photo_'+empKey);
+  const img = document.getElementById('empPhoto');
+  const emoji = document.getElementById('empPhotoEmoji');
+  if (saved) {
+    img.src = saved; img.style.display='block'; emoji.style.display='none';
+  } else {
+    img.src=''; img.style.display='none'; emoji.style.display='block';
+  }
+}
+function adminUploadPhoto() {
+  if (!document.body.classList.contains('admin-mode')) return;
+  document.getElementById('photoInput').click();
+}
+function onPhotoSelected(evt) {
+  const file = evt.target.files[0]; if(!file||!curEmp) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const key = 'photo_'+(curEmp.code||curEmp.name);
+    // Resize to ~300px for storage efficiency
+    const canvas = document.createElement('canvas');
+    const tmpImg = new Image();
+    tmpImg.onload = function() {
+      const size = 300;
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const min = Math.min(tmpImg.width, tmpImg.height);
+      const sx = (tmpImg.width-min)/2, sy = (tmpImg.height-min)/2;
+      ctx.drawImage(tmpImg, sx, sy, min, min, 0, 0, size, size);
+      const data = canvas.toDataURL('image/jpeg', 0.82);
+      localStorage.setItem(key, data);
+      loadEmpPhoto(curEmp.code||curEmp.name);
+      showToast('อัปโหลดรูปสำเร็จ');
+    };
+    tmpImg.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  evt.target.value='';
+}
+// Show upload hint in admin mode
+const _origEnterAdmin = enterAdmin;
+function enterAdmin() {
+  _origEnterAdmin();
+  const h = document.getElementById('photoUploadHint');
+  if(h) h.style.display='block';
+  document.getElementById('empPhotoFrame').style.cursor='pointer';
+}
+const _origExitAdmin = exitAdmin;
+function exitAdmin() {
+  _origExitAdmin();
+  const h = document.getElementById('photoUploadHint');
+  if(h) h.style.display='none';
+  document.getElementById('empPhotoFrame').style.cursor='default';
+}
+
+// ══════════════════════════════════════════════════
+// GAME FEATURE
+// ══════════════════════════════════════════════════
+let gameState = {score:0, qIdx:0, questions:[], answered:false};
+
+function generateQuestions(emp) {
+  if (!emp) return [];
+  const qs = [];
+  const mthName = MTH[emp.month];
+  // Q1: เดือนเกิด
+  const wrongMonths = MTH.filter(m=>m!==mthName).sort(()=>Math.random()-.5).slice(0,3);
+  const opts1 = [mthName,...wrongMonths].sort(()=>Math.random()-.5);
+  qs.push({q:`คุณ${emp.name.split(' ')[0]} เกิดเดือนอะไร?`, opts:opts1, ans:mthName});
+  // Q2: แผนก
+  const allFactions=[...new Set(calPersons.map(p=>p.faction).filter(Boolean))];
+  const wrongF = allFactions.filter(f=>f!==emp.faction).sort(()=>Math.random()-.5).slice(0,3);
+  if(wrongF.length>=2) {
+    const opts2 = [emp.faction,...wrongF.slice(0,3)].sort(()=>Math.random()-.5);
+    qs.push({q:`คุณ${emp.name.split(' ')[0]} อยู่แผนกไหน?`, opts:opts2, ans:emp.faction});
+  }
+  // Q3: ทาย emoji ที่เหมาะกับ
+  const emojis = ['🎉','🌟','💖','🎂','🥳','🌈','✨','🎁'];
+  const ans3 = emojis[Math.floor(Math.random()*emojis.length)];
+  const opts3 = [ans3,...emojis.filter(e=>e!==ans3).sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
+  qs.push({q:`เลือก emoji ที่เหมาะกับคุณ${emp.name.split(' ')[0]} ที่สุด!`, opts:opts3, ans:ans3, fun:true});
+  return qs;
+}
+
+function startGame() {
+  if (!curEmp) return;
+  gameState = {score:0, qIdx:0, questions:generateQuestions(curEmp), answered:false};
+  renderGame();
+}
+
+function renderGame() {
+  const body = document.getElementById('gameBody');
+  const score = document.getElementById('gameScore');
+  if (!body) return;
+  score.textContent = gameState.score + ' คะแนน';
+  const qs = gameState.questions;
+  if (!qs.length) { body.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.3);padding:1rem">ไม่มีคำถาม</div>'; return; }
+  if (gameState.qIdx >= qs.length) {
+    const total = qs.length;
+    const s = gameState.score;
+    const msg = s===total?'เก่งมาก! 🏆':s>total/2?'ดีมาก! 👍':'ลองใหม่นะ 😊';
+    body.innerHTML = `<div class="quiz-result">
+      <div style="font-size:2rem;margin-bottom:.5rem">${s===total?'🏆':s>total/2?'🌟':'💪'}</div>
+      <div style="font-size:1rem;font-weight:500;margin-bottom:.3rem">${msg}</div>
+      <div style="font-size:.82rem;color:rgba(255,255,255,.5)">${s}/${total} ข้อถูก</div>
+      <button class="quiz-next" style="margin-top:.75rem" onclick="startGame()">🔄 เล่นอีกครั้ง</button>
+    </div>`;
+    return;
+  }
+  const q = qs[gameState.qIdx];
+  body.innerHTML = `
+    <div class="quiz-question">${q.q}${q.fun?' <span style="font-size:.72rem;color:var(--gold)">(ข้อสนุก!)</span>':''}</div>
+    <div class="quiz-options">
+      ${q.opts.map(o=>`<button class="quiz-opt" onclick="answerGame(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}','${q.fun?'fun':''}')">${o}</button>`).join('')}
+    </div>`;
+}
+
+function answerGame(btn, selected, ans, type) {
+  if (gameState.answered) return;
+  gameState.answered = true;
+  const opts = document.querySelectorAll('.quiz-opt');
+  const isCorrect = type==='fun' || selected===ans;
+  opts.forEach(o => {
+    o.disabled = true;
+    if (o.textContent.trim()===ans) o.classList.add('correct');
+    else if (o===btn && !isCorrect) o.classList.add('wrong');
+  });
+  if (isCorrect) {
+    gameState.score++;
+    fireConfetti();
+    showToast(type==='fun'?'สนุกมาก! +1 คะแนน':'ถูกต้อง! +1 คะแนน');
+  } else {
+    showToast('ไม่ถูกนะ คำตอบที่ถูกคือ '+ans,'warn');
+  }
+  document.getElementById('gameScore').textContent = gameState.score+' คะแนน';
+  // Auto next after 1.5s
+  setTimeout(()=>{
+    gameState.qIdx++;
+    gameState.answered = false;
+    renderGame();
+  }, 1500);
+}
+
+// ══════════════════════════════════════════════════
+// VOTE FEATURE
+// ══════════════════════════════════════════════════
+function renderVoteList(wishes) {
+  const voteEl = document.getElementById('voteSection');
+  const listEl = document.getElementById('voteList');
+  if (!voteEl||!listEl) return;
+  if (!wishes||!wishes.length) {
+    voteEl.style.display='none'; return;
+  }
+  voteEl.style.display='block';
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
+  const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
+  // Sort by vote count desc
+  const wWithVotes = wishes
+    .filter(w=>(w.msg||w.message))
+    .map(w=>({...w, voteCount: votes[String(w.ts||w.timestamp||w.senderName||w.msg)]||0}))
+    .sort((a,b)=>b.voteCount-a.voteCount)
+    .slice(0,5);
+  const maxV = Math.max(...wWithVotes.map(w=>w.voteCount), 1);
+  const myVote = localStorage.getItem('myvote_'+empKey);
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  listEl.innerHTML = wWithVotes.map((w,i)=>{
+    const wid = String(w.ts||w.timestamp||w.senderName||w.msg||i);
+    const pct = Math.round(w.voteCount/maxV*100);
+    const isVoted = myVote===wid;
+    return `<div class="vote-card${isVoted?' voted':''}" onclick="voteWish('${wid.replace(/'/g,"\\'")}')">
+      <span class="vote-heart">${medals[i]||'⭐'}</span>
+      <div style="flex:1;min-width:0">
+        <div class="vote-msg">"${escHtml(w.msg||w.message||'')}"</div>
+        <div style="display:flex;align-items:center;gap:.4rem;margin-top:.25rem">
+          <div class="vote-bar-wrap"><div class="vote-bar" style="width:${pct}%"></div></div>
+          <span style="font-size:.62rem;color:rgba(255,255,255,.35)">❤️ ${w.voteCount}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function voteWish(wid) {
+  if (!curEmp) return;
+  const empKey = curEmp.code||curEmp.name;
+  const prev = localStorage.getItem('myvote_'+empKey);
+  const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
+  if (prev === wid) {
+    // Unvote
+    votes[wid] = Math.max(0,(votes[wid]||1)-1);
+    localStorage.removeItem('myvote_'+empKey);
+    showToast('ยกเลิกไลก์แล้ว');
+  } else {
+    // Remove prev vote
+    if (prev) votes[prev] = Math.max(0,(votes[prev]||1)-1);
+    votes[wid] = (votes[wid]||0)+1;
+    localStorage.setItem('myvote_'+empKey, wid);
+    showToast('❤️ ไลก์แล้ว!');
+    fireConfetti();
+  }
+  localStorage.setItem('votes_'+empKey, JSON.stringify(votes));
+  // Re-render vote list with updated counts
+  const empId = curEmp.code||curEmp.name;
+  const ws = localWishes[empId]||[];
+  renderVoteList(ws.slice(0,10));
 }
 
 </script>
