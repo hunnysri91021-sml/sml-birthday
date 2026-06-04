@@ -146,12 +146,16 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
 
 <div class="container">
 
+  <!-- SYNC STATUS (visible to all) -->
+  <div id="syncStatus" style="font-size:.7rem;color:rgba(255,255,255,.35);text-align:center;min-height:1.2rem;margin-bottom:.25rem"></div>
+
   <!-- ADMIN BAR (hidden by default) -->
   <div class="admin-bar" id="apiBar">
     <span style="font-size:.65rem;color:rgba(255,200,66,.6);flex-shrink:0">🔐 Script URL:</span>
     <input id="apiUrl" type="text" placeholder="วาง Web App URL ของ Google Apps Script..." oninput="saveApiUrl()">
     <span class="api-status api-pending" id="apiStatus">—</span>
     <button onclick="testApi()" style="background:none;border:1px solid rgba(255,200,66,.2);border-radius:7px;color:rgba(255,200,66,.6);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.22rem .55rem;cursor:pointer">ทดสอบ</button>
+    <button onclick="reloadPersons()" style="background:none;border:1px solid rgba(255,200,66,.2);border-radius:7px;color:rgba(255,200,66,.6);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.22rem .55rem;cursor:pointer">🔄 รีโหลดพนักงาน</button>
   </div>
 
   <!-- ADMIN MONTH CONTROL (visible to admin only) -->
@@ -554,12 +558,46 @@ window.addEventListener('online',()=>{document.getElementById('offline-banner').
 window.addEventListener('offline',()=>{document.getElementById('offline-banner').style.display='block';});
 
 // ─── INIT ─────────────────────────────────────────────────
-(function(){
+// ── LOAD PERSONS FROM GOOGLE SHEET ───────────────────────────────────
+async function loadPersonsFromSheet(){
+  const url = getApiUrl();
+  if(!url) return false;
+  const statusEl = document.getElementById('syncStatus');
+  if(statusEl) statusEl.textContent = 'กำลังโหลดข้อมูลพนักงาน...';
+  try{
+    const data = await apiGet({action:'getPersons'});
+    if(!data || !Array.isArray(data) || data.length === 0) return false;
+    // Convert sheet format → calPersons format
+    // Sheet: {code, name(fname+lname), pos, faction, day, month(0-based)}
+    const parsed = data
+      .filter(p => p.name && String(p.name).trim())
+      .map(p => ({
+        code:    String(p.code||'').trim(),
+        name:    String(p.name||'').trim().replace(/\s+/,' '),
+        pos:     String(p.pos||'').trim(),
+        faction: String(p.faction||'').trim(),
+        day:     parseInt(p.day)||1,
+        month:   typeof p.month==='number' ? p.month : Math.max(0,parseInt(p.month||0)-1),
+      }));
+    if(parsed.length === 0) return false;
+    calPersons = parsed;
+    if(statusEl) statusEl.textContent = 'โหลดข้อมูลพนักงานแล้ว ' + parsed.length + ' คน';
+    setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 3000);
+    return true;
+  } catch(e){
+    console.error('loadPersons error:', e);
+    return false;
+  }
+}
+
+(async function(){
   // Load saved API URL
   const savedUrl=getApiUrl();
   if(savedUrl){
     document.getElementById('apiUrl').value=savedUrl;
     testApi();
+    // Load persons from Sheet before building UI
+    await loadPersonsFromSheet();
   }
   // Build UI
   buildMonthTabs();
@@ -568,8 +606,13 @@ window.addEventListener('offline',()=>{document.getElementById('offline-banner')
   selectMonth(now.getMonth());
   // Sync pending
   syncPending();
-  // Auto-refresh every 30s
+  // Auto-refresh wishes every 30s
   setInterval(loadWishes, 30000);
+  // Auto-refresh persons every 5 minutes
+  setInterval(async()=>{
+    const ok = await loadPersonsFromSheet();
+    if(ok){ buildMonthTabs(); if(selMonth>=0) selectMonth(selMonth); }
+  }, 5*60*1000);
 })();
 
 
@@ -643,8 +686,12 @@ function enterAdmin(){
   if(saved){ document.getElementById('apiUrl').value=saved; testApi(); }
   // Build admin month grid
   buildAmcGrid();
-  buildMonthTabs();
-  showToast('เข้าสู่ Admin Mode แล้ว');
+  // Reload persons from sheet when entering admin
+  loadPersonsFromSheet().then(ok=>{
+    buildMonthTabs();
+    if(ok) showToast('เข้าสู่ Admin Mode — โหลดพนักงานแล้ว ' + calPersons.length + ' คน');
+    else showToast('เข้าสู่ Admin Mode แล้ว');
+  });
   loadWishes();
 }
 
@@ -699,6 +746,18 @@ async function deleteWish(wid, btn){
     localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
   }
   loadWishes();
+}
+
+
+async function reloadPersons(){
+  const ok = await loadPersonsFromSheet();
+  if(ok){
+    buildMonthTabs();
+    if(selMonth>=0) selectMonth(selMonth);
+    showToast('โหลดข้อมูลพนักงานใหม่แล้ว ' + calPersons.length + ' คน');
+  } else {
+    showToast('โหลดไม่ได้ — ตรวจสอบ Script URL','warn');
+  }
 }
 
 </script>
