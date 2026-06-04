@@ -112,6 +112,15 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
 .wish-act-del:hover{background:rgba(255,107,157,.35)}
 .admin-badge{display:none;background:rgba(255,200,66,.15);border:1px solid rgba(255,200,66,.3);border-radius:20px;padding:.22rem .7rem;font-size:.65rem;color:var(--gold);letter-spacing:.05em}
 .admin-mode .admin-badge{display:inline-block}
+.admin-month-ctrl{display:none;background:rgba(255,200,66,.06);border:1px solid rgba(255,200,66,.2);border-radius:12px;padding:.75rem 1rem;margin-bottom:1rem}
+.admin-mode .admin-month-ctrl{display:block}
+.amc-title{font-size:.68rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between}
+.amc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.28rem}
+.amc-chip{padding:.28rem .2rem;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:transparent;color:rgba(255,255,255,.4);font-family:'Kanit',sans-serif;font-size:.7rem;cursor:pointer;text-align:center;transition:all .15s}
+.amc-chip.on{background:rgba(255,200,66,.18);border-color:var(--gold);color:var(--gold);font-weight:500}
+.amc-hint{font-size:.62rem;color:rgba(255,255,255,.3);margin-top:.4rem;text-align:center}
+.month-tabs .mtab.hidden-month{opacity:.35;text-decoration:line-through}
+.person-locked{text-align:center;padding:1.5rem;color:rgba(255,255,255,.3);font-size:.82rem}
 /* TOAST */
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(120px);background:rgba(0,229,204,.15);border:1px solid var(--mint);border-radius:30px;padding:.55rem 1.4rem;font-size:.82rem;color:var(--mint);transition:transform .35s cubic-bezier(.34,1.56,.64,1);z-index:999;backdrop-filter:blur(10px)}
 .toast.show{transform:translateX(-50%) translateY(0)}
@@ -145,6 +154,16 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
     <button onclick="testApi()" style="background:none;border:1px solid rgba(255,200,66,.2);border-radius:7px;color:rgba(255,200,66,.6);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.22rem .55rem;cursor:pointer">ทดสอบ</button>
   </div>
 
+  <!-- ADMIN MONTH CONTROL (visible to admin only) -->
+  <div class="admin-month-ctrl" id="adminMonthCtrl">
+    <div class="amc-title">
+      <span>🗓 เลือกเดือนที่แสดงให้พนักงานเห็น</span>
+      <button onclick="toggleAllMonths()" style="background:none;border:1px solid rgba(255,200,66,.3);border-radius:6px;color:var(--gold);font-family:'Kanit',sans-serif;font-size:.65rem;padding:.15rem .5rem;cursor:pointer">เลือกทั้งหมด</button>
+    </div>
+    <div class="amc-grid" id="amcGrid"></div>
+    <div class="amc-hint">พนักงานทั่วไปจะเห็นเฉพาะเดือนที่เปิดใช้งาน</div>
+  </div>
+
   <!-- PERSON SELECTOR -->
   <div class="person-selector">
     <div class="person-selector-label">เลือกเดือนเกิด</div>
@@ -161,7 +180,7 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
     </div>
     <div class="hero-name" id="hero-name">เลือกพนักงาน</div>
     <div class="hero-pos" id="hero-pos">—</div>
-    <div class="hero-date" id="hero-date"><span>📅</span><span>เกิดวันที่</span></div>
+    <div class="hero-date" id="hero-date"><span>🎂</span><span>เกิดเดือน...</span></div>
     <div class="wish-counter">
       <span>คำอวยพรทั้งหมด</span>
       <span class="wish-count-num" id="wish-count">0</span>
@@ -345,21 +364,33 @@ async function apiPost(body){
 
 // ─── MONTH TABS ──────────────────────────────────────────
 function buildMonthTabs(){
-  document.getElementById('monthTabs').innerHTML=MTH.map((m,i)=>
-    `<button class="mtab${i===selMonth?' active':''}" onclick="selectMonth(${i})">${m.substring(0,3)}</button>`
-  ).join('');
+  const isAdmin=document.body.classList.contains('admin-mode');
+  const allowed=getActiveMonths();
+  document.getElementById('monthTabs').innerHTML=MTH.map((m,i)=>{
+    const hasEmp=calPersons.some(p=>p.month===i);
+    const isAllowed=allowed.includes(i);
+    const cls=['mtab', i===selMonth?'active':'', !isAdmin&&!isAllowed?'hidden-month':''].filter(Boolean).join(' ');
+    return `<button class="${cls}" onclick="selectMonth(${i})">${m.substring(0,3)}</button>`;
+  }).join('');
 }
 function selectMonth(mi){
-  selMonth=mi;buildMonthTabs();
-  const list=calPersons.filter(p=>p.month===mi);
+  selMonth=mi; buildMonthTabs();
   const chips=document.getElementById('personChips');
+  const isAdmin=document.body.classList.contains('admin-mode');
+  const allowed=getActiveMonths();
+  // Non-admin: block hidden months
+  if(!isAdmin && !allowed.includes(mi)){
+    chips.innerHTML='<div class="person-locked">🔒 ยังไม่เปิดให้ดูเดือนนี้</div>';
+    return;
+  }
+  const list=calPersons.filter(p=>p.month===mi);
   if(!list.length){chips.innerHTML='<div style="font-size:.78rem;color:rgba(255,255,255,.3)">ไม่มีพนักงานเกิดเดือนนี้</div>';return;}
   chips.innerHTML=list.map((p,i)=>
     `<div class="pchip${curEmp&&curEmp.code===p.code?' active':''}" onclick="selectPerson('${p.code}')">
       <span class="pchip-dot"></span>คุณ${p.name.split(' ')[0]}
     </div>`
   ).join('');
-  if(!curEmp) selectPerson(list[0].code);
+  if(!curEmp||curEmp.month!==mi) selectPerson(list[0].code);
 }
 function selectPerson(code){
   curEmp=calPersons.find(p=>p.code===code)||null;
@@ -371,7 +402,7 @@ function selectPerson(code){
   // Update hero
   document.getElementById('hero-name').textContent='คุณ'+curEmp.name;
   document.getElementById('hero-pos').textContent=(curEmp.pos||'')+(curEmp.faction?' | '+curEmp.faction:'')+(curEmp.code?' | รหัส '+curEmp.code:'');
-  document.getElementById('hero-date').innerHTML=`<span>📅</span><span>เกิดวันที่ ${curEmp.day} ${MTH[curEmp.month]}</span>`;
+  document.getElementById('hero-date').innerHTML=`<span>🎂</span><span>เกิดเดือน${MTH[curEmp.month]}</span>`;
   loadWishes();
 }
 
@@ -541,6 +572,50 @@ window.addEventListener('offline',()=>{document.getElementById('offline-banner')
   setInterval(loadWishes, 30000);
 })();
 
+
+// ── ADMIN MONTH CONTROL ─────────────────────────────────────────────
+function getActiveMonths(){
+  const saved=localStorage.getItem('sml_active_months');
+  if(saved) return JSON.parse(saved);
+  // Default: current month only
+  return [new Date().getMonth()];
+}
+
+function saveActiveMonths(arr){
+  localStorage.setItem('sml_active_months', JSON.stringify(arr));
+}
+
+function buildAmcGrid(){
+  const active=getActiveMonths();
+  const grid=document.getElementById('amcGrid');
+  if(!grid) return;
+  grid.innerHTML=MTH.map((m,i)=>
+    `<button class="amc-chip${active.includes(i)?' on':''}" onclick="toggleAdminMonth(${i})" id="amc-${i}">${m.substring(0,3)}</button>`
+  ).join('');
+}
+
+function toggleAdminMonth(mi){
+  const active=getActiveMonths();
+  const idx=active.indexOf(mi);
+  if(idx>=0) active.splice(idx,1);
+  else active.push(mi);
+  saveActiveMonths(active);
+  buildAmcGrid();
+  buildMonthTabs();
+  // If current selMonth is now hidden, clear person list
+  if(!active.includes(selMonth)){
+    document.getElementById('personChips').innerHTML='<div class="person-locked">🔒 ยังไม่เปิดให้ดูเดือนนี้</div>';
+  }
+}
+
+function toggleAllMonths(){
+  const active=getActiveMonths();
+  const newActive = active.length===12 ? [] : MTH.map((_,i)=>i);
+  saveActiveMonths(newActive);
+  buildAmcGrid();
+  buildMonthTabs();
+}
+
 // ── ADMIN MODE ──────────────────────────────────────────────────────
 const ADMIN_PASS = 'sml2569';  // ← เปลี่ยน password ที่นี่
 
@@ -566,6 +641,9 @@ function enterAdmin(){
   // load saved URL
   const saved=getApiUrl();
   if(saved){ document.getElementById('apiUrl').value=saved; testApi(); }
+  // Build admin month grid
+  buildAmcGrid();
+  buildMonthTabs();
   showToast('เข้าสู่ Admin Mode แล้ว');
   loadWishes();
 }
@@ -592,24 +670,35 @@ function toggleHideWish(wid, btn){
 }
 
 // ── DELETE WISH ──────────────────────────────────────────────────────
-function deleteWish(wid, btn){
+async function deleteWish(wid, btn){
   if(!confirm('ลบคำอวยพรนี้? ไม่สามารถกู้คืนได้')) return;
-  // Remove from local cache
+  // 1. Remove from local cache
   if(curEmp){
     const empId=curEmp.code||curEmp.name;
     if(localWishes[empId]){
-      localWishes[empId]=localWishes[empId].filter(w=>String(w.ts||w.timestamp||w.senderName)!==wid);
+      localWishes[empId]=localWishes[empId].filter(w=>String(w.ts||w.timestamp||w.senderName||w.msg)!==wid);
       localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
     }
   }
-  // Remove from hidden list too
+  // 2. Remove from hidden list
   const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
-  const idx=hidden.indexOf(wid);
-  if(idx>=0){ hidden.splice(idx,1); localStorage.setItem('sml_hidden',JSON.stringify(hidden)); }
-  // Try delete via API
-  apiGet({action:'deleteWish', wid});
+  const hi=hidden.indexOf(wid);
+  if(hi>=0){ hidden.splice(hi,1); localStorage.setItem('sml_hidden',JSON.stringify(hidden)); }
+  // 3. Delete from Google Sheet via API
+  const result=await apiGet({action:'deleteWish', wid:encodeURIComponent(wid)});
+  if(result&&result.ok){
+    showToast('ลบออกจาก Google Sheet แล้ว');
+  } else {
+    showToast('ลบจากหน้าเว็บแล้ว (Sheet อาจต้องลบเอง)','warn');
+  }
+  // 4. Force reload from server
+  const empId=curEmp?curEmp.code||curEmp.name:'';
+  const fresh=await apiGet({action:'getWishes',empId});
+  if(fresh&&Array.isArray(fresh)){
+    localWishes[empId]=fresh;
+    localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
+  }
   loadWishes();
-  showToast('ลบคำอวยพรแล้ว');
 }
 
 </script>
