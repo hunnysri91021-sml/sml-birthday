@@ -116,6 +116,77 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
 .quiz-opt:disabled{cursor:default}
 .quiz-next{margin-top:.75rem;width:100%;padding:.6rem;background:linear-gradient(135deg,#f5c842,#f7a621);border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer}
 .quiz-result{text-align:center;padding:1rem;font-size:.9rem;color:#fff}
+/* ── QUIZ EDITOR (admin) ─────────────────── */
+.quiz-editor{display:none;margin-top:.75rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem}
+.admin-mode .quiz-editor{display:block}
+.qe-title{font-size:.72rem;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.qe-list{display:flex;flex-direction:column;gap:.4rem;max-height:180px;overflow-y:auto;margin-bottom:.5rem}
+.qe-item{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.04);border-radius:8px;padding:.35rem .6rem;font-size:.75rem;color:rgba(255,255,255,.7)}
+.qe-item-q{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qe-del{background:none;border:none;color:rgba(255,107,157,.5);cursor:pointer;font-size:.85rem;padding:0 4px;flex-shrink:0}
+.qe-del:hover{color:#ff6b9d}
+.qe-form{display:flex;flex-direction:column;gap:.35rem}
+.qe-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.4rem .6rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.78rem;width:100%;outline:none}
+.qe-input:focus{border-color:rgba(245,200,66,.4)}
+.qe-opts-row{display:grid;grid-template-columns:1fr 1fr;gap:.3rem}
+.qe-add-btn{padding:.4rem;background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.2);border-radius:8px;color:var(--gold);font-family:'Kanit',sans-serif;font-size:.75rem;cursor:pointer;width:100%;transition:all .15s}
+.qe-add-btn:hover{background:rgba(245,200,66,.2)}
+/* ── LIKE NOTIFICATION ───────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-box{background:#1a1227;border:1px solid rgba(255,200,66,.25);border-radius:20px;padding:1.5rem;width:100%;max-width:380px;display:flex;flex-direction:column;gap:.85rem}
+.modal-title{font-size:1rem;font-weight:500;color:#fff;display:flex;align-items:center;gap:.4rem}
+.modal-input{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:.55rem .85rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.9rem;width:100%;outline:none;transition:border-color .2s}
+.modal-input:focus{border-color:rgba(245,200,66,.5)}
+.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.modal-btn-primary{padding:.65rem;background:linear-gradient(135deg,#f5c842,#f7a621);border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer}
+.modal-btn-ghost{padding:.65rem;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:10px;color:rgba(255,255,255,.5);font-family:'Kanit',sans-serif;font-size:.88rem;cursor:pointer}
+.modal-sep{height:1px;background:rgba(255,255,255,.08);margin:.1rem 0}
+.modal-label{font-size:.7rem;color:rgba(255,255,255,.4);letter-spacing:.05em}
+.modal-danger{color:#ff6b9d;font-size:.8rem;background:rgba(255,107,157,.08);border:1px solid rgba(255,107,157,.2);border-radius:10px;padding:.6rem .85rem;cursor:pointer;font-family:'Kanit',sans-serif;width:100%;text-align:left}
+.modal-danger:hover{background:rgba(255,107,157,.15)}
+.modal-success-msg{font-size:.78rem;color:#00e5cc;text-align:center;display:none}
+.like-notif{position:fixed;bottom:5rem;left:50%;.like-notif{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(245,107,157,.15);border:1px solid #ff6b9d;border-radius:30px;padding:.5rem 1.25rem;font-size:.82rem;color:#ff6b9d;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;z-index:998;opacity:0;pointer-events:none;display:flex;align-items:center;gap:.4rem;white-space:nowrap}
+.like-notif.show{transform:translateX(-50%) translateY(0);opacity:1}
+.like-heart-fly{position:fixed;pointer-events:none;z-index:997;font-size:1.5rem;animation:heartFly 1.2s ease forwards}
+@keyframes heartFly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-120px) scale(1.5)}}
+/* ── LEADERBOARD ─────────────────────────── */
+.lb-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
+/* ── PARTICIPANTS ────────────────────────── */
+.part-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
+.part-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.part-title{font-size:.95rem;font-weight:500;color:#fff}
+.part-count{font-size:.72rem;color:var(--gold);background:rgba(245,200,66,.1);border-radius:20px;padding:.2rem .7rem}
+.part-grid{display:flex;flex-wrap:wrap;gap:.35rem}
+.part-chip{display:flex;align-items:center;gap:.3rem;padding:.28rem .65rem;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:.72rem;color:rgba(255,255,255,.75)}
+.part-chip.winner{background:rgba(245,200,66,.15);border-color:var(--gold);color:var(--gold);font-weight:500}
+.part-empty{font-size:.78rem;color:rgba(255,255,255,.3);padding:.5rem 0}
+/* ── WHEEL ───────────────────────────────── */
+.wheel-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
+.wheel-header{font-size:.95rem;font-weight:500;color:#fff;margin-bottom:.85rem;display:flex;align-items:center;gap:.4rem}
+.wheel-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem}
+.wheel-canvas-wrap{position:relative;width:260px;height:260px}
+canvas#wheelCanvas{border-radius:50%}
+.wheel-pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:24px solid #f5c842;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+.wheel-spin-btn{padding:.65rem 2rem;background:linear-gradient(135deg,#f5c842,#f7a621);border:none;border-radius:30px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s}
+.wheel-spin-btn:hover{opacity:.9}
+.wheel-spin-btn:active{transform:scale(.97)}
+.wheel-spin-btn:disabled{opacity:.5;cursor:not-allowed}
+.wheel-result{font-size:1.1rem;font-weight:500;color:var(--gold);text-align:center;min-height:1.5rem}
+.wheel-export-btn{padding:.45rem 1.2rem;background:none;border:1px solid rgba(245,200,66,.3);border-radius:20px;color:var(--gold);font-family:'Kanit',sans-serif;font-size:.72rem;cursor:pointer}
+.wheel-export-btn:hover{background:rgba(245,200,66,.1)}
+.lb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.lb-title{font-size:.95rem;font-weight:500;color:#fff}
+.lb-tabs{display:flex;gap:.3rem}
+.lb-tab{padding:.22rem .7rem;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.4);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
+.lb-tab.active{background:rgba(245,200,66,.15);border-color:var(--gold);color:var(--gold)}
+.lb-list{display:flex;flex-direction:column;gap:.35rem}
+.lb-row{display:flex;align-items:center;gap:.65rem;padding:.45rem .7rem;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
+.lb-row.me{border-color:rgba(245,200,66,.3);background:rgba(245,200,66,.06)}
+.lb-rank{font-size:1rem;width:24px;text-align:center;flex-shrink:0}
+.lb-ava{width:28px;height:28px;border-radius:50%;background:rgba(245,200,66,.2);display:flex;align-items:center;justify-content:center;font-size:.62rem;color:var(--gold);flex-shrink:0;font-weight:600}
+.lb-name{flex:1;font-size:.8rem;color:#fff;font-weight:400}
+.lb-score{font-size:.78rem;font-weight:500;color:var(--gold);flex-shrink:0}
+.lb-empty{font-size:.78rem;color:rgba(255,255,255,.3);text-align:center;padding:.75rem}
 /* ── VOTE ────────────────────────────────── */
 .vote-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
 .vote-header{font-size:.95rem;font-weight:500;color:#fff;margin-bottom:.85rem;display:flex;align-items:center;gap:.4rem}
@@ -189,6 +260,7 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
     <span class="api-status api-pending" id="apiStatus">—</span>
     <button onclick="testApi()" style="background:none;border:1px solid rgba(255,200,66,.2);border-radius:7px;color:rgba(255,200,66,.6);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.22rem .55rem;cursor:pointer">ทดสอบ</button>
     <button onclick="reloadPersons()" style="background:none;border:1px solid rgba(255,200,66,.2);border-radius:7px;color:rgba(255,200,66,.6);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.22rem .55rem;cursor:pointer">🔄 รีโหลดพนักงาน</button>
+    <button onclick="showAdminSettings()" style="background:none;border:1px solid rgba(255,200,66,.2);border-radius:7px;color:rgba(255,200,66,.6);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.22rem .55rem;cursor:pointer">⚙️ ตั้งค่า</button>
   </div>
 
   <!-- ADMIN MONTH CONTROL (visible to admin only) -->
@@ -261,11 +333,32 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
   <!-- GAME SECTION -->
   <div class="game-section" id="gameSection" style="display:none">
     <div class="game-header">
-      <div class="game-title-text">🎯 ทายสิ! เกี่ยวกับเจ้าของวันเกิด</div>
-      <div class="game-score" id="gameScore">0 คะแนน</div>
+      <div class="game-title-text" id="gameTitleText">🎯 คุณเป็นแฟนพันธุ์แท้ของเจ้าของวันเกิดหรือไม่?</div>
+      <div style="display:flex;align-items:center;gap:.4rem">
+        <div class="game-score" id="gameScore">0 คะแนน</div>
+        <div id="gameNameHint" style="font-size:.62rem;color:rgba(255,255,255,.35);display:none">⬇ กรอกชื่อในคำอวยพรก่อนนะ</div>
+        <button onclick="startGame()" style="background:none;border:1px solid rgba(255,255,255,.12);border-radius:7px;color:rgba(255,255,255,.4);font-family:'Kanit',sans-serif;font-size:.65rem;padding:.18rem .45rem;cursor:pointer">🔄</button>
+      </div>
     </div>
     <div id="gameBody">
       <div style="text-align:center;color:rgba(255,255,255,.3);font-size:.82rem;padding:1rem">เลือกพนักงานก่อนเล่นเกม</div>
+    </div>
+    <!-- ADMIN: Quiz Editor -->
+    <div class="quiz-editor" id="quizEditor">
+      <div class="qe-title">✏️ Admin — เพิ่มคำถามของคุณเอง</div>
+      <div class="qe-list" id="customQList"></div>
+      <div class="qe-form">
+        <input class="qe-input" id="qeQuestion" placeholder="คำถาม เช่น คุณ... ชอบอาหารอะไร?">
+        <div class="qe-opts-row">
+          <input class="qe-input" id="qeOpt1" placeholder="ตัวเลือก 1 (คำตอบถูก)">
+          <input class="qe-input" id="qeOpt2" placeholder="ตัวเลือก 2">
+        </div>
+        <div class="qe-opts-row">
+          <input class="qe-input" id="qeOpt3" placeholder="ตัวเลือก 3">
+          <input class="qe-input" id="qeOpt4" placeholder="ตัวเลือก 4 (ไม่บังคับ)">
+        </div>
+        <button class="qe-add-btn" onclick="addCustomQuestion()">+ เพิ่มคำถาม (ตัวเลือก 1 = คำตอบถูก)</button>
+      </div>
     </div>
   </div>
 
@@ -273,6 +366,50 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
   <div class="vote-section" id="voteSection" style="display:none">
     <div class="vote-header">❤️ คำอวยพรยอดฮิต — กดไลก์คำอวยพรที่ชอบ</div>
     <div id="voteList"><div class="vote-empty">ยังไม่มีคำอวยพรให้โหวต</div></div>
+  </div>
+
+  <!-- PARTICIPANTS -->
+  <div class="part-section" id="partSection">
+    <div class="part-header">
+      <div class="part-title">👥 ผู้ร่วมตอบคำถาม</div>
+      <div class="part-count" id="partCount">0 คน</div>
+    </div>
+    <div class="part-grid" id="partGrid">
+      <div class="part-empty">ยังไม่มีผู้เข้าร่วม</div>
+    </div>
+  </div>
+
+  <!-- WHEEL -->
+  <div class="wheel-section" id="wheelSection">
+    <div class="wheel-header">🎡 วงล้อสุ่มรางวัล</div>
+    <div class="wheel-wrap">
+      <div class="wheel-canvas-wrap">
+        <canvas id="wheelCanvas" width="260" height="260"></canvas>
+        <div class="wheel-pointer"></div>
+      </div>
+      <div class="wheel-result" id="wheelResult">กด หมุน! เพื่อสุ่มผู้โชคดี</div>
+      <div id="wheelAdminArea" style="display:none;flex-direction:column;align-items:center;gap:.5rem;width:100%">
+        <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">🎡 หมุน!</button>
+        <button class="wheel-export-btn" onclick="exportScoresExcel()">📊 Export คะแนนเป็น Excel</button>
+      </div>
+      <div id="wheelPublicHint" style="font-size:.72rem;color:rgba(255,255,255,.25);text-align:center">
+        รอ Admin เป็นคนหมุนวงล้อสุ่มรางวัล 🎡
+      </div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="lb-section" id="lbSection">
+    <div class="lb-header">
+      <div class="lb-title">🏆 กระดานคะแนน</div>
+      <div class="lb-tabs">
+        <button class="lb-tab active" id="lbTabGame" onclick="switchLbTab('game')">🎯 เกม</button>
+        <button class="lb-tab" id="lbTabLike" onclick="switchLbTab('like')">❤️ ไลก์</button>
+      </div>
+    </div>
+    <div class="lb-list" id="lbList">
+      <div class="lb-empty">เล่นเกมเพื่อขึ้นกระดานคะแนน!</div>
+    </div>
   </div>
 
   <!-- WISH WALL -->
@@ -291,6 +428,7 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
 <button class="admin-lock" id="adminLock" onclick="showAdminPrompt()" title="Admin Login">🔒</button>
 
 <div class="toast" id="toast"></div>
+<div class="like-notif" id="likeNotif"></div>
 
 <script>
 const MTH=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
@@ -470,10 +608,22 @@ function selectPerson(code){
   document.getElementById('hero-date').innerHTML=`<span>🎂</span><span>เกิดเดือน${MTH[curEmp.month]}</span>`;
   // Load saved photo for this employee
   loadEmpPhoto(curEmp.code||curEmp.name);
+  // Update game title
+  const gtt = document.getElementById('gameTitleText');
+  if(gtt) gtt.textContent = '🎯 คุณเป็นแฟนพันธุ์แท้ของคุณ'+curEmp.name.split(' ')[0]+' หรือไม่?';
   // Show game section
   const gs=document.getElementById('gameSection');
   if(gs) gs.style.display='block';
+  // Always show wheel + participants sections when person is selected
+  const ws=document.getElementById('wheelSection');
+  if(ws) ws.style.display='block';
+  const ps=document.getElementById('partSection');
+  if(ps) ps.style.display='block';
   startGame();
+  renderCustomQList();
+  renderParticipants();
+  renderLeaderboard();
+  setTimeout(drawWheel, 100);
   loadWishes();
 }
 
@@ -569,6 +719,17 @@ async function submitWish(){
     fireConfetti();
   }
 
+  // Auto-save game score with this name if not saved yet
+  if (name) {
+    localStorage.setItem('playerName', name);
+    const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+    const alreadySaved = board.find(r=>r.name===name);
+    if (!alreadySaved) {
+      // Mark as participant even without playing game
+      saveGameScore(name, 0, 0);
+    }
+  }
   // UI
   document.getElementById('wf-name').value='';
   document.getElementById('wf-dept').value='';
@@ -678,6 +839,8 @@ async function loadPersonsFromSheet(){
   syncPending();
   // Auto-refresh wishes every 30s
   setInterval(loadWishes, 30000);
+  // Draw placeholder wheel on load
+  setTimeout(drawWheel, 300);
   // Auto-refresh persons every 5 minutes
   setInterval(async()=>{
     const ok = await loadPersonsFromSheet();
@@ -730,19 +893,15 @@ function toggleAllMonths(){
 }
 
 // ── ADMIN MODE ──────────────────────────────────────────────────────
-const ADMIN_PASS = 'sml2569';  // ← เปลี่ยน password ที่นี่
+// Password stored in localStorage — changeable without editing code
+function getAdminPass(){ return localStorage.getItem('adminPass') || 'sml2569'; }
+function setAdminPass(p){ localStorage.setItem('adminPass', p); }
 
 function showAdminPrompt(){
   if(document.body.classList.contains('admin-mode')){
     exitAdmin(); return;
   }
-  const pw = prompt('รหัส Admin:');
-  if(pw === null) return;
-  if(pw === ADMIN_PASS){
-    enterAdmin();
-  } else {
-    showToast('รหัสไม่ถูกต้อง');
-  }
+  showAdminLoginModal();
 }
 
 function enterAdmin(){
@@ -751,16 +910,27 @@ function enterAdmin(){
   document.getElementById('adminLock').classList.add('active');
   document.getElementById('adminLock').textContent='🔓';
   document.getElementById('adminLock').title='ออกจาก Admin Mode';
-  // load saved URL
+  // Photo hints
+  const ph = document.getElementById('photoUploadHint');
+  if(ph) ph.style.display='block';
+  const pf = document.getElementById('empPhotoFrame');
+  if(pf) pf.style.cursor='pointer';
+  // Load saved URL
   const saved=getApiUrl();
   if(saved){ document.getElementById('apiUrl').value=saved; testApi(); }
   // Build admin month grid
   buildAmcGrid();
-  // Reload persons from sheet when entering admin
+  // Render custom questions
+  renderCustomQList();
+  // Show admin-only wheel controls
+  const wa=document.getElementById('wheelAdminArea');
+  const wh=document.getElementById('wheelPublicHint');
+  if(wa) wa.style.display='flex';
+  if(wh) wh.style.display='none';
+  // Reload persons from sheet
   loadPersonsFromSheet().then(ok=>{
     buildMonthTabs();
-    if(ok) showToast('เข้าสู่ Admin Mode — โหลดพนักงานแล้ว ' + calPersons.length + ' คน');
-    else showToast('เข้าสู่ Admin Mode แล้ว');
+    showToast(ok?'เข้าสู่ Admin Mode — พนักงาน '+calPersons.length+' คน':'เข้าสู่ Admin Mode แล้ว');
   });
   loadWishes();
 }
@@ -771,6 +941,16 @@ function exitAdmin(){
   document.getElementById('adminLock').classList.remove('active');
   document.getElementById('adminLock').textContent='🔒';
   document.getElementById('adminLock').title='Admin Login';
+  // Photo hints
+  const ph = document.getElementById('photoUploadHint');
+  if(ph) ph.style.display='none';
+  const pf = document.getElementById('empPhotoFrame');
+  if(pf) pf.style.cursor='default';
+  // Hide admin-only wheel controls
+  const wa=document.getElementById('wheelAdminArea');
+  const wh=document.getElementById('wheelPublicHint');
+  if(wa) wa.style.display='none';
+  if(wh) wh.style.display='block';
   showToast('ออกจาก Admin Mode แล้ว');
   loadWishes();
 }
@@ -873,21 +1053,7 @@ function onPhotoSelected(evt) {
   reader.readAsDataURL(file);
   evt.target.value='';
 }
-// Show upload hint in admin mode
-const _origEnterAdmin = enterAdmin;
-function enterAdmin() {
-  _origEnterAdmin();
-  const h = document.getElementById('photoUploadHint');
-  if(h) h.style.display='block';
-  document.getElementById('empPhotoFrame').style.cursor='pointer';
-}
-const _origExitAdmin = exitAdmin;
-function exitAdmin() {
-  _origExitAdmin();
-  const h = document.getElementById('photoUploadHint');
-  if(h) h.style.display='none';
-  document.getElementById('empPhotoFrame').style.cursor='default';
-}
+// photo hints handled inside enterAdmin/exitAdmin directly
 
 // ══════════════════════════════════════════════════
 // GAME FEATURE
@@ -928,17 +1094,36 @@ function renderGame() {
   const score = document.getElementById('gameScore');
   if (!body) return;
   score.textContent = gameState.score + ' คะแนน';
+  // Show hint if name not filled
+  const hint = document.getElementById('gameNameHint');
+  const wfName = (document.getElementById('wf-name')||{value:''}).value.trim();
+  const saved = localStorage.getItem('playerName');
+  if(hint) hint.style.display = (!wfName && !saved) ? 'block' : 'none';
   const qs = gameState.questions;
   if (!qs.length) { body.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.3);padding:1rem">ไม่มีคำถาม</div>'; return; }
   if (gameState.qIdx >= qs.length) {
     const total = qs.length;
     const s = gameState.score;
     const msg = s===total?'เก่งมาก! 🏆':s>total/2?'ดีมาก! 👍':'ลองใหม่นะ 😊';
+    // Auto-get name from wish form (no extra input needed)
+    const wishFormName = (document.getElementById('wf-name')||{value:''}).value.trim();
+    const savedName = wishFormName || localStorage.getItem('playerName') || '';
+    if (savedName) {
+      localStorage.setItem('playerName', savedName);
+      saveGameScore(savedName, s, total);
+    }
+    const hasName = !!savedName;
     body.innerHTML = `<div class="quiz-result">
       <div style="font-size:2rem;margin-bottom:.5rem">${s===total?'🏆':s>total/2?'🌟':'💪'}</div>
       <div style="font-size:1rem;font-weight:500;margin-bottom:.3rem">${msg}</div>
-      <div style="font-size:.82rem;color:rgba(255,255,255,.5)">${s}/${total} ข้อถูก</div>
-      <button class="quiz-next" style="margin-top:.75rem" onclick="startGame()">🔄 เล่นอีกครั้ง</button>
+      <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:.65rem">${s}/${total} ข้อถูก</div>
+      ${hasName
+        ? `<div style="font-size:.78rem;color:rgba(245,200,66,.8);margin-bottom:.5rem">✅ บันทึกคะแนนของ <b>${escHtml(savedName)}</b> แล้ว</div>`
+        : `<div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:.45rem">กรอกชื่อในช่องเขียนคำอวยพรก่อนนะ เพื่อขึ้นกระดานคะแนน</div>`
+      }
+      <button class="quiz-next" onclick="${!hasName?`autoSaveThenRestart();`:'startGame()'}">
+        ${!hasName?'⬇ เลื่อนลงกรอกชื่อ':'🔄 เล่นอีกครั้ง'}
+      </button>
     </div>`;
     return;
   }
@@ -1021,25 +1206,616 @@ function voteWish(wid) {
   const prev = localStorage.getItem('myvote_'+empKey);
   const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
   if (prev === wid) {
-    // Unvote
     votes[wid] = Math.max(0,(votes[wid]||1)-1);
     localStorage.removeItem('myvote_'+empKey);
-    showToast('ยกเลิกไลก์แล้ว');
+    showLikeNotif('💔 ยกเลิกไลก์แล้ว', false);
   } else {
-    // Remove prev vote
     if (prev) votes[prev] = Math.max(0,(votes[prev]||1)-1);
     votes[wid] = (votes[wid]||0)+1;
     localStorage.setItem('myvote_'+empKey, wid);
-    showToast('❤️ ไลก์แล้ว!');
-    fireConfetti();
+    showLikeNotif('❤️ ไลก์คำอวยพรนี้แล้ว!', true);
+    spawnHearts();
   }
   localStorage.setItem('votes_'+empKey, JSON.stringify(votes));
-  // Re-render vote list with updated counts
   const empId = curEmp.code||curEmp.name;
   const ws = localWishes[empId]||[];
   renderVoteList(ws.slice(0,10));
 }
 
+let likeTimer;
+function showLikeNotif(msg, isLike) {
+  const el = document.getElementById('likeNotif');
+  if (!el) return;
+  el.innerHTML = (isLike?'❤️ ':'💔 ') + msg;
+  el.style.borderColor = isLike ? '#ff6b9d' : '#888';
+  el.style.color = isLike ? '#ff6b9d' : 'rgba(255,255,255,.5)';
+  el.style.background = isLike ? 'rgba(255,107,157,.15)' : 'rgba(255,255,255,.05)';
+  el.classList.add('show');
+  clearTimeout(likeTimer);
+  likeTimer = setTimeout(()=>el.classList.remove('show'), 2200);
+}
+
+function spawnHearts() {
+  const colors = ['❤️','💖','💝','💗','🌸'];
+  for (let i=0;i<6;i++) {
+    setTimeout(()=>{
+      const h = document.createElement('div');
+      h.className = 'like-heart-fly';
+      h.textContent = colors[~~(Math.random()*colors.length)];
+      h.style.left = (30+Math.random()*40)+'vw';
+      h.style.bottom = '80px';
+      h.style.animationDelay = Math.random()*0.3+'s';
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), 1400);
+    }, i*80);
+  }
+}
+
+
+// ══════════════════════════════════════════════════
+// CUSTOM QUIZ QUESTIONS (ADMIN)
+// ══════════════════════════════════════════════════
+function getCustomQuestions(empKey) {
+  return JSON.parse(localStorage.getItem('customQ_'+(empKey||''))||'[]');
+}
+function saveCustomQuestions(empKey, qs) {
+  localStorage.setItem('customQ_'+(empKey||''), JSON.stringify(qs));
+}
+
+function renderCustomQList() {
+  const el = document.getElementById('customQList');
+  if (!el) return;
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
+  const qs = getCustomQuestions(empKey);
+  if (!qs.length) {
+    el.innerHTML = '<div style="font-size:.72rem;color:rgba(255,255,255,.25);padding:.25rem">ยังไม่มีคำถามของตัวเอง</div>';
+    return;
+  }
+  el.innerHTML = qs.map((q,i) => `
+    <div class="qe-item">
+      <span class="qe-item-q" title="${q.q}">${i+1}. ${q.q}</span>
+      <button class="qe-del" onclick="deleteCustomQ(${i})" title="ลบ">✕</button>
+    </div>`).join('');
+}
+
+function addCustomQuestion() {
+  const q  = document.getElementById('qeQuestion').value.trim();
+  const o1 = document.getElementById('qeOpt1').value.trim();
+  const o2 = document.getElementById('qeOpt2').value.trim();
+  const o3 = document.getElementById('qeOpt3').value.trim();
+  const o4 = document.getElementById('qeOpt4').value.trim();
+  if (!q || !o1 || !o2) { showToast('กรอกคำถาม + ตัวเลือก 1-2 ก่อนนะ','warn'); return; }
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
+  const opts = [o1, o2, o3, o4].filter(Boolean);
+  const qs = getCustomQuestions(empKey);
+  qs.push({ q, opts, ans: o1 });
+  saveCustomQuestions(empKey, qs);
+  // Clear inputs
+  ['qeQuestion','qeOpt1','qeOpt2','qeOpt3','qeOpt4'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  renderCustomQList();
+  showToast('เพิ่มคำถามแล้ว! ' + qs.length + ' คำถามทั้งหมด');
+}
+
+function deleteCustomQ(idx) {
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
+  const qs = getCustomQuestions(empKey);
+  qs.splice(idx, 1);
+  saveCustomQuestions(empKey, qs);
+  renderCustomQList();
+  showToast('ลบคำถามแล้ว');
+}
+
+// Override generateQuestions to include custom questions
+const _origGenQ = generateQuestions;
+function generateQuestions(emp) {
+  const auto = _origGenQ(emp);
+  const empKey = emp ? (emp.code||emp.name) : '';
+  const custom = getCustomQuestions(empKey).map(q => ({
+    ...q,
+    opts: [...q.opts].sort(()=>Math.random()-.5), // shuffle options
+  }));
+  // Interleave: auto first, then custom, shuffle together
+  const all = [...auto, ...custom].sort(()=>Math.random()-.5);
+  return all;
+}
+
+// customQList rendered inside enterAdmin directly
+
+
+// ══════════════════════════════════════════════════
+// LEADERBOARD
+// ══════════════════════════════════════════════════
+let lbTab = 'game';
+
+function switchLbTab(tab) {
+  lbTab = tab;
+  document.getElementById('lbTabGame').classList.toggle('active', tab==='game');
+  document.getElementById('lbTabLike').classList.toggle('active', tab==='like');
+  renderLeaderboard();
+}
+
+function saveGameScore(playerName, score, total) {
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+  const key = 'lbGame_' + empKey;
+  const board = JSON.parse(localStorage.getItem(key)||'[]');
+  const ts = new Date().toLocaleString('th-TH');
+  const existing = board.find(r=>r.name===playerName);
+  if (existing) {
+    existing.score = Math.max(existing.score||0, score);
+    existing.games = (existing.games||0) + 1;
+    existing.lastScore = score;
+    existing.lastTs = ts;
+  } else {
+    board.push({name:playerName, score, games:1, lastScore:score, lastTs:ts});
+  }
+  board.sort((a,b)=>b.score-a.score);
+  localStorage.setItem(key, JSON.stringify(board.slice(0,50)));
+  renderLeaderboard();
+  renderParticipants();
+  // Show wheel and participants
+  const ps = document.getElementById('partSection');
+  const ws = document.getElementById('wheelSection');
+  if(ps) ps.style.display='block';
+  if(ws) ws.style.display='block';
+  drawWheel();
+}
+
+function renderLeaderboard() {
+  const el = document.getElementById('lbList');
+  if (!el) return;
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+  const medals = ['🥇','🥈','🥉'];
+
+  if (lbTab === 'game') {
+    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+    if (!board.length) {
+      el.innerHTML='<div class="lb-empty">ยังไม่มีคะแนน — เล่นเกมเพื่อขึ้นกระดาน!</div>'; return;
+    }
+    el.innerHTML = board.slice(0,10).map((r,i)=>`
+      <div class="lb-row">
+        <span class="lb-rank">${medals[i]||'#'+(i+1)}</span>
+        <div class="lb-ava">${r.name.substring(0,2)}</div>
+        <div class="lb-name">${escHtml(r.name)}</div>
+        <div class="lb-score">${r.score} แต้ม · ${r.games} รอบ</div>
+      </div>`).join('');
+  } else {
+    // Like leaderboard: who sent most-liked wishes
+    const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
+    const wishes = localWishes[empKey]||[];
+    const senderVotes = {};
+    wishes.forEach(w=>{
+      const wid = String(w.ts||w.timestamp||w.senderName||w.msg);
+      const v = votes[wid]||0;
+      const sender = w.senderName||w.name||'ไม่ระบุ';
+      senderVotes[sender] = (senderVotes[sender]||0) + v;
+    });
+    const sorted = Object.entries(senderVotes).sort((a,b)=>b[1]-a[1]).filter(e=>e[1]>0);
+    if (!sorted.length) {
+      el.innerHTML='<div class="lb-empty">ยังไม่มีคะแนนไลก์ — ส่งคำอวยพรให้คนอื่นโหวต!</div>'; return;
+    }
+    el.innerHTML = sorted.slice(0,10).map(([name,v],i)=>`
+      <div class="lb-row">
+        <span class="lb-rank">${medals[i]||'#'+(i+1)}</span>
+        <div class="lb-ava">${name.substring(0,2)}</div>
+        <div class="lb-name">${escHtml(name)}</div>
+        <div class="lb-score">❤️ ${v} ไลก์</div>
+      </div>`).join('');
+  }
+}
+
+
+function doSaveScore(s, total) {
+  const inp = document.getElementById('lbNameInput');
+  const name = inp ? inp.value.trim() : localStorage.getItem('playerName');
+  if (name) {
+    localStorage.setItem('playerName', name);
+    saveGameScore(name, s, total);
+    showToast('บันทึกคะแนนแล้ว! ดู 🏆 กระดานด้านล่าง');
+  }
+}
+
+function autoSaveThenRestart() {
+  // Scroll to wish form so user fills in name
+  const wf = document.getElementById('wish-form');
+  if (wf) {
+    wf.scrollIntoView({behavior:'smooth', block:'center'});
+    // Highlight the name input
+    const inp = document.getElementById('wf-name');
+    if (inp) {
+      inp.focus();
+      inp.style.borderColor = '#f5c842';
+      inp.placeholder = 'กรอกชื่อที่นี่ก่อนเพื่อขึ้นกระดานคะแนน...';
+      setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ชื่อ-นามสกุล หรือ ชื่อเล่น'; }, 3000);
+    }
+  }
+  showToast('กรอกชื่อในช่อง "เขียนคำอวยพร" ด้านล่างนะครับ');
+}
+
+
+// ══════════════════════════════════════════════════
+// PARTICIPANTS LIST
+// ══════════════════════════════════════════════════
+function renderParticipants() {
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+  const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  const grid = document.getElementById('partGrid');
+  const cnt  = document.getElementById('partCount');
+  if (!grid) return;
+  const ps = document.getElementById('partSection');
+  const ws = document.getElementById('wheelSection');
+  if (!board.length) {
+    if(ps) ps.style.display='none';
+    if(ws) ws.style.display='none';
+    return;
+  }
+  if(ps) ps.style.display='block';
+  if(ws) ws.style.display='block';
+  if(cnt) cnt.textContent = board.length + ' คน';
+  const winner = localStorage.getItem('wheelWinner_'+empKey)||'';
+  grid.innerHTML = board.map(r=>`
+    <div class="part-chip${r.name===winner?' winner':''}">
+      ${r.name===winner?'🏆 ':''}${escHtml(r.name)}
+      <span style="opacity:.5;font-size:.65rem">${r.score}แต้ม</span>
+    </div>`).join('');
+  drawWheel();
+}
+
+// ══════════════════════════════════════════════════
+// WHEEL OF FORTUNE
+// ══════════════════════════════════════════════════
+const WHEEL_COLORS = [
+  '#E94560','#F5A623','#7ED321','#4A90D9','#9B59B6',
+  '#1ABC9C','#E67E22','#E91E63','#00BCD4','#8BC34A',
+  '#FF5722','#3F51B5','#009688','#FF9800','#673AB7'
+];
+let wheelAngle = 0;
+let wheelSpinning = false;
+
+function getWheelNames() {
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+  const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  return board.map(r=>r.name);
+}
+
+function drawWheel(highlightIdx=-1) {
+  const canvas = document.getElementById('wheelCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const names = getWheelNames();
+  if (!names.length) {
+    ctx.clearRect(0,0,260,260);
+    // Draw decorative empty wheel
+    const emptyColors=['#2a1a4e','#3d2a6e','#2a1a5e','#1a2a5e','#2a3a6e','#1a3a4e','#3a2a5e','#2a3a5e'];
+    const emptyLabels=['🎂','🎉','🌟','🎁','🥳','✨','💖','🎊'];
+    const eArc = Math.PI*2/8;
+    for(let i=0;i<8;i++){
+      ctx.beginPath(); ctx.moveTo(130,130);
+      ctx.arc(130,130,120,i*eArc,(i+1)*eArc); ctx.closePath();
+      ctx.fillStyle=emptyColors[i]; ctx.fill();
+      ctx.strokeStyle='rgba(245,200,66,.2)'; ctx.lineWidth=1; ctx.stroke();
+      ctx.save(); ctx.translate(130,130); ctx.rotate(i*eArc+eArc/2);
+      ctx.font='18px sans-serif'; ctx.textAlign='right';
+      ctx.fillText(emptyLabels[i],105,6); ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(130,130,22,0,Math.PI*2);
+    ctx.fillStyle='#0f0c1d'; ctx.fill();
+    ctx.strokeStyle='#f5c842'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='#f5c842'; ctx.font='bold 10px Kanit,sans-serif';
+    ctx.textAlign='center'; ctx.fillText('SML',130,134);
+    // Center text
+    ctx.fillStyle='rgba(255,255,255,.4)'; ctx.font='13px Kanit,sans-serif';
+    ctx.fillText('เลือกพนักงาน',130,180);
+    ctx.font='11px Kanit,sans-serif'; ctx.fillStyle='rgba(255,255,255,.25)';
+    ctx.fillText('แล้วเล่นเกมเพื่อขึ้นวงล้อ',130,198);
+    return;
+  }
+  const n = names.length;
+  const arc = (Math.PI*2)/n;
+  ctx.clearRect(0,0,260,260);
+
+  for (let i=0;i<n;i++) {
+    const start = wheelAngle + i*arc;
+    const end   = start + arc;
+    const color = WHEEL_COLORS[i%WHEEL_COLORS.length];
+    // Sector
+    ctx.beginPath();
+    ctx.moveTo(130,130);
+    ctx.arc(130,130,120,start,end);
+    ctx.closePath();
+    ctx.fillStyle = i===highlightIdx ? '#f5c842' : color;
+    ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,.15)';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+    // Text
+    ctx.save();
+    ctx.translate(130,130);
+    ctx.rotate(start + arc/2);
+    ctx.textAlign='right';
+    ctx.fillStyle='#fff';
+    ctx.font=`${Math.min(13, 200/n)}px Kanit,sans-serif`;
+    ctx.shadowColor='rgba(0,0,0,.5)';
+    ctx.shadowBlur=3;
+    const name = names[i].split(' ')[0]; // first name only
+    const maxLen = Math.floor(100/Math.max(8,name.length));
+    ctx.fillText(name.substring(0,maxLen+(maxLen<name.length?-1:0))+(name.length>maxLen?'…':''), 110, 5);
+    ctx.restore();
+  }
+  // Center circle
+  ctx.beginPath();
+  ctx.arc(130,130,22,0,Math.PI*2);
+  ctx.fillStyle='#1a0a2e';
+  ctx.fill();
+  ctx.strokeStyle='#f5c842';
+  ctx.lineWidth=2;
+  ctx.stroke();
+  ctx.fillStyle='#f5c842';
+  ctx.font='bold 11px Kanit,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('SML',130,134);
+}
+
+function spinWheel() {
+  if (!document.body.classList.contains('admin-mode')) {
+    showToast('เฉพาะ Admin เท่านั้นที่กดหมุนได้ครับ','warn'); return;
+  }
+  const names = getWheelNames();
+  if (!names.length || wheelSpinning) return;
+  wheelSpinning = true;
+  const btn = document.getElementById('wheelSpinBtn');
+  const resEl = document.getElementById('wheelResult');
+  btn.disabled = true;
+  btn.textContent = '🌀 กำลังหมุน...';
+  if(resEl) resEl.textContent = '';
+
+  // Pick random winner
+  const winIdx = Math.floor(Math.random()*names.length);
+  const arc = (Math.PI*2)/names.length;
+  // Calculate target angle: pointer at top = -π/2, sector center at winIdx
+  const targetSectorAngle = -(winIdx * arc + arc/2) - Math.PI/2;
+  const spins = 5 + Math.random()*4; // 5-9 full rotations
+  const totalRot = spins * Math.PI*2 + ((targetSectorAngle - wheelAngle) % (Math.PI*2));
+  const duration = 4500;
+  const startAngle = wheelAngle;
+  const start = performance.now();
+
+  function animate(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed/duration, 1);
+    // Ease out cubic
+    const ease = 1 - Math.pow(1-progress, 3);
+    wheelAngle = startAngle + totalRot * ease;
+    drawWheel();
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      wheelAngle = startAngle + totalRot;
+      drawWheel(winIdx);
+      wheelSpinning = false;
+      btn.disabled = false;
+      btn.textContent = '🎡 หมุนอีกครั้ง!';
+      const winner = names[winIdx];
+      if(resEl) resEl.innerHTML = `🏆 ผู้โชคดีคือ <span style="color:#f5c842;font-weight:600">${escHtml(winner)}</span>!`;
+      // Save winner
+      const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+      localStorage.setItem('wheelWinner_'+empKey, winner);
+      renderParticipants();
+      fireConfetti();
+      showToast('🏆 ผู้โชคดี: ' + winner);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+// ══════════════════════════════════════════════════
+// EXPORT SCORES TO EXCEL
+// ══════════════════════════════════════════════════
+function exportScoresExcel() {
+  if (!document.body.classList.contains('admin-mode')) {
+    showToast('เฉพาะ Admin เท่านั้นครับ','warn'); return;
+  }
+  if (typeof XLSX==='undefined') {
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onload=exportScoresExcel; document.head.appendChild(s); return;
+  }
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+  const empName = curEmp ? curEmp.name : 'ทั้งหมด';
+  const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  const winner = localStorage.getItem('wheelWinner_'+empKey)||'';
+
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: Scores
+  const hdr = [['อันดับ','ชื่อ','คะแนนสูงสุด','จำนวนครั้งที่เล่น','คะแนนล่าสุด','วันที่','ผู้โชคดี']];
+  const rows = board.map((r,i)=>[
+    i+1, r.name, r.score, r.games, r.lastScore||r.score,
+    r.lastTs||'', r.name===winner?'🏆 ผู้โชคดี':''
+  ]);
+  const ws1 = XLSX.utils.aoa_to_sheet([...hdr,...rows]);
+  ws1['!cols']=[{wch:6},{wch:24},{wch:14},{wch:16},{wch:14},{wch:20},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws1,'คะแนนเกม');
+
+  // Sheet 2: Summary
+  const summary = [
+    ['เกมวันเกิด','คุณเป็นแฟนพันธุ์แท้ของ '+empName+' หรือไม่?'],
+    ['จำนวนผู้เข้าร่วม',board.length],
+    ['ผู้โชคดี (วงล้อ)',winner||'ยังไม่ได้สุ่ม'],
+    ['คะแนนสูงสุด',board[0]?board[0].score:'—'],
+    ['ผู้ชนะ',board[0]?board[0].name:'—'],
+  ];
+  const ws2 = XLSX.utils.aoa_to_sheet(summary);
+  ws2['!cols']=[{wch:20},{wch:40}];
+  XLSX.utils.book_append_sheet(wb,ws2,'สรุป');
+
+  const fname = 'SML_Game_Score_'+empName.replace(/\s+/g,'_')+'_'+new Date().toLocaleDateString('th-TH').replace(/\//g,'-')+'.xlsx';
+  XLSX.writeFile(wb, fname);
+  showToast('Export คะแนนสำเร็จ!');
+}
+
+
+// ══════════════════════════════════════════════════
+// ADMIN AUTH & SETTINGS
+// ══════════════════════════════════════════════════
+function getMasterKey(){
+  let mk = localStorage.getItem('adminMasterKey');
+  if (!mk) {
+    // Generate random 8-char key on first use
+    mk = Math.random().toString(36).substring(2,6).toUpperCase() +
+         Math.random().toString(36).substring(2,6).toUpperCase();
+    localStorage.setItem('adminMasterKey', mk);
+  }
+  return mk;
+}
+
+function showAdminLoginModal(){
+  const m = document.getElementById('loginModal');
+  if(m){ m.style.display='flex'; setTimeout(()=>document.getElementById('loginPassInput').focus(),100); }
+}
+
+function doLogin(){
+  const inp = document.getElementById('loginPassInput');
+  if(!inp) return;
+  const pw = inp.value;
+  if(pw === getAdminPass() || pw === getMasterKey()){
+    inp.value='';
+    document.getElementById('loginModal').style.display='none';
+    enterAdmin();
+  } else {
+    inp.style.borderColor='#ff6b9d';
+    inp.value='';
+    inp.placeholder='รหัสไม่ถูกต้อง ลองใหม่...';
+    setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ใส่รหัส Admin...'; },2000);
+    showToast('รหัสไม่ถูกต้องครับ','warn');
+  }
+}
+
+function showAdminSettings(){
+  const m = document.getElementById('settingsModal');
+  if(m){ m.style.display='flex'; }
+  // Clear fields
+  ['settOldPass','settNewPass','settConfPass'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  const sm = document.getElementById('settSuccessMsg');
+  if(sm) sm.style.display='none';
+  const mkd = document.getElementById('masterKeyDisplay');
+  if(mkd) mkd.textContent='••••••••';
+}
+
+function changePassword(){
+  const old   = (document.getElementById('settOldPass')||{value:''}).value;
+  const nw    = (document.getElementById('settNewPass')||{value:''}).value;
+  const conf  = (document.getElementById('settConfPass')||{value:''}).value;
+  const sm    = document.getElementById('settSuccessMsg');
+
+  if(old !== getAdminPass() && old !== getMasterKey()){
+    showToast('รหัสเดิมไม่ถูกต้อง','warn'); return;
+  }
+  if(nw.length < 4){ showToast('รหัสใหม่ต้องมีอย่างน้อย 4 ตัว','warn'); return; }
+  if(nw !== conf){ showToast('รหัสยืนยันไม่ตรงกัน','warn'); return; }
+
+  setAdminPass(nw);
+  ['settOldPass','settNewPass','settConfPass'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  if(sm){ sm.style.display='block'; setTimeout(()=>sm.style.display='none',3000); }
+  showToast('เปลี่ยนรหัสผ่านสำเร็จ!');
+}
+
+function showMasterKey(){
+  const mk = getMasterKey();
+  const el = document.getElementById('masterKeyDisplay');
+  if(el){
+    if(el.textContent==='••••••••'){
+      el.textContent = mk;
+      showToast('Master Key: ' + mk + ' — จำไว้ด้วยนะครับ');
+    } else {
+      el.textContent='••••••••';
+    }
+  }
+}
+
+function showForgotPass(){
+  document.getElementById('loginModal').style.display='none';
+  const m = document.getElementById('forgotModal');
+  if(m){ m.style.display='flex'; setTimeout(()=>document.getElementById('forgotMasterKey').focus(),100); }
+}
+
+function resetWithMasterKey(){
+  const mk  = (document.getElementById('forgotMasterKey')||{value:''}).value;
+  const nw  = (document.getElementById('forgotNewPass')||{value:''}).value;
+  if(mk !== getMasterKey()){ showToast('Master Key ไม่ถูกต้อง','warn'); return; }
+  if(nw.length < 4){ showToast('รหัสใหม่ต้องมีอย่างน้อย 4 ตัว','warn'); return; }
+  setAdminPass(nw);
+  document.getElementById('forgotModal').style.display='none';
+  showToast('รีเซ็ตรหัสผ่านสำเร็จ! รหัสใหม่: ' + nw);
+  // Auto open login modal
+  setTimeout(showAdminLoginModal, 1000);
+}
+
 </script>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">🔐 เข้าสู่ระบบ Admin</div>
+    <div>
+      <div class="modal-label" style="margin-bottom:.3rem">รหัสผ่าน</div>
+      <input class="modal-input" id="loginPassInput" type="password" placeholder="ใส่รหัส Admin..."
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="modal-row">
+      <button class="modal-btn-ghost" onclick="document.getElementById('loginModal').style.display='none'">ยกเลิก</button>
+      <button class="modal-btn-primary" onclick="doLogin()">เข้าสู่ระบบ</button>
+    </div>
+    <div class="modal-sep"></div>
+    <button class="modal-danger" onclick="showForgotPass()">🔑 ลืมรหัสผ่าน / รีเซ็ต</button>
+  </div>
+</div>
+
+<!-- ADMIN SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">⚙️ ตั้งค่า Admin</div>
+    <div>
+      <div class="modal-label" style="margin-bottom:.3rem">เปลี่ยนรหัสผ่าน</div>
+      <input class="modal-input" id="settOldPass" type="password" placeholder="รหัสเดิม" style="margin-bottom:.4rem">
+      <input class="modal-input" id="settNewPass" type="password" placeholder="รหัสใหม่ (อย่างน้อย 4 ตัว)" style="margin-bottom:.4rem">
+      <input class="modal-input" id="settConfPass" type="password" placeholder="ยืนยันรหัสใหม่">
+    </div>
+    <button class="modal-btn-primary" onclick="changePassword()">💾 บันทึกรหัสใหม่</button>
+    <div class="modal-success-msg" id="settSuccessMsg">✅ เปลี่ยนรหัสสำเร็จ!</div>
+    <div class="modal-sep"></div>
+    <div class="modal-label" style="margin-bottom:.3rem">รหัสสำรอง (Master Key)</div>
+    <div style="font-size:.72rem;color:rgba(255,255,255,.35);line-height:1.6;margin-bottom:.4rem">
+      ใช้เข้าได้เสมอแม้ลืมรหัสหลัก — เก็บไว้ในที่ปลอดภัย<br>
+      <span style="color:var(--gold);font-weight:500;letter-spacing:.08em" id="masterKeyDisplay">••••••••</span>
+    </div>
+    <button class="modal-btn-ghost" onclick="showMasterKey()" style="font-size:.78rem">👁 แสดง / สร้าง Master Key</button>
+    <div class="modal-sep"></div>
+    <button class="modal-btn-ghost" onclick="document.getElementById('settingsModal').style.display='none'">ปิด</button>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-overlay" id="forgotModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">🔑 รีเซ็ตรหัสผ่าน</div>
+    <div style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.6">
+      ใส่ <b style="color:var(--gold)">Master Key</b> เพื่อตั้งรหัสใหม่<br>
+      <span style="font-size:.7rem">(ดู Master Key ได้ที่ ⚙️ ตั้งค่า → เข้า Admin ก่อน)</span>
+    </div>
+    <input class="modal-input" id="forgotMasterKey" type="password" placeholder="Master Key">
+    <input class="modal-input" id="forgotNewPass" type="password" placeholder="รหัสผ่านใหม่">
+    <div class="modal-row">
+      <button class="modal-btn-ghost" onclick="document.getElementById('forgotModal').style.display='none'">ยกเลิก</button>
+      <button class="modal-btn-primary" onclick="resetWithMasterKey()">รีเซ็ต</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
