@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>SML Birthday Wishes</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Dancing+Script:wght@700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --deep:#0f0c1d;--card:rgba(255,255,255,0.06);--gold:#f5c842;
+  --rose:#ff6b9d;--mint:#00e5cc;--purple:#a78bfa;
+  --text:#fff;--sub:rgba(255,255,255,0.55);--border:rgba(255,255,255,0.1)
+}
+html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:'Kanit',sans-serif;overflow-x:hidden}
+/* BG */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;animation:drift 12s ease-in-out infinite alternate}
+.bb1{width:500px;height:500px;background:radial-gradient(#6c3fa0,transparent);top:-100px;left:-100px;animation-delay:0s}
+.bb2{width:400px;height:400px;background:radial-gradient(#1a4a6e,transparent);bottom:-50px;right:-50px;animation-delay:-5s}
+.bb3{width:300px;height:300px;background:radial-gradient(#6e1a3a,transparent);top:40%;left:40%;animation-delay:-9s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.1)}}
+/* PARTICLES */
+.particles{position:fixed;inset:0;z-index:1;pointer-events:none}
+/* LAYOUT */
+.container{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:1.5rem 1rem 4rem}
+/* HEADER */
+.hero{text-align:center;padding:2.5rem 1rem 2rem;position:relative}
+.hero-tag{font-size:.7rem;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:.5rem;opacity:.8}
+.hero-name{font-family:'Dancing Script',cursive;font-size:3.2rem;font-weight:700;color:#fff;line-height:1.1;text-shadow:0 0 40px rgba(245,200,66,.4)}
+.hero-pos{font-size:.85rem;color:var(--sub);margin-top:.25rem;font-weight:300}
+.hero-date{display:inline-flex;align-items:center;gap:.4rem;margin-top:.75rem;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.2);border-radius:20px;padding:.3rem .9rem;font-size:.78rem;color:var(--gold)}
+.wish-counter{display:flex;align-items:center;justify-content:center;gap:.4rem;margin-top:1rem;font-size:.82rem;color:var(--sub)}
+.wish-count-num{font-size:1.4rem;font-weight:600;color:var(--gold)}
+/* PERSON SELECTOR */
+.person-selector{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
+.person-selector-label{font-size:.7rem;color:var(--sub);letter-spacing:.1em;text-transform:uppercase}
+.month-tabs{display:flex;gap:.35rem;flex-wrap:wrap}
+.mtab{padding:.32rem .7rem;border-radius:16px;border:1px solid var(--border);background:transparent;color:rgba(255,255,255,.45);font-family:'Kanit',sans-serif;font-size:.75rem;cursor:pointer;transition:all .15s}
+.mtab:hover,.mtab.active{background:rgba(245,200,66,.15);border-color:var(--gold);color:var(--gold)}
+.person-chips{display:flex;gap:.4rem;flex-wrap:wrap;min-height:36px}
+.pchip{padding:.3rem .85rem;border-radius:20px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-family:'Kanit',sans-serif;font-size:.78rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.35rem}
+.pchip:hover{border-color:var(--rose);color:var(--rose)}
+.pchip.active{background:rgba(255,107,157,.15);border-color:var(--rose);color:var(--rose);font-weight:500}
+.pchip-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+/* WISH FORM */
+.wish-form{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:20px;padding:1.5rem;margin-bottom:1.5rem;transition:border-color .3s}
+.wish-form:focus-within{border-color:rgba(245,200,66,.3)}
+.form-title{font-size:.95rem;font-weight:500;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:.4rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.65rem}
+.form-row-full{margin-bottom:.65rem}
+.field-label{font-size:.68rem;color:var(--sub);margin-bottom:.22rem;letter-spacing:.04em}
+.field-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:.55rem .8rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s}
+.field-input:focus{border-color:rgba(245,200,66,.45)}
+.field-textarea{height:90px;resize:none;line-height:1.6}
+.emoji-row{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.75rem}
+.emoji-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.05);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.emoji-btn:hover{background:rgba(255,255,255,.12);transform:scale(1.15)}
+.send-btn{width:100%;padding:.7rem;background:linear-gradient(135deg,#f5c842,#f7a621);border:none;border-radius:12px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;letter-spacing:.02em}
+.send-btn:hover{opacity:.92}
+.send-btn:active{transform:scale(.98)}
+.send-btn:disabled{opacity:.5;cursor:not-allowed}
+.success-msg{display:none;text-align:center;color:var(--mint);font-size:.85rem;margin-top:.65rem;animation:fadeIn .4s}
+.success-msg.show{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+/* API CONFIG */
+.api-bar{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;margin-bottom:1.25rem;display:flex;gap:.5rem;align-items:center}
+.api-bar input{flex:1;background:transparent;border:none;color:rgba(255,255,255,.6);font-family:'Kanit',sans-serif;font-size:.75rem;outline:none}
+.api-bar input::placeholder{color:rgba(255,255,255,.25)}
+.api-status{font-size:.65rem;padding:.22rem .6rem;border-radius:20px;flex-shrink:0}
+.api-ok{background:rgba(0,229,204,.15);color:var(--mint)}
+.api-err{background:rgba(255,107,157,.15);color:var(--rose)}
+.api-pending{background:rgba(245,200,66,.15);color:var(--gold)}
+/* WISH WALL */
+.wall-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.wall-title{font-size:1.05rem;font-weight:500;color:#fff}
+.wall-refresh{background:none;border:1px solid var(--border);border-radius:8px;color:var(--sub);font-family:'Kanit',sans-serif;font-size:.72rem;padding:.3rem .65rem;cursor:pointer;transition:all .2s}
+.wall-refresh:hover{border-color:var(--gold);color:var(--gold)}
+.wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.75rem}
+.wish-card{background:var(--card);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:16px;padding:1.1rem;position:relative;overflow:hidden;animation:cardIn .4s ease both}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.wish-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.wc-0::before{background:linear-gradient(90deg,var(--gold),#f7a621)}
+.wc-1::before{background:linear-gradient(90deg,var(--rose),#ff9f7a)}
+.wc-2::before{background:linear-gradient(90deg,var(--mint),#00b4d8)}
+.wc-3::before{background:linear-gradient(90deg,var(--purple),#818cf8)}
+.wc-4::before{background:linear-gradient(90deg,#34d399,#059669)}
+.wc-5::before{background:linear-gradient(90deg,#f472b6,#ec4899)}
+.wish-emoji{font-size:1.6rem;margin-bottom:.4rem}
+.wish-msg{font-size:.85rem;font-weight:300;color:rgba(255,255,255,.85);line-height:1.65;margin-bottom:.65rem;word-break:break-word}
+.wish-from{font-size:.7rem;color:var(--sub);display:flex;align-items:center;gap:.3rem}
+.wish-from-name{color:var(--gold);font-weight:500}
+.wish-ts{margin-left:auto;font-size:.62rem;opacity:.4}
+.wish-empty{text-align:center;padding:3rem 1rem;color:var(--sub)}
+.wish-empty-icon{font-size:2.5rem;margin-bottom:.6rem}
+/* OFFLINE INDICATOR */
+.offline-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(90deg,#92400e,#78350f);padding:.5rem 1rem;text-align:center;font-size:.8rem}
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(120px);background:rgba(0,229,204,.15);border:1px solid var(--mint);border-radius:30px;padding:.55rem 1.4rem;font-size:.82rem;color:var(--mint);transition:transform .35s cubic-bezier(.34,1.56,.64,1);z-index:999;backdrop-filter:blur(10px)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+/* CONFETTI */
+.confetti-piece{position:fixed;pointer-events:none;z-index:999;width:8px;height:8px;border-radius:2px;animation:confettiFall 2.5s ease forwards}
+@keyframes confettiFall{0%{opacity:1;transform:translate(0,0) rotate(0deg)}100%{opacity:0;transform:translate(var(--dx),100vh) rotate(720deg)}}
+/* MOBILE */
+@media(max-width:600px){
+  .form-row{grid-template-columns:1fr}
+  .hero-name{font-size:2.4rem}
+  .wish-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="bg">
+  <div class="bg-blob bb1"></div>
+  <div class="bg-blob bb2"></div>
+  <div class="bg-blob bb3"></div>
+</div>
+<div class="particles" id="particles"></div>
+<div class="offline-banner" id="offline-banner">⚠️ ออฟไลน์ — คำอวยพรจะบันทึกในเครื่องและส่งเมื่อออนไลน์</div>
+
+<div class="container">
+
+  <!-- API CONFIG -->
+  <div class="api-bar" id="apiBar">
+    <span style="font-size:.68rem;color:rgba(255,255,255,.35);flex-shrink:0">Google Script URL:</span>
+    <input id="apiUrl" type="text" placeholder="วาง URL จาก Google Apps Script ที่นี่..." oninput="saveApiUrl()">
+    <span class="api-status api-pending" id="apiStatus">ยังไม่ได้ตั้งค่า</span>
+    <button onclick="testApi()" style="background:none;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.5);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.25rem .55rem;cursor:pointer">ทดสอบ</button>
+  </div>
+
+  <!-- PERSON SELECTOR -->
+  <div class="person-selector">
+    <div class="person-selector-label">เลือกเดือนเกิด</div>
+    <div class="month-tabs" id="monthTabs"></div>
+    <div class="person-selector-label" style="margin-top:.25rem">เลือกพนักงานเจ้าของวันเกิด</div>
+    <div class="person-chips" id="personChips"><div style="font-size:.78rem;color:rgba(255,255,255,.3)">เลือกเดือนก่อน</div></div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero" id="hero">
+    <div class="hero-tag">🎂 Happy Birthday</div>
+    <div class="hero-name" id="hero-name">เลือกพนักงาน</div>
+    <div class="hero-pos" id="hero-pos">—</div>
+    <div class="hero-date" id="hero-date"><span>📅</span><span>เกิดวันที่</span></div>
+    <div class="wish-counter">
+      <span>คำอวยพรทั้งหมด</span>
+      <span class="wish-count-num" id="wish-count">0</span>
+      <span>ข้อความ</span>
+    </div>
+  </div>
+
+  <!-- WISH FORM -->
+  <div class="wish-form" id="wish-form">
+    <div class="form-title">✍️ เขียนคำอวยพร</div>
+    <div class="form-row">
+      <div>
+        <div class="field-label">ชื่อของคุณ *</div>
+        <input class="field-input" id="wf-name" placeholder="ชื่อ-นามสกุล หรือ ชื่อเล่น" maxlength="50">
+      </div>
+      <div>
+        <div class="field-label">แผนก / ทีม</div>
+        <input class="field-input" id="wf-dept" placeholder="เช่น PDI, HR&GA, Yard...">
+      </div>
+    </div>
+    <div class="form-row-full">
+      <div class="field-label">คำอวยพร *</div>
+      <textarea class="field-input field-textarea" id="wf-text" placeholder="เขียนคำอวยพรให้เพื่อนร่วมงาน..."></textarea>
+    </div>
+    <div class="emoji-row" id="emojiRow"></div>
+    <button class="send-btn" id="send-btn" onclick="submitWish()">🎊 ส่งคำอวยพร!</button>
+    <div class="success-msg" id="success-msg">🎉 ส่งคำอวยพรสำเร็จแล้ว! ขอบคุณนะ ❤️</div>
+  </div>
+
+  <!-- WISH WALL -->
+  <div>
+    <div class="wall-header">
+      <div class="wall-title">💌 กำแพงคำอวยพร</div>
+      <button class="wall-refresh" onclick="loadWishes()">🔄 รีเฟรช</button>
+    </div>
+    <div class="wish-grid" id="wish-grid">
+      <div class="wish-empty"><div class="wish-empty-icon">💭</div><div>ยังไม่มีคำอวยพร<br><span style="font-size:.75rem">เป็นคนแรกที่ส่งคำอวยพร!</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MTH=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const EMOJIS=['🎉','🌟','💖','🎂','🥳','🌈','✨','🎁','🍀','🏆','🌺','💐','🦋','⭐'];
+let calPersons = [
+  {code:'90245',name:'ประจักษ์ แก้วหานาม',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:23,month:0},
+  {code:'90308',name:'สกุล พรมมี',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:29,month:0},
+  {code:'90576',name:'อานนท์ โสธรรมมงคล',pos:'พนักงานปรับแต่ง',faction:'Accessories Installetion',day:24,month:0},
+  {code:'90954',name:'วิรัตน์ สมศรี',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:5,month:0},
+  {code:'91038',name:'เสรี คะรัมย์',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:13,month:0},
+  {code:'91115',name:'ชาญวิทย์ ฤทธิ์สยาม',pos:'พนักงานติดตั้งอุปกรณ์',faction:'Accessories Installetion',day:21,month:0},
+  {code:'90239',name:'กิตติกา จันทร์สายทอง',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:5,month:1},
+  {code:'90615',name:'ประธาน แช่มโชติ',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:19,month:1},
+  {code:'90638',name:'รังสรรค์ แจ่มประเสริฐ',pos:'หัวหน้าหน่วยล้างรถใหม่',faction:'PDI Operation',day:21,month:1},
+  {code:'91021',name:'โชสิญา ดานเรือง',pos:'ผู้ช่วย้จัดการส่วน HR&GA',faction:'HR&GA',day:2,month:1},
+  {code:'90057',name:'ทวี กัณหา',pos:'เจ้าหน้าที่เคลม',faction:'Accessories Installetion',day:8,month:2},
+  {code:'90841',name:'สัมพันธ์ สำนวน',pos:'หัวหน้ากลุ่มงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:26,month:2},
+  {code:'91100',name:'วิระพงษ์ กิระหัด',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:27,month:2},
+  {code:'91112',name:'กุหลาบ กองทอง',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:28,month:2},
+  {code:'90040',name:'ภูวดล ปาราลิตร์',pos:'พนักงานธุรการทั่วไป',faction:'HR&GA',day:2,month:3},
+  {code:'90258',name:'นาเรณ มูฮำหมัด',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:17,month:3},
+  {code:'90566',name:'ยืนยง กันหา',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:24,month:3},
+  {code:'90715',name:'ณธีพัฒน์ รัตนอธิพัฒน์',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:5,month:3},
+  {code:'90835',name:'คำภา ปานิสัย',pos:'เจ้าหน้าที่สโตร์',faction:'Accessories Installetion',day:24,month:3},
+  {code:'91059',name:'ปัทมา เห็มบุตร',pos:'เจ้าหน้าที่บัญชี',faction:'บัญชีและการเงิน',day:16,month:3},
+  {code:'91079',name:'ณัฐวุฒิ เลิศวงษ์วรรณ',pos:'ผู้ช่วยผู้จัดการส่วน Yrad Control',faction:'Yard Operation',day:30,month:3},
+  {code:'91116',name:'คณิน บุญอยู่',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:5,month:3},
+  {code:'90354',name:'นำพล เล็กใจกล้า',pos:'เจ้าหน้าที่จัดซื้อ',faction:'HR&GA',day:31,month:4},
+  {code:'90439',name:'ปุณยนุช ม่วงศรี',pos:'ผู้ช่วยผู้จัดการส่วนบัญชีและการเงิน',faction:'บัญชีและการเงิน',day:19,month:4},
+  {code:'90713',name:'บุญเลี้ยง เหมภูมิ',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:3,month:4},
+  {code:'90939',name:'สุรกิจ ตันกุล',pos:'ผู้จัดกรส่วนอาวุโส',faction:'PC&PDI Operation',day:21,month:4},
+  {code:'90459',name:'ดนุพล วังใจ',pos:'หัวหน้าหน่วยติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:15,month:5},
+  {code:'90495',name:'บุญช่วย เนียมมาก',pos:'พนักงานอาวุโสเทียบเท่าหัวหน้างาน(Final Judgement)',faction:'PDI Operation',day:24,month:5},
+  {code:'90570',name:'ชาญณรงค์ ดวงสิน',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:3,month:5},
+  {code:'91010',name:'โสภา สุดตาภักดี',pos:'เจ้าหน้าที่บัญชีทรัพย์สิน',faction:'บัญชีและการเงิน',day:18,month:5},
+  {code:'91146',name:'อลงกรณ์ สัตยาคุณ',pos:'เจ้าหน้าที่เคลม',faction:'Accessories Installetion',day:9,month:5},
+  {code:'90714',name:'วัชรินทร์ จันทำ',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:24,month:6},
+  {code:'91155',name:'สุนิษา เกษพิจิตร',pos:'จป.วิชาชีพ',faction:'HR&GA',day:5,month:6},
+  {code:'91147',name:'ณัฐวิช เลิศวงษ์วรรณ',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:3,month:7},
+  {code:'91152',name:'วิวัฒน์ ตันติวีรกุล',pos:'ผู้จัดการส่วน Accessories Installetion',faction:'Accessories Installetion',day:15,month:7},
+  {code:'90352',name:'อาทิตย์ ภูแล่นคู่',pos:'หัวหน้าหน่วยตรวจสอบรถใหม่',faction:'PDI Operation',day:15,month:8},
+  {code:'90498',name:'อำนาจ ศุลญลา',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:23,month:8},
+  {code:'90526',name:'ยศศักดิ์ ทัศนพงษ์',pos:'เจ้าหน้าที่ IT',faction:'HR&GA',day:24,month:8},
+  {code:'91064',name:'วิภาวดี โตประดิษฐ์',pos:'หัวหน้าแผนก Yard Operation',faction:'Yard Operation',day:30,month:8},
+  {code:'91118',name:'อดิเรก บัวจันทร์',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:18,month:8},
+  {code:'90368',name:'ฤทธิรงค์ อุปถัมภ์',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:26,month:9},
+  {code:'90986',name:'พรรณเชษฐ์ นครรัตน์',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:26,month:9},
+  {code:'90325',name:'ระวิ จันทโรทัย',pos:'หัวหน้าแผนก PDI Operation',faction:'PDI Operation',day:7,month:10},
+  {code:'90696',name:'ดลลดา ใจแก้ว',pos:'เจ้าหน้าที่สรรหา',faction:'HR&GA',day:6,month:10},
+  {code:'90722',name:'ธนโชติ โพธิ์ใต้',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:23,month:10},
+  {code:'91068',name:'วราภรณ์ ใสสม',pos:'หัวหน้าหน่วย Yard Control',faction:'Yard Operation',day:3,month:10},
+  {code:'90179',name:'ณุชัย หาญรักษ์',pos:'หัวหน้าหน่วยปรับแต่ง',faction:'PDI Operation',day:28,month:11},
+  {code:'90934',name:'เชิดชัย มิกขุนทด',pos:'ผู้ช่วยกรมการผู้จัดการ',faction:'-',day:17,month:11},
+  {code:'91133',name:'กฤษณะ เหลืองมิวาย',pos:'เจ้าหน้าที่สโตร์(Accessories)',faction:'Accessories Installetion',day:24,month:11},
+];
+
+let curEmp = null;
+let selMonth = -1;
+let localWishes = JSON.parse(localStorage.getItem('sml_wishes') || '{}');
+let pendingQueue = JSON.parse(localStorage.getItem('sml_pending') || '[]');
+
+// ─── API ───────────────────────────────────────────────────
+function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim(); }
+function saveApiUrl(){
+  const url = document.getElementById('apiUrl').value.trim();
+  localStorage.setItem('sml_api_url', url);
+  setApiStatus('pending','ยังไม่ได้ทดสอบ');
+}
+function setApiStatus(type, text){
+  const el = document.getElementById('apiStatus');
+  el.className = 'api-status api-'+type;
+  el.textContent = text;
+}
+async function testApi(){
+  const url = getApiUrl();
+  if(!url){setApiStatus('err','ยังไม่ได้ใส่ URL');return;}
+  setApiStatus('pending','กำลังทดสอบ...');
+  try{
+    const r = await fetch(url+'?action=ping');
+    const d = await r.json();
+    if(d.ok) setApiStatus('ok','✅ เชื่อมต่อแล้ว');
+    else setApiStatus('err','ตอบกลับผิดปกติ');
+  }catch(e){setApiStatus('err','❌ เชื่อมต่อไม่ได้');}
+}
+async function apiGet(params){
+  const url = getApiUrl();
+  if(!url) return null;
+  const qs = Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+  try{ const r=await fetch(url+'?'+qs); return await r.json(); }
+  catch{ return null; }
+}
+async function apiPost(body){
+  const url = getApiUrl();
+  if(!url) return null;
+  try{
+    const r=await fetch(url,{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'application/json'}});
+    return await r.json();
+  }catch{ return null; }
+}
+
+// ─── PARTICLES ───────────────────────────────────────────
+(function(){
+  const c=['#f5c842','#ff6b9d','#00e5cc','#a78bfa','#f97316'];
+  const pc=document.getElementById('particles');
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');p.className='particle';
+    const s=Math.random()*5+3;
+    p.style.cssText=`position:absolute;border-radius:50%;width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${c[~~(Math.random()*c.length)]};animation:float ${Math.random()*15+10}s linear infinite;animation-delay:${Math.random()*10}s;opacity:0`;
+    pc.appendChild(p);
+  }
+  // Add float animation
+  const style=document.createElement('style');
+  style.textContent='@keyframes float{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh) rotate(720deg);opacity:0}}';
+  document.head.appendChild(style);
+})();
+
+// ─── EMOJI ROW ───────────────────────────────────────────
+(function(){
+  const row=document.getElementById('emojiRow');
+  ['🎉','🌟','💖','🎂','🥳','🌈','✨','🎁','🍀','🏆','💪','❤️','🙏','😊'].forEach(e=>{
+    const btn=document.createElement('button');btn.className='emoji-btn';btn.textContent=e;
+    btn.onclick=()=>{const ta=document.getElementById('wf-text');ta.value+=e;ta.focus();};
+    row.appendChild(btn);
+  });
+})();
+
+// ─── MONTH TABS ──────────────────────────────────────────
+function buildMonthTabs(){
+  document.getElementById('monthTabs').innerHTML=MTH.map((m,i)=>
+    `<button class="mtab${i===selMonth?' active':''}" onclick="selectMonth(${i})">${m.substring(0,3)}</button>`
+  ).join('');
+}
+function selectMonth(mi){
+  selMonth=mi;buildMonthTabs();
+  const list=calPersons.filter(p=>p.month===mi);
+  const chips=document.getElementById('personChips');
+  if(!list.length){chips.innerHTML='<div style="font-size:.78rem;color:rgba(255,255,255,.3)">ไม่มีพนักงานเกิดเดือนนี้</div>';return;}
+  chips.innerHTML=list.map((p,i)=>
+    `<div class="pchip${curEmp&&curEmp.code===p.code?' active':''}" onclick="selectPerson('${p.code}')">
+      <span class="pchip-dot"></span>คุณ${p.name.split(' ')[0]}
+    </div>`
+  ).join('');
+  if(!curEmp) selectPerson(list[0].code);
+}
+function selectPerson(code){
+  curEmp=calPersons.find(p=>p.code===code)||null;
+  if(!curEmp)return;
+  // Update chips
+  document.querySelectorAll('.pchip').forEach(c=>{
+    c.classList.toggle('active', c.textContent.includes(curEmp.name.split(' ')[0]));
+  });
+  // Update hero
+  document.getElementById('hero-name').textContent='คุณ'+curEmp.name;
+  document.getElementById('hero-pos').textContent=(curEmp.pos||'')+(curEmp.faction?' | '+curEmp.faction:'')+(curEmp.code?' | รหัส '+curEmp.code:'');
+  document.getElementById('hero-date').innerHTML=`<span>📅</span><span>เกิดวันที่ ${curEmp.day} ${MTH[curEmp.month]}</span>`;
+  loadWishes();
+}
+
+// ─── WISHES ──────────────────────────────────────────────
+async function loadWishes(){
+  if(!curEmp)return;
+  const empId=curEmp.code||curEmp.name;
+  // Try API first
+  const remote=await apiGet({action:'getWishes',empId});
+  let wishes;
+  if(remote&&Array.isArray(remote)){
+    wishes=remote;
+    // merge local pending
+    localWishes[empId]=wishes;
+    localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
+  } else {
+    wishes=localWishes[empId]||[];
+  }
+  renderWishes(wishes);
+  document.getElementById('wish-count').textContent=wishes.length;
+}
+function renderWishes(wishes){
+  const grid=document.getElementById('wish-grid');
+  if(!wishes.length){
+    grid.innerHTML='<div class="wish-empty"><div class="wish-empty-icon">💭</div><div>ยังไม่มีคำอวยพร<br><span style="font-size:.75rem">เป็นคนแรกที่ส่งคำอวยพร!</span></div></div>';
+    return;
+  }
+  grid.innerHTML=wishes.map((w,i)=>`
+    <div class="wish-card wc-${i%6}" style="animation-delay:${i*0.05}s">
+      <div class="wish-emoji">${w.emoji||'🎉'}</div>
+      <div class="wish-msg">${escHtml(w.msg||w.message||'')}</div>
+      <div class="wish-from">
+        <span class="wish-from-name">${escHtml(w.senderName||w.name||'ไม่ระบุชื่อ')}</span>
+        <span>· ${escHtml(w.senderDept||w.dept||'ทีมงาน')}</span>
+        <span class="wish-ts">${w.ts||w.timestamp||''}</span>
+      </div>
+    </div>`).join('');
+}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ─── SUBMIT ──────────────────────────────────────────────
+async function submitWish(){
+  if(!curEmp){showToast('กรุณาเลือกพนักงานก่อนครับ');return;}
+  const name=document.getElementById('wf-name').value.trim();
+  const dept=document.getElementById('wf-dept').value.trim();
+  const text=document.getElementById('wf-text').value.trim();
+  if(!name){shake('wf-name');return;}
+  if(!text){shake('wf-text');return;}
+
+  const empId=curEmp.code||curEmp.name;
+  const wish={
+    action:'addWish', empId, empName:curEmp.name,
+    senderName:name, senderDept:dept||'ทีมงาน', msg:text,
+    emoji:EMOJIS[~~(Math.random()*EMOJIS.length)],
+    ts:new Date().toLocaleString('th-TH')
+  };
+
+  const btn=document.getElementById('send-btn');
+  btn.disabled=true;btn.textContent='⏳ กำลังส่ง...';
+
+  // Save locally first
+  if(!localWishes[empId])localWishes[empId]=[];
+  const localWish={...wish};
+  localWishes[empId].unshift(localWish);
+  localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
+
+  // Try API
+  const result=await apiPost(wish);
+  if(!result||result.error){
+    // Queue for later
+    pendingQueue.push(wish);
+    localStorage.setItem('sml_pending',JSON.stringify(pendingQueue));
+    showToast('💾 บันทึกในเครื่องแล้ว (จะส่งเมื่อออนไลน์)','warn');
+  } else {
+    showToast('🎉 ส่งคำอวยพรสำเร็จ!');
+    fireConfetti();
+  }
+
+  // UI
+  document.getElementById('wf-name').value='';
+  document.getElementById('wf-dept').value='';
+  document.getElementById('wf-text').value='';
+  const succ=document.getElementById('success-msg');
+  succ.classList.add('show');
+  setTimeout(()=>{succ.classList.remove('show');btn.disabled=false;btn.textContent='🎊 ส่งคำอวยพร!';},3500);
+  loadWishes();
+}
+
+function shake(id){
+  const el=document.getElementById(id);
+  el.style.animation='';el.style.borderColor='var(--rose)';
+  el.style.animation='shake .4s';
+  const style=document.getElementById('shakeStyle')||document.createElement('style');
+  style.id='shakeStyle';style.textContent='@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}';
+  document.head.appendChild(style);
+  setTimeout(()=>{el.style.borderColor='';el.style.animation='';},500);
+}
+
+// ─── CONFETTI ────────────────────────────────────────────
+function fireConfetti(){
+  const colors=['#f5c842','#ff6b9d','#00e5cc','#a78bfa','#f97316','#34d399'];
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');p.className='confetti-piece';
+    p.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[~~(Math.random()*colors.length)]};transform:rotate(${Math.random()*360}deg);--dx:${(Math.random()-0.5)*300}px;animation-delay:${Math.random()*.5}s;animation-duration:${Math.random()*1+1.5}s`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),3000);
+  }
+}
+
+// ─── TOAST ───────────────────────────────────────────────
+let toastTimer;
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show';
+  if(type==='warn')t.style.borderColor='var(--gold)';
+  else t.style.borderColor='var(--mint)';
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ─── SYNC PENDING ─────────────────────────────────────────
+async function syncPending(){
+  if(!pendingQueue.length)return;
+  const url=getApiUrl();if(!url)return;
+  const remaining=[];
+  for(const wish of pendingQueue){
+    try{const r=await apiPost(wish);if(!r||r.error)remaining.push(wish);}
+    catch{remaining.push(wish);}
+  }
+  pendingQueue=remaining;
+  localStorage.setItem('sml_pending',JSON.stringify(pendingQueue));
+}
+
+// ─── OFFLINE ─────────────────────────────────────────────
+window.addEventListener('online',()=>{document.getElementById('offline-banner').style.display='none';syncPending();});
+window.addEventListener('offline',()=>{document.getElementById('offline-banner').style.display='block';});
+
+// ─── INIT ─────────────────────────────────────────────────
+(function(){
+  // Load saved API URL
+  const savedUrl=getApiUrl();
+  if(savedUrl){
+    document.getElementById('apiUrl').value=savedUrl;
+    testApi();
+  }
+  // Build UI
+  buildMonthTabs();
+  // Auto-select current month
+  const now=new Date();
+  selectMonth(now.getMonth());
+  // Sync pending
+  syncPending();
+  // Auto-refresh every 30s
+  setInterval(loadWishes, 30000);
+})();
+</script>
+</body>
+</html>
