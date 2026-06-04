@@ -95,6 +95,23 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
 .wish-empty-icon{font-size:2.5rem;margin-bottom:.6rem}
 /* OFFLINE INDICATOR */
 .offline-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(90deg,#92400e,#78350f);padding:.5rem 1rem;text-align:center;font-size:.8rem}
+.admin-bar{display:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,200,66,.2);border-radius:12px;padding:.75rem 1rem;margin-bottom:1.25rem;gap:.5rem;align-items:center}
+.admin-bar.show{display:flex}
+.admin-bar input{flex:1;background:transparent;border:none;color:rgba(255,255,255,.6);font-family:'Kanit',sans-serif;font-size:.75rem;outline:none}
+.admin-bar input::placeholder{color:rgba(255,255,255,.25)}
+.admin-lock{position:fixed;bottom:1.5rem;right:1.5rem;z-index:99;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.admin-lock:hover{background:rgba(255,200,66,.15);border-color:rgba(255,200,66,.4);color:var(--gold)}
+.admin-lock.active{background:rgba(255,200,66,.2);border-color:var(--gold);color:var(--gold)}
+.wish-hidden{opacity:.3;filter:grayscale(1)}
+.wish-actions{display:none;position:absolute;top:.5rem;right:.5rem;gap:.3rem}
+.admin-mode .wish-card .wish-actions{display:flex}
+.wish-act-btn{width:26px;height:26px;border-radius:6px;border:none;cursor:pointer;font-size:.7rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.wish-act-hide{background:rgba(255,200,66,.15);color:var(--gold)}
+.wish-act-del{background:rgba(255,107,157,.15);color:var(--rose)}
+.wish-act-hide:hover{background:rgba(255,200,66,.3)}
+.wish-act-del:hover{background:rgba(255,107,157,.35)}
+.admin-badge{display:none;background:rgba(255,200,66,.15);border:1px solid rgba(255,200,66,.3);border-radius:20px;padding:.22rem .7rem;font-size:.65rem;color:var(--gold);letter-spacing:.05em}
+.admin-mode .admin-badge{display:inline-block}
 /* TOAST */
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(120px);background:rgba(0,229,204,.15);border:1px solid var(--mint);border-radius:30px;padding:.55rem 1.4rem;font-size:.82rem;color:var(--mint);transition:transform .35s cubic-bezier(.34,1.56,.64,1);z-index:999;backdrop-filter:blur(10px)}
 .toast.show{transform:translateX(-50%) translateY(0)}
@@ -120,12 +137,12 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
 
 <div class="container">
 
-  <!-- API CONFIG -->
-  <div class="api-bar" id="apiBar">
-    <span style="font-size:.68rem;color:rgba(255,255,255,.35);flex-shrink:0">Google Script URL:</span>
-    <input id="apiUrl" type="text" placeholder="วาง URL จาก Google Apps Script ที่นี่..." oninput="saveApiUrl()">
-    <span class="api-status api-pending" id="apiStatus">ยังไม่ได้ตั้งค่า</span>
-    <button onclick="testApi()" style="background:none;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.5);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.25rem .55rem;cursor:pointer">ทดสอบ</button>
+  <!-- ADMIN BAR (hidden by default) -->
+  <div class="admin-bar" id="apiBar">
+    <span style="font-size:.65rem;color:rgba(255,200,66,.6);flex-shrink:0">🔐 Script URL:</span>
+    <input id="apiUrl" type="text" placeholder="วาง Web App URL ของ Google Apps Script..." oninput="saveApiUrl()">
+    <span class="api-status api-pending" id="apiStatus">—</span>
+    <button onclick="testApi()" style="background:none;border:1px solid rgba(255,200,66,.2);border-radius:7px;color:rgba(255,200,66,.6);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.22rem .55rem;cursor:pointer">ทดสอบ</button>
   </div>
 
   <!-- PERSON SELECTOR -->
@@ -138,7 +155,10 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
 
   <!-- HERO -->
   <div class="hero" id="hero">
-    <div class="hero-tag">🎂 Happy Birthday</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.25rem">
+      <div class="hero-tag" style="margin:0">🎂 Happy Birthday</div>
+      <span class="admin-badge">ADMIN MODE</span>
+    </div>
     <div class="hero-name" id="hero-name">เลือกพนักงาน</div>
     <div class="hero-pos" id="hero-pos">—</div>
     <div class="hero-date" id="hero-date"><span>📅</span><span>เกิดวันที่</span></div>
@@ -182,6 +202,9 @@ html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:
     </div>
   </div>
 </div>
+
+<!-- Admin lock floating button -->
+<button class="admin-lock" id="adminLock" onclick="showAdminPrompt()" title="Admin Login">🔒</button>
 
 <div class="toast" id="toast"></div>
 
@@ -272,16 +295,26 @@ async function apiGet(params){
   const url = getApiUrl();
   if(!url) return null;
   const qs = Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
-  try{ const r=await fetch(url+'?'+qs); return await r.json(); }
-  catch{ return null; }
+  try{ 
+    const r = await fetch(url+'?'+qs);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json(); 
+  }
+  catch(e){ console.error('apiGet error:', e); return null; }
 }
 async function apiPost(body){
   const url = getApiUrl();
   if(!url) return null;
   try{
-    const r=await fetch(url,{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'application/json'}});
+    // ใช้ GET แทน POST เพื่อหลีกเลี่ยงปัญหา CORS ของ Google Apps Script
+    const params = new URLSearchParams();
+    Object.entries(body).forEach(([k,v]) => params.append(k, v));
+    const r = await fetch(url + '?' + params.toString());
     return await r.json();
-  }catch{ return null; }
+  }catch(e){ 
+    console.error('API error:', e);
+    return null; 
+  }
 }
 
 // ─── PARTICLES ───────────────────────────────────────────
@@ -362,12 +395,25 @@ async function loadWishes(){
 }
 function renderWishes(wishes){
   const grid=document.getElementById('wish-grid');
-  if(!wishes.length){
+  const isAdmin=document.body.classList.contains('admin-mode');
+  // load hidden list
+  const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
+
+  const visible=isAdmin ? wishes : wishes.filter(w=>!hidden.includes(String(w.ts||w.timestamp||w.senderName)));
+
+  if(!visible.length){
     grid.innerHTML='<div class="wish-empty"><div class="wish-empty-icon">💭</div><div>ยังไม่มีคำอวยพร<br><span style="font-size:.75rem">เป็นคนแรกที่ส่งคำอวยพร!</span></div></div>';
     return;
   }
-  grid.innerHTML=wishes.map((w,i)=>`
-    <div class="wish-card wc-${i%6}" style="animation-delay:${i*0.05}s">
+  grid.innerHTML=wishes.map((w,i)=>{
+    const wid=String(w.ts||w.timestamp||w.senderName||i);
+    const isHidden=hidden.includes(wid);
+    if(!isAdmin && isHidden) return '';
+    return `<div class="wish-card wc-${i%6}${isHidden?' wish-hidden':''}" style="animation-delay:${i*0.05}s;position:relative">
+      <div class="wish-actions">
+        <button class="wish-act-btn wish-act-hide" onclick="toggleHideWish('${wid.replace(/'/g,"\'")}',this)" title="${isHidden?'แสดง':'ซ่อน'}">${isHidden?'👁':'🙈'}</button>
+        <button class="wish-act-btn wish-act-del" onclick="deleteWish('${wid.replace(/'/g,"\'")}',this)" title="ลบ">🗑</button>
+      </div>
       <div class="wish-emoji">${w.emoji||'🎉'}</div>
       <div class="wish-msg">${escHtml(w.msg||w.message||'')}</div>
       <div class="wish-from">
@@ -375,7 +421,8 @@ function renderWishes(wishes){
         <span>· ${escHtml(w.senderDept||w.dept||'ทีมงาน')}</span>
         <span class="wish-ts">${w.ts||w.timestamp||''}</span>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
@@ -493,6 +540,78 @@ window.addEventListener('offline',()=>{document.getElementById('offline-banner')
   // Auto-refresh every 30s
   setInterval(loadWishes, 30000);
 })();
+
+// ── ADMIN MODE ──────────────────────────────────────────────────────
+const ADMIN_PASS = 'sml2569';  // ← เปลี่ยน password ที่นี่
+
+function showAdminPrompt(){
+  if(document.body.classList.contains('admin-mode')){
+    exitAdmin(); return;
+  }
+  const pw = prompt('รหัส Admin:');
+  if(pw === null) return;
+  if(pw === ADMIN_PASS){
+    enterAdmin();
+  } else {
+    showToast('รหัสไม่ถูกต้อง');
+  }
+}
+
+function enterAdmin(){
+  document.body.classList.add('admin-mode');
+  document.getElementById('apiBar').classList.add('show');
+  document.getElementById('adminLock').classList.add('active');
+  document.getElementById('adminLock').textContent='🔓';
+  document.getElementById('adminLock').title='ออกจาก Admin Mode';
+  // load saved URL
+  const saved=getApiUrl();
+  if(saved){ document.getElementById('apiUrl').value=saved; testApi(); }
+  showToast('เข้าสู่ Admin Mode แล้ว');
+  loadWishes();
+}
+
+function exitAdmin(){
+  document.body.classList.remove('admin-mode');
+  document.getElementById('apiBar').classList.remove('show');
+  document.getElementById('adminLock').classList.remove('active');
+  document.getElementById('adminLock').textContent='🔒';
+  document.getElementById('adminLock').title='Admin Login';
+  showToast('ออกจาก Admin Mode แล้ว');
+  loadWishes();
+}
+
+// ── HIDE / SHOW WISH ─────────────────────────────────────────────────
+function toggleHideWish(wid, btn){
+  const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
+  const idx=hidden.indexOf(wid);
+  if(idx>=0){ hidden.splice(idx,1); }
+  else { hidden.push(wid); }
+  localStorage.setItem('sml_hidden',JSON.stringify(hidden));
+  loadWishes();
+  showToast(idx>=0?'แสดงคำอวยพรแล้ว':'ซ่อนคำอวยพรแล้ว');
+}
+
+// ── DELETE WISH ──────────────────────────────────────────────────────
+function deleteWish(wid, btn){
+  if(!confirm('ลบคำอวยพรนี้? ไม่สามารถกู้คืนได้')) return;
+  // Remove from local cache
+  if(curEmp){
+    const empId=curEmp.code||curEmp.name;
+    if(localWishes[empId]){
+      localWishes[empId]=localWishes[empId].filter(w=>String(w.ts||w.timestamp||w.senderName)!==wid);
+      localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
+    }
+  }
+  // Remove from hidden list too
+  const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
+  const idx=hidden.indexOf(wid);
+  if(idx>=0){ hidden.splice(idx,1); localStorage.setItem('sml_hidden',JSON.stringify(hidden)); }
+  // Try delete via API
+  apiGet({action:'deleteWish', wid});
+  loadWishes();
+  showToast('ลบคำอวยพรแล้ว');
+}
+
 </script>
 </body>
 </html>
