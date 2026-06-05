@@ -131,9 +131,49 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'K
 .finput{background:rgba(255,255,255,.06);border:1px solid var(--b2);border-radius:9px;padding:.48rem .72rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.83rem;width:100%;outline:none;transition:border-color .2s}
 .finput:focus{border-color:rgba(245,200,66,.42)}
 .ftextarea{height:76px;resize:none;line-height:1.55}
-.emoji-bar{display:flex;gap:.25rem;flex-wrap:wrap;margin:.45rem 0}
-.emo{width:28px;height:28px;border-radius:7px;border:1px solid var(--b);background:rgba(255,255,255,.04);cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.emo:hover{background:rgba(255,255,255,.1);transform:scale(1.12)}
+.emoji-bar{display:flex;gap:.22rem;flex-wrap:wrap;margin:.3rem 0 .5rem}
+.emo{width:32px;height:32px;border-radius:9px;border:1px solid var(--b);background:rgba(255,255,255,.05);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .18s;position:relative}
+.emo:hover{background:rgba(255,255,255,.12);transform:scale(1.2);border-color:rgba(255,255,255,.2);z-index:2}
+.emo:active{transform:scale(.95)}
+.emo-used{border-color:rgba(245,200,66,.4);background:rgba(245,200,66,.08)}
+/* STICKER TABS */
+
+
+.sticker-tab{flex-shrink:0;padding:.22rem .6rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.sticker-tab.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
+/* CHAR COUNTER */
+.char-counter{font-size:.62rem;color:var(--mute);text-align:right;margin-top:.18rem;transition:color .2s}
+.char-counter.warn{color:var(--rose)}
+/* MOOD SELECTOR */
+.mood-row{display:flex;gap:.3rem;margin-bottom:.5rem;overflow-x:auto;scrollbar-width:none}
+.mood-row::-webkit-scrollbar{display:none}
+.mood-btn{flex-shrink:0;padding:.28rem .75rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.72rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.25rem;white-space:nowrap}
+.mood-btn:hover{border-color:var(--b2);color:var(--sub)}
+.mood-btn.active{font-weight:500}
+.mood-warm.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
+.mood-cute.active{background:rgba(255,107,157,.1);border-color:var(--rose);color:var(--rose)}
+.mood-cool.active{background:rgba(0,229,204,.08);border-color:var(--mint);color:var(--mint)}
+.mood-funny.active{background:rgba(167,139,250,.1);border-color:var(--purple);color:var(--purple)}
+/* SEND BUTTON ANIM */
+.send-btn{width:100%;padding:.72rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:12px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.send-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .4s}
+.send-btn:hover::before{transform:translateX(100%)}
+.send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,200,66,.35)}
+.send-btn:active{transform:scale(.98)}
+.send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+/* TEMPLATE SUGGESTIONS */
+.tmpl-row{display:flex;gap:.28rem;flex-wrap:wrap;margin-bottom:.45rem}
+/* CUSTOM STICKER EDITOR */
+
+
+.sticker-add-inp::placeholder{font-size:.65rem;color:var(--mute)}
+
+.sticker-add-btn:hover{background:rgba(245,200,66,.18);border-color:var(--gold)}
+
+.sticker-clear-btn:hover{background:rgba(255,107,157,.1);color:var(--rose)}
+
+.tmpl-btn{flex-shrink:0;padding:.25rem .65rem;border-radius:20px;border:1px dashed rgba(255,255,255,.15);background:rgba(255,255,255,.03);color:rgba(255,255,255,.5);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s;line-height:1.3}
+.tmpl-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.25);color:#fff}
 .send-btn{width:100%;padding:.68rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:11px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;transition:opacity .2s}
 .send-btn:hover{opacity:.9}
 .send-btn:disabled{opacity:.45;cursor:not-allowed}
@@ -292,6 +332,47 @@ canvas#wheelCanvas{border-radius:50%}
   </div>
 </div>
 
+<!-- WISH FORM -->
+<div class="wish-form" id="wish-form">
+  <div class="sec-hdr">
+    <div class="sec-title">✍️ เขียนคำอวยพร</div>
+    <div class="sec-badge" id="wishFormBadge">กรอกชื่อก่อนนะ</div>
+  </div>
+
+  <!-- MOOD SELECTOR -->
+  <div class="mood-row" id="moodRow">
+    <div class="fl" style="flex-shrink:0;align-self:center">บรรยากาศ:</div>
+    <button class="mood-btn mood-warm active" data-mood="warm" onclick="setMood(this)">🌟 อบอุ่น</button>
+    <button class="mood-btn mood-cute" data-mood="cute" onclick="setMood(this)">🥰 น่ารัก</button>
+    <button class="mood-btn mood-cool" data-mood="cool" onclick="setMood(this)">😎 เท่ๆ</button>
+    <button class="mood-btn mood-funny" data-mood="funny" onclick="setMood(this)">😄 ฮา</button>
+  </div>
+
+  <!-- TEMPLATE SUGGESTIONS -->
+  <div class="tmpl-row" id="tmplRow"></div>
+
+  <div class="form-grid">
+    <div class="fi"><div class="fl">ชื่อของคุณ *</div><input class="finput" id="wf-name" placeholder="ชื่อเล่น / ชื่อ-สกุล" maxlength="50" oninput="onNameInput()"></div>
+    <div class="fi"><div class="fl">แผนก / ทีม</div><input class="finput" id="wf-dept" placeholder="PDI, HR, Yard..."></div>
+    <div class="fi fi-full">
+      <div class="fl" style="display:flex;justify-content:space-between">
+        <span>คำอวยพร *</span>
+        <span class="char-counter" id="charCounter">0/200</span>
+      </div>
+      <textarea class="finput ftextarea" id="wf-text" placeholder="เขียนคำอวยพรให้เพื่อนร่วมงาน..." maxlength="200" oninput="onTextInput()"></textarea>
+    </div>
+  </div>
+
+  <!-- EMOJI GRID -->
+  <div class="fl" style="margin:.4rem 0 .25rem;font-size:.65rem;color:var(--mute)">กด Emoji เพื่อใส่ในข้อความ 👇</div>
+  <div class="emoji-bar" id="emojiBar">
+    <!-- inline fallback — will be overwritten by initStickerSystem() -->
+  </div>
+
+  <button class="send-btn" id="send-btn" onclick="submitWish()">🎊 ส่งคำอวยพร!</button>
+  <div class="success-msg" id="success-msg">🎉 ส่งคำอวยพรสำเร็จ! ขอบคุณนะ ❤️</div>
+</div>
+
 <!-- GAME BANNER -->
 <div class="game-banner" id="gameBanner" onclick="document.getElementById('quizInline').scrollIntoView({behavior:'smooth'})">
   <div class="gb-icon">🎯</div>
@@ -324,21 +405,6 @@ canvas#wheelCanvas{border-radius:50%}
     <input class="qe-inp" id="qeOpt4" placeholder="ตัวเลือก 4">
   </div>
   <button class="qe-add" onclick="addCustomQuestion()" style="margin-top:.28rem">+ เพิ่มคำถาม (ตัวเลือก 1 = ถูก)</button>
-</div>
-
-<!-- WISH FORM -->
-<div class="wish-form" id="wish-form">
-  <div class="sec-hdr">
-    <div class="sec-title">✍️ เขียนคำอวยพร</div>
-  </div>
-  <div class="form-grid">
-    <div class="fi"><div class="fl">ชื่อของคุณ *</div><input class="finput" id="wf-name" placeholder="ชื่อเล่น / ชื่อ-สกุล" maxlength="50"></div>
-    <div class="fi"><div class="fl">แผนก / ทีม</div><input class="finput" id="wf-dept" placeholder="PDI, HR, Yard..."></div>
-    <div class="fi fi-full"><div class="fl">คำอวยพร *</div><textarea class="finput ftextarea" id="wf-text" placeholder="เขียนคำอวยพรให้เพื่อนร่วมงาน..."></textarea></div>
-  </div>
-  <div class="emoji-bar" id="emojiBar"></div>
-  <button class="send-btn" id="send-btn" onclick="submitWish()">🎊 ส่งคำอวยพร!</button>
-  <div class="success-msg" id="success-msg">🎉 ส่งคำอวยพรสำเร็จ! ขอบคุณนะ ❤️</div>
 </div>
 
 <!-- VOTE -->
@@ -444,6 +510,11 @@ canvas#wheelCanvas{border-radius:50%}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 function toggleMonthCtrl(){const el=document.getElementById('adminMonthCtrl');if(el)el.classList.toggle('open');}
+// Render emoji bar as soon as DOM is ready (before async init)
+document.addEventListener('DOMContentLoaded',function(){
+  if(typeof initStickerSystem==='function') initStickerSystem();
+  if(typeof renderTemplates==='function') renderTemplates();
+});
 function updateStatRow(){
   const empKey=curEmp?(curEmp.code||curEmp.name):'';
   const wishes=localWishes[empKey]||[];
@@ -571,30 +642,36 @@ async function apiPost(body){
 }
 
 // ─── PARTICLES ───────────────────────────────────────────
-(function(){
-  const c=['#f5c842','#ff6b9d','#00e5cc','#a78bfa','#f97316'];
-  const pc=document.getElementById('particles');
-  for(let i=0;i<20;i++){
-    const p=document.createElement('div');p.className='particle';
-    const s=Math.random()*5+3;
-    p.style.cssText=`position:absolute;border-radius:50%;width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${c[~~(Math.random()*c.length)]};animation:float ${Math.random()*15+10}s linear infinite;animation-delay:${Math.random()*10}s;opacity:0`;
-    pc.appendChild(p);
-  }
-  // Add float animation
-  const style=document.createElement('style');
-  style.textContent='@keyframes float{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh) rotate(720deg);opacity:0}}';
-  document.head.appendChild(style);
-})();
+// particles removed
 
 // ─── EMOJI ROW ───────────────────────────────────────────
-(function(){
-  const row=document.getElementById('emojiRow');
-  ['🎉','🌟','💖','🎂','🥳','🌈','✨','🎁','🍀','🏆','💪','❤️','🙏','😊'].forEach(e=>{
-    const btn=document.createElement('button');btn.className='emoji-btn';btn.textContent=e;
-    btn.onclick=()=>{const ta=document.getElementById('wf-text');ta.value+=e;ta.focus();};
-    row.appendChild(btn);
-  });
-})();
+// ── EMOJI GRID ────────────────────────────────────
+function initStickerSystem(){
+  const bar=document.getElementById('emojiBar');
+  if(!bar){ setTimeout(initStickerSystem,200); return; }
+  const emojis=['🎉','🎂','🎊','🎁','🥳','🎈','🎀','🧁','🍰','🥂',
+    '❤️','💖','💝','🥰','😍','🤩','✨','🌟','⭐','🏆',
+    '👑','💪','🙏','😊','🤗','🌸','🌺','🦋','🌈','🍀',
+    '😄','🤣','😜','😎','🚀','💎','🎯','💡','🌙','☀️'];
+  bar.innerHTML=emojis.map(e=>
+    `<button class="emo" onclick="insertEmoji('${e}')">${e}</button>`
+  ).join('');
+}
+// Auto-call when script loads
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', initStickerSystem);
+} else {
+  initStickerSystem();
+}
+function insertEmoji(e){
+  const ta=document.getElementById('wf-text');
+  if(!ta) return;
+  const s=ta.selectionStart||ta.value.length;
+  const en=ta.selectionEnd||ta.value.length;
+  ta.value=ta.value.slice(0,s)+e+ta.value.slice(en);
+  ta.focus(); ta.selectionStart=ta.selectionEnd=s+e.length;
+  onTextInput();
+}
 
 // ─── MONTH TABS ──────────────────────────────────────────
 function buildMonthTabs(){
@@ -639,11 +716,9 @@ function selectPerson(code){
   document.getElementById('hero-date').innerHTML=`<span>🎂</span><span>เกิดเดือน${MTH[curEmp.month]}</span>`;
   // Load saved photo for this employee
   loadEmpPhoto(curEmp.code||curEmp.name);
-  // Update game titles
+  // Update game title
   const gtt = document.getElementById('gameTitleText');
   if(gtt) gtt.textContent = '🎯 คุณเป็นแฟนพันธุ์แท้ของคุณ'+curEmp.name.split(' ')[0]+' หรือไม่?';
-  const gbt = document.getElementById('gameBannerTitle');
-  if(gbt) gbt.textContent = 'คุณเป็นแฟนพันธุ์แท้ของคุณ'+curEmp.name.split(' ')[0]+' หรือไม่?';
   // Show game section
   const gs=document.getElementById('gameSection');
   if(gs) gs.style.display='block';
@@ -696,8 +771,8 @@ function renderWishes(wishes){
     if(!isAdmin && isHidden) return '';
     return `<div class="wish-card wc-${i%6}${isHidden?' wish-hidden':''}" style="animation-delay:${i*0.05}s;position:relative">
       <div class="wish-actions">
-        <button class="wact wact-hide" onclick="toggleHideWish('${wid.replace(/'/g,"\'")}',this)" title="${isHidden?'แสดง':'ซ่อน'}">${isHidden?'👁':'🙈'}</button>
-        <button class="wact wact-del" onclick="deleteWish('${wid.replace(/'/g,"\'")}',this)" title="ลบ">🗑</button>
+        <button class="wish-act-btn wish-act-hide" onclick="toggleHideWish('${wid.replace(/'/g,"\'")}',this)" title="${isHidden?'แสดง':'ซ่อน'}">${isHidden?'👁':'🙈'}</button>
+        <button class="wish-act-btn wish-act-del" onclick="deleteWish('${wid.replace(/'/g,"\'")}',this)" title="ลบ">🗑</button>
       </div>
       <div class="wish-emoji">${w.emoji||'🎉'}</div>
       <div class="wish-msg">${escHtml(w.msg||w.message||'')}</div>
@@ -711,8 +786,6 @@ function renderWishes(wishes){
 
   // Update vote list with visible wishes
   renderVoteList(visible.slice(0,10));
-  // Update stats
-  if(typeof updateStatRow==='function') updateStatRow();
 }
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
@@ -856,6 +929,80 @@ async function loadPersonsFromSheet(){
   }
 }
 
+
+// ── MOOD & TEMPLATE SYSTEM ─────────────────────────────────
+const MOOD_TEMPLATES = {
+  warm: [
+    'ขอให้วันเกิดนี้เต็มไปด้วยความสุขและรอยยิ้มนะ ❤️',
+    'ขอบคุณที่เป็นเพื่อนร่วมงานที่ดีเสมอมา สุขสันต์วันเกิดครับ/ค่ะ 🎂',
+    'ขอให้สุขภาพแข็งแรง มีแต่เรื่องดีๆ เข้ามาในชีวิตตลอดปีนะ 🌟',
+    'ขอให้ทุกความฝันเป็นจริง ประสบความสำเร็จในทุกด้าน 🏆',
+  ],
+  cute: [
+    'แก่แต่กาย ใจยังสาวเสมอนะจ๊ะ 🥰 สุขสันต์วันเกิดค้าบ!',
+    'เกิดมาดีมากเลยนะ ขอให้ปีนี้ดีกว่าเดิมอีก 100 เท่า 💖',
+    'ขอให้น่ารักและเก่งแบบนี้ไปตลอด ไม่มีวันแก่เลย! 🌸',
+    'วันเกิดแล้ว! ขอให้ได้ของขวัญที่อยากได้ทุกอย่างเลยนะ 🎁',
+  ],
+  cool: [
+    'Happy Birthday! Stay awesome เหมือนเดิมนะ 😎✨',
+    'ปีใหม่ชีวิตใหม่ ไปให้ถึงเป้าหมายที่ตั้งไว้ได้เลย 🚀',
+    'Level up! อีกหนึ่งปีที่แกร่งขึ้น เก่งขึ้น เจ๋งขึ้น 💪',
+    'ขอให้ความสำเร็จตามมาหาเอง ไม่ต้องวิ่งหาเลย 🏆',
+  ],
+  funny: [
+    'ยินดีด้วยที่แก่ขึ้นอีกปี! แต่ยังดูเด็กกว่าอายุจริงมากนะ 😄',
+    'อายุเพิ่ม แต่หล่อ/สวยเพิ่มด้วย ไม่ยุติธรรมกับคนอื่นเลย 🤣',
+    'สุขสันต์วันเกิด! ปีนี้ขอให้ได้นอนพักผ่อนเยอะๆ นะ 😴💤',
+    'ขอให้วันเกิดปีนี้ไม่ต้องทำงานล่วงเวลานะ 🙏😂',
+  ],
+};
+let curMood='warm';
+
+function setMood(btn){
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  curMood=btn.dataset.mood;
+  renderTemplates();
+  const ta=document.getElementById('wf-text');
+  const ph={warm:'ส่งความปรารถนาดีจากใจ...',cute:'เขียนอะไรน่ารักๆ ให้เจ้าของวันเกิด...',cool:'Cool message goes here...',funny:'ฮาๆ หน่อยก็ได้นะ! 😄'};
+  if(ta) ta.placeholder=ph[curMood]||'เขียนคำอวยพรให้เพื่อนร่วมงาน...';
+}
+
+function renderTemplates(){
+  const row=document.getElementById('tmplRow');
+  if(!row) return;
+  const tmpls=MOOD_TEMPLATES[curMood]||[];
+  row.innerHTML='<span style="font-size:.62rem;color:var(--mute);align-self:center;flex-shrink:0">เลือก:</span>'+
+    tmpls.map(t=>`<button class="tmpl-btn" onclick="useTmpl(this)" title="${t}">${t.substring(0,18)}…</button>`).join('');
+}
+
+function useTmpl(btn){
+  const ta=document.getElementById('wf-text');
+  if(!ta) return;
+  ta.value=btn.title; ta.focus(); onTextInput();
+  ta.style.borderColor='rgba(245,200,66,.6)';
+  setTimeout(()=>ta.style.borderColor='',800);
+}
+
+function onNameInput(){
+  const name=(document.getElementById('wf-name')||{value:''}).value.trim();
+  const badge=document.getElementById('wishFormBadge');
+  if(badge){
+    if(name){badge.textContent='พร้อมส่ง! 🎊';badge.style.color='var(--mint)';badge.style.borderColor='rgba(0,229,204,.3)';}
+    else{badge.textContent='กรอกชื่อก่อนนะ';badge.style.color='';badge.style.borderColor='';}
+  }
+}
+
+function onTextInput(){
+  const ta=document.getElementById('wf-text');
+  const counter=document.getElementById('charCounter');
+  if(!ta||!counter) return;
+  const len=ta.value.length, max=parseInt(ta.maxLength)||200;
+  counter.textContent=len+'/'+max;
+  counter.classList.toggle('warn',len>=max*0.85);
+}
+
 (async function(){
   // Load saved API URL
   const savedUrl=getApiUrl();
@@ -876,6 +1023,9 @@ async function loadPersonsFromSheet(){
   setInterval(loadWishes, 30000);
   // Draw placeholder wheel on load
   setTimeout(drawWheel, 300);
+  // Init emoji grid + templates
+  initStickerSystem();
+  renderTemplates();
   // Auto-refresh persons every 5 minutes
   setInterval(async()=>{
     const ok = await loadPersonsFromSheet();
@@ -900,11 +1050,9 @@ function buildAmcGrid(){
   const active=getActiveMonths();
   const grid=document.getElementById('amcGrid');
   if(!grid) return;
-  grid.innerHTML=MTH.map((m,i)=>{
-    const on=active.includes(i);
-    return `<button onclick="toggleAdminMonth(${i})" id="amc-${i}" class="amp-chip ${on?'on':'off'}">${m.substring(0,3)}</button>`;
-  }).join('');
-  renderAmpConfirm();
+  grid.innerHTML=MTH.map((m,i)=>
+    `<button class="amc-chip${active.includes(i)?' on':''}" onclick="toggleAdminMonth(${i})" id="amc-${i}">${m.substring(0,3)}</button>`
+  ).join('');
 }
 
 function toggleAdminMonth(mi){
@@ -915,28 +1063,10 @@ function toggleAdminMonth(mi){
   saveActiveMonths(active);
   buildAmcGrid();
   buildMonthTabs();
+  // If current selMonth is now hidden, clear person list
   if(!active.includes(selMonth)){
     document.getElementById('personChips').innerHTML='<div class="person-locked">🔒 ยังไม่เปิดให้ดูเดือนนี้</div>';
   }
-}
-
-function renderAmpConfirm(){
-  const active=getActiveMonths();
-  const conf=document.getElementById('ampConfirm');
-  const txt=document.getElementById('ampConfirmText');
-  if(!conf||!txt) return;
-  if(!active.length){
-    conf.style.display='flex';
-    conf.style.background='rgba(255,107,157,.06)';
-    conf.style.borderColor='rgba(255,107,157,.18)';
-    txt.innerHTML='<span style="color:rgba(255,107,157,.8)">⚠️ ยังไม่ได้เลือกเดือน — พนักงานจะไม่เห็นใครเลย</span>';
-    return;
-  }
-  conf.style.display='flex';
-  conf.style.background='rgba(0,229,204,.06)';
-  conf.style.borderColor='rgba(0,229,204,.18)';
-  const names=active.slice().sort((a,b)=>a-b).map(i=>MTH[i].substring(0,3)).join(', ');
-  txt.innerHTML=`เปิดใช้งาน <b style="color:var(--mint)">${active.length} เดือน</b> — พนักงานเห็น: <span style="color:rgba(255,255,255,.65)">${names}</span>`;
 }
 
 function toggleAllMonths(){
@@ -961,6 +1091,7 @@ function showAdminPrompt(){
 
 function enterAdmin(){
   document.body.classList.add('admin-mode');
+  document.getElementById('apiBar').classList.add('show');
   document.getElementById('adminLock').classList.add('active');
   document.getElementById('adminLock').textContent='🔓';
   document.getElementById('adminLock').title='ออกจาก Admin Mode';
@@ -969,14 +1100,14 @@ function enterAdmin(){
   if(ph) ph.style.display='block';
   const pf = document.getElementById('empPhotoFrame');
   if(pf) pf.style.cursor='pointer';
+  // Load saved URL
   const saved=getApiUrl();
   if(saved){ document.getElementById('apiUrl').value=saved; testApi(); }
   // Build admin month grid
   buildAmcGrid();
-  renderAmpConfirm();
   // Render custom questions
   renderCustomQList();
-  // Wheel admin controls
+  // Show admin-only wheel controls
   const wa=document.getElementById('wheelAdminArea');
   const wh=document.getElementById('wheelPublicHint');
   if(wa) wa.style.display='flex';
@@ -991,6 +1122,7 @@ function enterAdmin(){
 
 function exitAdmin(){
   document.body.classList.remove('admin-mode');
+  document.getElementById('apiBar').classList.remove('show');
   document.getElementById('adminLock').classList.remove('active');
   document.getElementById('adminLock').textContent='🔒';
   document.getElementById('adminLock').title='Admin Login';
@@ -999,6 +1131,7 @@ function exitAdmin(){
   if(ph) ph.style.display='none';
   const pf = document.getElementById('empPhotoFrame');
   if(pf) pf.style.cursor='default';
+  // Hide admin-only wheel controls
   const wa=document.getElementById('wheelAdminArea');
   const wh=document.getElementById('wheelPublicHint');
   if(wa) wa.style.display='none';
@@ -1041,8 +1174,8 @@ async function deleteWish(wid, btn){
     showToast('ลบจากหน้าเว็บแล้ว (Sheet อาจต้องลบเอง)','warn');
   }
   // 4. Force reload from server
-  const empId2=curEmp?curEmp.code||curEmp.name:'';
-  const fresh=await apiGet({action:'getWishes',empId:empId2});
+  const empId=curEmp?curEmp.code||curEmp.name:'';
+  const fresh=await apiGet({action:'getWishes',empId});
   if(fresh&&Array.isArray(fresh)){
     localWishes[empId]=fresh;
     localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
@@ -1406,9 +1539,6 @@ function saveGameScore(playerName, score, total) {
   localStorage.setItem(key, JSON.stringify(board.slice(0,50)));
   renderLeaderboard();
   renderParticipants();
-  if(typeof updateStatRow==='function') updateStatRow();
-  const gsBadge=document.getElementById('gameScore');
-  if(gsBadge) gsBadge.textContent=score+' แต้ม';
   // Show wheel and participants
   const ps = document.getElementById('partSection');
   const ws = document.getElementById('wheelSection');
@@ -1813,5 +1943,6 @@ function resetWithMasterKey(){
 
 
 </script>
+
 </body>
 </html>
