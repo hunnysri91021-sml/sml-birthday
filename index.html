@@ -3,434 +3,450 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-<title>SML Birthday Wishes</title>
+<title>SML Birthday Wishes 🎂</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Dancing+Script:wght@700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --deep:#0f0c1d;--card:rgba(255,255,255,0.06);--gold:#f5c842;
-  --rose:#ff6b9d;--mint:#00e5cc;--purple:#a78bfa;
-  --text:#fff;--sub:rgba(255,255,255,0.55);--border:rgba(255,255,255,0.1)
-}
-html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:'Kanit',sans-serif;overflow-x:hidden}
+:root{--bg:#0d0d1a;--c1:#16162a;--c2:#1e1e35;--gold:#f5c842;--gold2:#f7a621;--rose:#ff6b9d;--mint:#00e5cc;--purple:#a78bfa;--text:#fff;--sub:rgba(255,255,255,.55);--mute:rgba(255,255,255,.28);--b:rgba(255,255,255,.08);--b2:rgba(255,255,255,.14)}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Kanit',sans-serif;overflow-x:hidden}
 /* BG */
-.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.bg-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;animation:drift 12s ease-in-out infinite alternate}
-.bb1{width:500px;height:500px;background:radial-gradient(#6c3fa0,transparent);top:-100px;left:-100px;animation-delay:0s}
-.bb2{width:400px;height:400px;background:radial-gradient(#1a4a6e,transparent);bottom:-50px;right:-50px;animation-delay:-5s}
-.bb3{width:300px;height:300px;background:radial-gradient(#6e1a3a,transparent);top:40%;left:40%;animation-delay:-9s}
-@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.1)}}
-/* PARTICLES */
-.particles{position:fixed;inset:0;z-index:1;pointer-events:none}
-/* LAYOUT */
-.container{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:1.5rem 1rem 4rem}
-/* HEADER */
-.hero{text-align:center;padding:2.5rem 1rem 2rem;position:relative}
-.hero-tag{font-size:.7rem;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:.5rem;opacity:.8}
-.hero-name{font-family:'Dancing Script',cursive;font-size:3.2rem;font-weight:700;color:#fff;line-height:1.1;text-shadow:0 0 40px rgba(245,200,66,.4)}
-.hero-pos{font-size:.85rem;color:var(--sub);margin-top:.25rem;font-weight:300}
-.hero-date{display:inline-flex;align-items:center;gap:.4rem;margin-top:.75rem;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.2);border-radius:20px;padding:.3rem .9rem;font-size:.78rem;color:var(--gold)}
-.wish-counter{display:flex;align-items:center;justify-content:center;gap:.4rem;margin-top:1rem;font-size:.82rem;color:var(--sub)}
-.wish-count-num{font-size:1.4rem;font-weight:600;color:var(--gold)}
-/* PERSON SELECTOR */
-.person-selector{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem}
-.person-selector-label{font-size:.7rem;color:var(--sub);letter-spacing:.1em;text-transform:uppercase}
-.month-tabs{display:flex;gap:.35rem;flex-wrap:wrap}
-.mtab{padding:.32rem .7rem;border-radius:16px;border:1px solid var(--border);background:transparent;color:rgba(255,255,255,.45);font-family:'Kanit',sans-serif;font-size:.75rem;cursor:pointer;transition:all .15s}
-.mtab:hover,.mtab.active{background:rgba(245,200,66,.15);border-color:var(--gold);color:var(--gold)}
-.person-chips{display:flex;gap:.4rem;flex-wrap:wrap;min-height:36px}
-.pchip{padding:.3rem .85rem;border-radius:20px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-family:'Kanit',sans-serif;font-size:.78rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.35rem}
-.pchip:hover{border-color:var(--rose);color:var(--rose)}
-.pchip.active{background:rgba(255,107,157,.15);border-color:var(--rose);color:var(--rose);font-weight:500}
-.pchip-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
-/* WISH FORM */
-.wish-form{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:20px;padding:1.5rem;margin-bottom:1.5rem;transition:border-color .3s}
-.wish-form:focus-within{border-color:rgba(245,200,66,.3)}
-.form-title{font-size:.95rem;font-weight:500;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:.4rem}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.65rem}
-.form-row-full{margin-bottom:.65rem}
-.field-label{font-size:.68rem;color:var(--sub);margin-bottom:.22rem;letter-spacing:.04em}
-.field-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:10px;padding:.55rem .8rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s}
-.field-input:focus{border-color:rgba(245,200,66,.45)}
-.field-textarea{height:90px;resize:none;line-height:1.6}
-.emoji-row{display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.75rem}
-.emoji-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.05);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.emoji-btn:hover{background:rgba(255,255,255,.12);transform:scale(1.15)}
-.send-btn{width:100%;padding:.7rem;background:linear-gradient(135deg,#f5c842,#f7a621);border:none;border-radius:12px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;letter-spacing:.02em}
-.send-btn:hover{opacity:.92}
-.send-btn:active{transform:scale(.98)}
-.send-btn:disabled{opacity:.5;cursor:not-allowed}
-.success-msg{display:none;text-align:center;color:var(--mint);font-size:.85rem;margin-top:.65rem;animation:fadeIn .4s}
-.success-msg.show{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-/* API CONFIG */
-.api-bar{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;margin-bottom:1.25rem;display:flex;gap:.5rem;align-items:center}
-.api-bar input{flex:1;background:transparent;border:none;color:rgba(255,255,255,.6);font-family:'Kanit',sans-serif;font-size:.75rem;outline:none}
-.api-bar input::placeholder{color:rgba(255,255,255,.25)}
-.api-status{font-size:.65rem;padding:.22rem .6rem;border-radius:20px;flex-shrink:0}
-.api-ok{background:rgba(0,229,204,.15);color:var(--mint)}
-.api-err{background:rgba(255,107,157,.15);color:var(--rose)}
-.api-pending{background:rgba(245,200,66,.15);color:var(--gold)}
-/* WISH WALL */
-.wall-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-.wall-title{font-size:1.05rem;font-weight:500;color:#fff}
-.wall-refresh{background:none;border:1px solid var(--border);border-radius:8px;color:var(--sub);font-family:'Kanit',sans-serif;font-size:.72rem;padding:.3rem .65rem;cursor:pointer;transition:all .2s}
-.wall-refresh:hover{border-color:var(--gold);color:var(--gold)}
-.wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.75rem}
-.wish-card{background:var(--card);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:16px;padding:1.1rem;position:relative;overflow:hidden;animation:cardIn .4s ease both}
-@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.wish-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.wc-0::before{background:linear-gradient(90deg,var(--gold),#f7a621)}
-.wc-1::before{background:linear-gradient(90deg,var(--rose),#ff9f7a)}
-.wc-2::before{background:linear-gradient(90deg,var(--mint),#00b4d8)}
-.wc-3::before{background:linear-gradient(90deg,var(--purple),#818cf8)}
-.wc-4::before{background:linear-gradient(90deg,#34d399,#059669)}
-.wc-5::before{background:linear-gradient(90deg,#f472b6,#ec4899)}
-.wish-emoji{font-size:1.6rem;margin-bottom:.4rem}
-.wish-msg{font-size:.85rem;font-weight:300;color:rgba(255,255,255,.85);line-height:1.65;margin-bottom:.65rem;word-break:break-word}
-.wish-from{font-size:.7rem;color:var(--sub);display:flex;align-items:center;gap:.3rem}
-.wish-from-name{color:var(--gold);font-weight:500}
-.wish-ts{margin-left:auto;font-size:.62rem;opacity:.4}
-.wish-empty{text-align:center;padding:3rem 1rem;color:var(--sub)}
-.wish-empty-icon{font-size:2.5rem;margin-bottom:.6rem}
-/* OFFLINE INDICATOR */
-.offline-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:linear-gradient(90deg,#92400e,#78350f);padding:.5rem 1rem;text-align:center;font-size:.8rem}
-/* ── PHOTO FRAME ─────────────────────────── */
-.photo-frame-wrap{display:flex;justify-content:center;margin:.75rem 0}
-.photo-frame{width:110px;height:110px;border-radius:50%;border:4px solid #f5c842;background:rgba(255,255,255,.08);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;cursor:pointer;transition:transform .2s}
-.photo-frame:hover{transform:scale(1.04)}
-.photo-frame img{width:100%;height:100%;object-fit:cover}
-.photo-upload-hint{font-size:.6rem;color:rgba(255,255,255,.3);text-align:center;margin-top:.25rem}
-.photo-badge{position:absolute;bottom:2px;right:2px;width:26px;height:26px;border-radius:50%;background:#f5c842;display:flex;align-items:center;justify-content:center;font-size:.8rem;border:2px solid #0f0c1d}
-/* ── GAME ────────────────────────────────── */
-.game-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
-.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
-.game-title-text{font-size:.95rem;font-weight:500;color:#fff}
-.game-score{font-size:.72rem;color:var(--gold);background:rgba(245,200,66,.1);border-radius:20px;padding:.2rem .7rem}
-.quiz-question{background:rgba(255,255,255,.06);border-radius:10px;padding:.75rem 1rem;font-size:.85rem;color:#fff;margin-bottom:.75rem;line-height:1.5}
-.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
-.quiz-opt{padding:.55rem .75rem;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.7);font-family:'Kanit',sans-serif;font-size:.8rem;cursor:pointer;text-align:left;transition:all .15s}
-.quiz-opt:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
-.quiz-opt.correct{background:rgba(0,229,204,.15);border-color:#00e5cc;color:#00e5cc}
-.quiz-opt.wrong{background:rgba(255,107,157,.15);border-color:#ff6b9d;color:#ff6b9d}
-.quiz-opt:disabled{cursor:default}
-.quiz-next{margin-top:.75rem;width:100%;padding:.6rem;background:linear-gradient(135deg,#f5c842,#f7a621);border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer}
-.quiz-result{text-align:center;padding:1rem;font-size:.9rem;color:#fff}
-/* ── QUIZ EDITOR (admin) ─────────────────── */
-.quiz-editor{display:none;margin-top:.75rem;border-top:1px solid rgba(255,255,255,.08);padding-top:.75rem}
-.admin-mode .quiz-editor{display:block}
-.qe-title{font-size:.72rem;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
-.qe-list{display:flex;flex-direction:column;gap:.4rem;max-height:180px;overflow-y:auto;margin-bottom:.5rem}
-.qe-item{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.04);border-radius:8px;padding:.35rem .6rem;font-size:.75rem;color:rgba(255,255,255,.7)}
+.bg-deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.2}
+.bb1{width:550px;height:550px;background:#4a1070;top:-150px;left:-120px;animation:drift 14s ease-in-out infinite alternate}
+.bb2{width:450px;height:450px;background:#0e2560;bottom:-80px;right:-80px;animation:drift 18s ease-in-out infinite alternate-reverse}
+.bb3{width:300px;height:300px;background:#6e1a3a;top:45%;left:30%;animation:drift 11s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(28px,22px)}}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,13,26,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--b);padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.tb-logo{font-family:'Mitr',sans-serif;font-size:.88rem;font-weight:500;color:var(--gold);letter-spacing:.05em}
+.tb-right{display:flex;align-items:center;gap:.35rem}
+.tb-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--b2);background:transparent;color:var(--sub);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.tb-btn:hover,.tb-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,.1)}
+.admin-top-badge{font-size:.6rem;background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);border-radius:20px;padding:.12rem .5rem;color:var(--gold);display:none}
+.admin-mode .admin-top-badge{display:inline-block}
+/* ADMIN STRIP */
+.admin-strip{display:none;background:rgba(245,200,66,.05);border-bottom:1px solid rgba(245,200,66,.1);padding:.5rem 1rem;gap:.35rem;flex-wrap:wrap;align-items:center}
+.admin-mode .admin-strip{display:flex}
+.as-lbl{font-size:.62rem;color:rgba(245,200,66,.55);letter-spacing:.05em}
+.as-inp{flex:1;min-width:120px;background:rgba(255,255,255,.06);border:1px solid rgba(245,200,66,.18);border-radius:7px;padding:.3rem .6rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.7rem;outline:none}
+.as-btn{padding:.28rem .6rem;border-radius:7px;border:1px solid rgba(245,200,66,.22);background:transparent;color:rgba(245,200,66,.7);font-family:'Kanit',sans-serif;font-size:.65rem;cursor:pointer;white-space:nowrap;transition:all .15s}
+.as-btn:hover{background:rgba(245,200,66,.1);color:var(--gold);border-color:var(--gold)}
+.api-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.api-dot.ok{background:var(--mint)}.api-dot.err{background:var(--rose)}.api-dot.pending{background:var(--gold)}
+/* ADMIN MONTH PANEL */
+.admin-month-panel{display:none;background:rgba(245,200,66,.04);border-bottom:1px solid rgba(245,200,66,.08);padding:.55rem 1rem}
+.admin-mode .admin-month-panel.open{display:block}
+.amp-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.amp-lbl{font-size:.62rem;color:rgba(245,200,66,.55);letter-spacing:.07em;text-transform:uppercase}
+.amp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.25rem}
+/* MONTH SCROLL */
+.month-row{display:flex;gap:.3rem;overflow-x:auto;padding:.65rem 1rem .35rem;scrollbar-width:none}
+.month-row::-webkit-scrollbar{display:none}
+.mtab{flex-shrink:0;padding:.3rem .7rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.mtab:hover{border-color:var(--b2);color:var(--sub)}
+.mtab.active{background:rgba(245,200,66,.14);border-color:var(--gold);color:var(--gold);font-weight:500}
+.mtab.hidden-month{opacity:.28;text-decoration:line-through}
+/* PERSON ROW */
+.person-row{display:flex;gap:.3rem;overflow-x:auto;padding:.15rem 1rem .6rem;scrollbar-width:none}
+.person-row::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .78rem;border-radius:20px;border:1px solid var(--b);background:var(--c1);color:var(--sub);font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.pchip.active{background:rgba(255,107,157,.12);border-color:var(--rose);color:var(--rose);font-weight:500}
+.person-locked{font-size:.75rem;color:var(--mute);padding:.35rem 1rem}
+/* HERO */
+.hero{padding:.85rem 1rem 1rem;text-align:center;background:linear-gradient(180deg,rgba(74,16,112,.2) 0%,transparent 100%)}
+.hero-photo-wrap{display:flex;justify-content:center;margin-bottom:.75rem}
+.hero-photo{width:84px;height:84px;border-radius:50%;border:3px solid var(--gold);background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:2.4rem;position:relative;overflow:hidden;cursor:default;transition:transform .2s}
+.admin-mode .hero-photo{cursor:pointer}
+.admin-mode .hero-photo:hover{transform:scale(1.04)}
+.hero-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo-badge-inner{position:absolute;bottom:1px;right:1px;width:22px;height:22px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:.7rem;border:2px solid var(--bg)}
+.photo-hint{font-size:.6rem;color:var(--mute);margin-top:.25rem;display:none;text-align:center}
+.admin-mode .photo-hint{display:block}
+.hero-name{font-family:'Dancing Script',cursive;font-size:1.9rem;font-weight:700;color:#fff;line-height:1.1;margin-bottom:.18rem}
+.hero-pos{font-size:.72rem;color:var(--sub);margin-bottom:.5rem}
+.hero-pill{display:inline-flex;align-items:center;gap:.3rem;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:.22rem .75rem;font-size:.72rem;color:var(--gold);margin-bottom:.65rem}
+.stat-row{display:flex;justify-content:center;gap:1.25rem}
+.stat-item{text-align:center}
+.stat-n{font-size:1.3rem;font-weight:600;color:var(--gold)}
+.stat-l{font-size:.62rem;color:var(--mute)}
+/* GAME BANNER */
+.game-banner{margin:.6rem 1rem .4rem;background:linear-gradient(135deg,#3d1a6e,#1a2560);border-radius:16px;padding:1rem 1.1rem;display:flex;align-items:center;gap:.75rem;border:1px solid rgba(167,139,250,.22);position:relative;overflow:hidden;cursor:pointer;transition:opacity .2s}
+.game-banner:hover{opacity:.92}
+.game-banner::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(167,139,250,.08);border-radius:50%}
+.gb-icon{font-size:1.8rem;flex-shrink:0;position:relative;z-index:1}
+.gb-body{flex:1;position:relative;z-index:1}
+.gb-title{font-size:.85rem;font-weight:500;color:#fff;margin-bottom:.18rem;line-height:1.3}
+.gb-sub{font-size:.68rem;color:rgba(255,255,255,.45)}
+.gb-score{font-size:.72rem;color:var(--gold);background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:.2rem .65rem;flex-shrink:0;position:relative;z-index:1}
+/* QUIZ INLINE */
+.quiz-inline{margin:0 1rem .4rem;background:var(--c1);border-radius:14px;padding:.9rem 1rem;border:1px solid var(--b)}
+.qi-q{font-size:.85rem;color:#fff;margin-bottom:.65rem;line-height:1.5}
+.qi-opts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.qopt{padding:.52rem .65rem;border-radius:10px;border:1px solid var(--b2);background:transparent;color:var(--sub);font-family:'Kanit',sans-serif;font-size:.78rem;cursor:pointer;text-align:left;transition:all .15s;line-height:1.3}
+.qopt:hover:not(:disabled){background:rgba(255,255,255,.07);color:#fff}
+.qopt.correct{background:rgba(0,229,204,.1);border-color:var(--mint);color:var(--mint)}
+.qopt.wrong{background:rgba(255,107,157,.1);border-color:var(--rose);color:var(--rose)}
+.qopt:disabled{cursor:default}
+.qi-next{margin-top:.6rem;width:100%;padding:.58rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer}
+.qi-score-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem}
+.qi-score-txt{font-size:.68rem;color:var(--mute)}
+.qi-score-val{font-size:.72rem;color:var(--gold);background:rgba(245,200,66,.1);border-radius:12px;padding:.18rem .6rem}
+.qi-result{text-align:center;padding:.5rem 0}
+.qi-name-inp{width:100%;background:rgba(255,255,255,.07);border:1px solid var(--b2);border-radius:9px;padding:.45rem .7rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.82rem;outline:none;margin:.5rem 0}
+.qi-name-inp:focus{border-color:rgba(245,200,66,.4)}
+/* ADMIN QUIZ EDITOR */
+.qe-panel{display:none;margin:0 1rem .4rem;background:rgba(245,200,66,.04);border-radius:14px;padding:.85rem 1rem;border:1px solid rgba(245,200,66,.12)}
+.admin-mode .qe-panel{display:block}
+.qe-lbl{font-size:.62rem;color:rgba(245,200,66,.6);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.4rem}
+.qe-list{display:flex;flex-direction:column;gap:.3rem;max-height:130px;overflow-y:auto;margin-bottom:.4rem}
+.qe-item{display:flex;align-items:center;gap:.3rem;background:var(--c2);border-radius:8px;padding:.28rem .55rem;font-size:.7rem;color:var(--sub)}
 .qe-item-q{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.qe-del{background:none;border:none;color:rgba(255,107,157,.5);cursor:pointer;font-size:.85rem;padding:0 4px;flex-shrink:0}
-.qe-del:hover{color:#ff6b9d}
-.qe-form{display:flex;flex-direction:column;gap:.35rem}
-.qe-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.4rem .6rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.78rem;width:100%;outline:none}
-.qe-input:focus{border-color:rgba(245,200,66,.4)}
-.qe-opts-row{display:grid;grid-template-columns:1fr 1fr;gap:.3rem}
-.qe-add-btn{padding:.4rem;background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.2);border-radius:8px;color:var(--gold);font-family:'Kanit',sans-serif;font-size:.75rem;cursor:pointer;width:100%;transition:all .15s}
-.qe-add-btn:hover{background:rgba(245,200,66,.2)}
-/* ── LIKE NOTIFICATION ───────────────────── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem}
-.modal-box{background:#1a1227;border:1px solid rgba(255,200,66,.25);border-radius:20px;padding:1.5rem;width:100%;max-width:380px;display:flex;flex-direction:column;gap:.85rem}
-.modal-title{font-size:1rem;font-weight:500;color:#fff;display:flex;align-items:center;gap:.4rem}
-.modal-input{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:.55rem .85rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.9rem;width:100%;outline:none;transition:border-color .2s}
-.modal-input:focus{border-color:rgba(245,200,66,.5)}
-.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
-.modal-btn-primary{padding:.65rem;background:linear-gradient(135deg,#f5c842,#f7a621);border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer}
-.modal-btn-ghost{padding:.65rem;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:10px;color:rgba(255,255,255,.5);font-family:'Kanit',sans-serif;font-size:.88rem;cursor:pointer}
-.modal-sep{height:1px;background:rgba(255,255,255,.08);margin:.1rem 0}
-.modal-label{font-size:.7rem;color:rgba(255,255,255,.4);letter-spacing:.05em}
-.modal-danger{color:#ff6b9d;font-size:.8rem;background:rgba(255,107,157,.08);border:1px solid rgba(255,107,157,.2);border-radius:10px;padding:.6rem .85rem;cursor:pointer;font-family:'Kanit',sans-serif;width:100%;text-align:left}
-.modal-danger:hover{background:rgba(255,107,157,.15)}
-.modal-success-msg{font-size:.78rem;color:#00e5cc;text-align:center;display:none}
-.like-notif{position:fixed;bottom:5rem;left:50%;.like-notif{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%) translateY(60px);background:rgba(245,107,157,.15);border:1px solid #ff6b9d;border-radius:30px;padding:.5rem 1.25rem;font-size:.82rem;color:#ff6b9d;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;z-index:998;opacity:0;pointer-events:none;display:flex;align-items:center;gap:.4rem;white-space:nowrap}
-.like-notif.show{transform:translateX(-50%) translateY(0);opacity:1}
-.like-heart-fly{position:fixed;pointer-events:none;z-index:997;font-size:1.5rem;animation:heartFly 1.2s ease forwards}
-@keyframes heartFly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-120px) scale(1.5)}}
-/* ── LEADERBOARD ─────────────────────────── */
-.lb-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
-/* ── PARTICIPANTS ────────────────────────── */
-.part-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
-.part-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
-.part-title{font-size:.95rem;font-weight:500;color:#fff}
-.part-count{font-size:.72rem;color:var(--gold);background:rgba(245,200,66,.1);border-radius:20px;padding:.2rem .7rem}
-.part-grid{display:flex;flex-wrap:wrap;gap:.35rem}
-.part-chip{display:flex;align-items:center;gap:.3rem;padding:.28rem .65rem;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:.72rem;color:rgba(255,255,255,.75)}
-.part-chip.winner{background:rgba(245,200,66,.15);border-color:var(--gold);color:var(--gold);font-weight:500}
-.part-empty{font-size:.78rem;color:rgba(255,255,255,.3);padding:.5rem 0}
-/* ── WHEEL ───────────────────────────────── */
-.wheel-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
-.wheel-header{font-size:.95rem;font-weight:500;color:#fff;margin-bottom:.85rem;display:flex;align-items:center;gap:.4rem}
-.wheel-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem}
-.wheel-canvas-wrap{position:relative;width:260px;height:260px}
-canvas#wheelCanvas{border-radius:50%}
-.wheel-pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:24px solid #f5c842;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
-.wheel-spin-btn{padding:.65rem 2rem;background:linear-gradient(135deg,#f5c842,#f7a621);border:none;border-radius:30px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s}
-.wheel-spin-btn:hover{opacity:.9}
-.wheel-spin-btn:active{transform:scale(.97)}
-.wheel-spin-btn:disabled{opacity:.5;cursor:not-allowed}
-.wheel-result{font-size:1.1rem;font-weight:500;color:var(--gold);text-align:center;min-height:1.5rem}
-.wheel-export-btn{padding:.45rem 1.2rem;background:none;border:1px solid rgba(245,200,66,.3);border-radius:20px;color:var(--gold);font-family:'Kanit',sans-serif;font-size:.72rem;cursor:pointer}
-.wheel-export-btn:hover{background:rgba(245,200,66,.1)}
-.lb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
-.lb-title{font-size:.95rem;font-weight:500;color:#fff}
-.lb-tabs{display:flex;gap:.3rem}
-.lb-tab{padding:.22rem .7rem;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.4);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
-.lb-tab.active{background:rgba(245,200,66,.15);border-color:var(--gold);color:var(--gold)}
-.lb-list{display:flex;flex-direction:column;gap:.35rem}
-.lb-row{display:flex;align-items:center;gap:.65rem;padding:.45rem .7rem;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
-.lb-row.me{border-color:rgba(245,200,66,.3);background:rgba(245,200,66,.06)}
-.lb-rank{font-size:1rem;width:24px;text-align:center;flex-shrink:0}
-.lb-ava{width:28px;height:28px;border-radius:50%;background:rgba(245,200,66,.2);display:flex;align-items:center;justify-content:center;font-size:.62rem;color:var(--gold);flex-shrink:0;font-weight:600}
-.lb-name{flex:1;font-size:.8rem;color:#fff;font-weight:400}
-.lb-score{font-size:.78rem;font-weight:500;color:var(--gold);flex-shrink:0}
-.lb-empty{font-size:.78rem;color:rgba(255,255,255,.3);text-align:center;padding:.75rem}
-/* ── VOTE ────────────────────────────────── */
-.vote-section{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem}
-.vote-header{font-size:.95rem;font-weight:500;color:#fff;margin-bottom:.85rem;display:flex;align-items:center;gap:.4rem}
-.vote-card{display:flex;align-items:center;gap:.65rem;padding:.55rem .75rem;border-radius:10px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);margin-bottom:.4rem;cursor:pointer;transition:border-color .15s}
-.vote-card:hover{border-color:rgba(245,200,66,.3)}
-.vote-card.voted{border-color:var(--gold)}
-.vote-msg{flex:1;min-width:0;font-size:.78rem;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vote-bar-wrap{width:80px;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;flex-shrink:0}
-.vote-bar{height:100%;background:var(--gold);border-radius:3px;transition:width .4s}
-.vote-pct{font-size:.68rem;color:var(--gold);min-width:28px;text-align:right;flex-shrink:0}
-.vote-heart{font-size:.85rem;flex-shrink:0}
-.vote-empty{font-size:.78rem;color:rgba(255,255,255,.3);text-align:center;padding:.75rem}
-.admin-bar{display:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,200,66,.2);border-radius:12px;padding:.75rem 1rem;margin-bottom:1.25rem;gap:.5rem;align-items:center}
-.admin-bar.show{display:flex}
-.admin-bar input{flex:1;background:transparent;border:none;color:rgba(255,255,255,.6);font-family:'Kanit',sans-serif;font-size:.75rem;outline:none}
-.admin-bar input::placeholder{color:rgba(255,255,255,.25)}
-.admin-lock{position:fixed;bottom:1.5rem;right:1.5rem;z-index:99;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.admin-lock:hover{background:rgba(255,200,66,.15);border-color:rgba(255,200,66,.4);color:var(--gold)}
-.admin-lock.active{background:rgba(255,200,66,.2);border-color:var(--gold);color:var(--gold)}
-.wish-hidden{opacity:.3;filter:grayscale(1)}
-.wish-actions{display:none;position:absolute;top:.5rem;right:.5rem;gap:.3rem}
+.qe-del{background:none;border:none;color:rgba(255,107,157,.4);cursor:pointer;font-size:.78rem;flex-shrink:0}
+.qe-del:hover{color:var(--rose)}
+.qe-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.28rem;margin-bottom:.3rem}
+.qe-inp{background:rgba(255,255,255,.06);border:1px solid var(--b2);border-radius:8px;padding:.36rem .58rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.72rem;width:100%;outline:none}
+.qe-inp:focus{border-color:rgba(245,200,66,.38)}
+.qe-add{padding:.38rem;background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.17);border-radius:8px;color:var(--gold);font-family:'Kanit',sans-serif;font-size:.7rem;cursor:pointer;width:100%}
+.qe-add:hover{background:rgba(245,200,66,.14)}
+/* WISH FORM */
+.wish-form{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.sec-title{font-size:.88rem;font-weight:500;color:#fff}
+.sec-badge{font-size:.62rem;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:.15rem .55rem;color:var(--gold)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.45rem}
+.fi{display:flex;flex-direction:column;gap:.2rem}
+.fi-full{grid-column:1/-1}
+.fl{font-size:.62rem;color:var(--mute);letter-spacing:.03em}
+.finput{background:rgba(255,255,255,.06);border:1px solid var(--b2);border-radius:9px;padding:.48rem .72rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.83rem;width:100%;outline:none;transition:border-color .2s}
+.finput:focus{border-color:rgba(245,200,66,.42)}
+.ftextarea{height:76px;resize:none;line-height:1.55}
+.emoji-bar{display:flex;gap:.25rem;flex-wrap:wrap;margin:.45rem 0}
+.emo{width:28px;height:28px;border-radius:7px;border:1px solid var(--b);background:rgba(255,255,255,.04);cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.emo:hover{background:rgba(255,255,255,.1);transform:scale(1.12)}
+.send-btn{width:100%;padding:.68rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:11px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.send-btn:hover{opacity:.9}
+.send-btn:disabled{opacity:.45;cursor:not-allowed}
+.success-msg{display:none;text-align:center;color:var(--mint);font-size:.8rem;margin-top:.5rem}
+.success-msg.show{display:block}
+/* VOTE */
+.vote-sec{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.vote-card{display:flex;align-items:center;gap:.5rem;padding:.42rem .6rem;border-radius:10px;border:1px solid var(--b);background:var(--c2);margin-bottom:.3rem;cursor:pointer;transition:border-color .15s}
+.vote-card:hover{border-color:var(--b2)}
+.vote-card.voted{border-color:var(--rose)}
+.vote-medal{font-size:.88rem;flex-shrink:0;width:18px}
+.vote-msg{flex:1;min-width:0;font-size:.73rem;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vote-bar-wrap{width:60px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;flex-shrink:0}
+.vote-bar{height:100%;background:var(--rose);border-radius:2px;transition:width .4s}
+.vote-cnt{font-size:.62rem;color:var(--rose);min-width:22px;text-align:right;flex-shrink:0}
+.vote-empty{font-size:.75rem;color:var(--mute);padding:.3rem 0}
+/* WISH WALL */
+.wish-wall{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.wall-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
+.wall-refresh{background:none;border:1px solid var(--b);border-radius:7px;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.68rem;padding:.25rem .55rem;cursor:pointer;transition:all .2s}
+.wall-refresh:hover{border-color:var(--gold);color:var(--gold)}
+.wish-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.wish-card{background:var(--c2);border-radius:12px;padding:.75rem;position:relative;overflow:hidden;animation:cardIn .3s ease both;border-left:2.5px solid transparent}
+.wc-0{border-color:var(--gold)}.wc-1{border-color:var(--rose)}.wc-2{border-color:var(--mint)}.wc-3{border-color:var(--purple)}.wc-4{border-color:#34d399}.wc-5{border-color:#f472b6}
+@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.wish-hidden{opacity:.25;filter:grayscale(1)}
+.wish-emoji{font-size:1.3rem;margin-bottom:.25rem}
+.wish-msg{font-size:.73rem;color:rgba(255,255,255,.8);line-height:1.55;margin-bottom:.42rem;word-break:break-word}
+.wish-from{font-size:.62rem;color:var(--mute)}
+.wish-from-name{color:var(--gold);font-weight:500}
+.wish-ts{font-size:.58rem;opacity:.4;display:block;margin-top:.1rem}
+.wish-actions{display:none;position:absolute;top:.38rem;right:.38rem;gap:.22rem}
 .admin-mode .wish-card .wish-actions{display:flex}
-.wish-act-btn{width:26px;height:26px;border-radius:6px;border:none;cursor:pointer;font-size:.7rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.wish-act-hide{background:rgba(255,200,66,.15);color:var(--gold)}
-.wish-act-del{background:rgba(255,107,157,.15);color:var(--rose)}
-.wish-act-hide:hover{background:rgba(255,200,66,.3)}
-.wish-act-del:hover{background:rgba(255,107,157,.35)}
-.admin-badge{display:none;background:rgba(255,200,66,.15);border:1px solid rgba(255,200,66,.3);border-radius:20px;padding:.22rem .7rem;font-size:.65rem;color:var(--gold);letter-spacing:.05em}
-.admin-mode .admin-badge{display:inline-block}
-.admin-month-ctrl{display:none;background:rgba(255,200,66,.06);border:1px solid rgba(255,200,66,.2);border-radius:12px;padding:.75rem 1rem;margin-bottom:1rem}
-.admin-mode .admin-month-ctrl{display:block}
-.amc-title{font-size:.68rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between}
-.amc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.28rem}
-.amc-chip{padding:.28rem .2rem;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:transparent;color:rgba(255,255,255,.4);font-family:'Kanit',sans-serif;font-size:.7rem;cursor:pointer;text-align:center;transition:all .15s}
-.amc-chip.on{background:rgba(255,200,66,.18);border-color:var(--gold);color:var(--gold);font-weight:500}
-.amc-hint{font-size:.62rem;color:rgba(255,255,255,.3);margin-top:.4rem;text-align:center}
-.month-tabs .mtab.hidden-month{opacity:.35;text-decoration:line-through}
-.person-locked{text-align:center;padding:1.5rem;color:rgba(255,255,255,.3);font-size:.82rem}
-/* TOAST */
-.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(120px);background:rgba(0,229,204,.15);border:1px solid var(--mint);border-radius:30px;padding:.55rem 1.4rem;font-size:.82rem;color:var(--mint);transition:transform .35s cubic-bezier(.34,1.56,.64,1);z-index:999;backdrop-filter:blur(10px)}
-.toast.show{transform:translateX(-50%) translateY(0)}
-/* CONFETTI */
-.confetti-piece{position:fixed;pointer-events:none;z-index:999;width:8px;height:8px;border-radius:2px;animation:confettiFall 2.5s ease forwards}
-@keyframes confettiFall{0%{opacity:1;transform:translate(0,0) rotate(0deg)}100%{opacity:0;transform:translate(var(--dx),100vh) rotate(720deg)}}
-/* MOBILE */
-@media(max-width:600px){
-  .form-row{grid-template-columns:1fr}
-  .hero-name{font-size:2.4rem}
-  .wish-grid{grid-template-columns:1fr}
-}
+.wact{width:22px;height:22px;border-radius:6px;border:none;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center}
+.wact-hide{background:rgba(245,200,66,.1);color:var(--gold)}
+.wact-del{background:rgba(255,107,157,.1);color:var(--rose)}
+.wish-empty{grid-column:1/-1;text-align:center;padding:1.8rem 1rem;color:var(--mute)}
+.wish-empty-icon{font-size:2rem;margin-bottom:.4rem}
+/* PARTICIPANTS */
+.part-sec{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.part-chips{display:flex;flex-wrap:wrap;gap:.28rem}
+.part-chip{display:flex;align-items:center;gap:.22rem;padding:.2rem .6rem;border-radius:20px;background:var(--c2);border:1px solid var(--b);font-size:.68rem;color:var(--sub)}
+.part-chip.winner{background:rgba(245,200,66,.1);border-color:var(--gold);color:var(--gold);font-weight:500}
+.part-empty{font-size:.72rem;color:var(--mute)}
+/* WHEEL */
+.wheel-sec{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.wheel-wrap{display:flex;flex-direction:column;align-items:center;gap:.65rem;padding-top:.25rem}
+.wheel-frame{position:relative;width:240px;height:240px}
+canvas#wheelCanvas{border-radius:50%}
+.wheel-ptr{position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:20px solid var(--gold)}
+.wheel-result-txt{font-size:.92rem;font-weight:500;color:var(--gold);min-height:1.3rem;text-align:center}
+.wheel-admin-btns{display:none;flex-direction:column;align-items:center;gap:.38rem;width:100%}
+.wheel-spin-btn{padding:.6rem 1.8rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:30px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.wheel-spin-btn:disabled{opacity:.42;cursor:not-allowed}
+.wheel-export-btn{padding:.35rem 1rem;background:transparent;border:1px solid rgba(245,200,66,.2);border-radius:20px;color:rgba(245,200,66,.65);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
+.wheel-export-btn:hover{background:rgba(245,200,66,.08);color:var(--gold)}
+.wheel-pub-hint{font-size:.68rem;color:var(--mute);text-align:center}
+/* LEADERBOARD */
+.lb-sec{margin:.4rem 1rem .4rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.lb-tabs{display:flex;gap:.28rem;margin-bottom:.7rem}
+.lb-tab{padding:.22rem .72rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
+.lb-tab.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
+.lb-row{display:flex;align-items:center;gap:.5rem;padding:.38rem .6rem;border-radius:9px;background:var(--c2);margin-bottom:.28rem}
+.lb-rank{font-size:.9rem;width:20px;text-align:center;flex-shrink:0}
+.lb-ava{width:24px;height:24px;border-radius:50%;background:rgba(245,200,66,.14);display:flex;align-items:center;justify-content:center;font-size:.58rem;color:var(--gold);flex-shrink:0;font-weight:600}
+.lb-name{flex:1;font-size:.78rem;color:#fff}
+.lb-score{font-size:.68rem;color:var(--gold);flex-shrink:0}
+.lb-empty{font-size:.72rem;color:var(--mute);padding:.3rem 0}
+/* SPACER */
+.spacer-bottom{height:1.5rem}
+/* NOTIFICATIONS */
+.offline-banner{display:none;position:sticky;top:53px;z-index:49;background:linear-gradient(90deg,#92400e,#78350f);padding:.38rem 1rem;text-align:center;font-size:.72rem}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(70px);background:rgba(0,229,204,.12);border:1px solid var(--mint);border-radius:30px;padding:.44rem 1.1rem;font-size:.78rem;color:var(--mint);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;z-index:100;opacity:0;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.like-notif{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(70px);background:rgba(255,107,157,.12);border:1px solid var(--rose);border-radius:30px;padding:.44rem 1.1rem;font-size:.78rem;color:var(--rose);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;z-index:99;opacity:0;pointer-events:none;white-space:nowrap}
+.like-notif.show{transform:translateX(-50%) translateY(0);opacity:1}
+.like-heart-fly{position:fixed;pointer-events:none;z-index:98;font-size:1.4rem;animation:heartFly 1.2s ease forwards}
+@keyframes heartFly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-100px) scale(1.5)}}
+.confetti-piece{position:fixed;pointer-events:none;z-index:97;width:7px;height:7px;border-radius:2px;animation:cfFall 2.5s ease forwards}
+@keyframes cfFall{0%{opacity:1;transform:translate(0,0) rotate(0deg)}100%{opacity:0;transform:translate(var(--dx),90vh) rotate(720deg)}}
+/* SYNC STATUS */
+#syncStatus{font-size:.62rem;color:var(--mute);text-align:center;padding:.18rem 1rem;min-height:1rem}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-box{background:#1a1230;border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:1.35rem;width:100%;max-width:340px;display:flex;flex-direction:column;gap:.75rem}
+.modal-title{font-size:.92rem;font-weight:500;color:#fff;display:flex;align-items:center;gap:.3rem}
+.modal-input{background:rgba(255,255,255,.07);border:1px solid var(--b2);border-radius:10px;padding:.5rem .78rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.86rem;width:100%;outline:none;transition:border-color .2s}
+.modal-input:focus{border-color:rgba(245,200,66,.42)}
+.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.modal-btn-primary{padding:.6rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer}
+.modal-btn-ghost{padding:.6rem;background:transparent;border:1px solid var(--b2);border-radius:10px;color:var(--sub);font-family:'Kanit',sans-serif;font-size:.86rem;cursor:pointer}
+.modal-sep{height:1px;background:var(--b)}
+.modal-label{font-size:.65rem;color:var(--mute);letter-spacing:.04em}
+.modal-danger{color:var(--rose);font-size:.76rem;background:rgba(255,107,157,.05);border:1px solid rgba(255,107,157,.16);border-radius:10px;padding:.52rem .78rem;cursor:pointer;font-family:'Kanit',sans-serif;width:100%;text-align:left}
+.modal-danger:hover{background:rgba(255,107,157,.11)}
+.modal-success-msg{font-size:.72rem;color:var(--mint);text-align:center;display:none}
 </style>
 </head>
 <body>
-<div class="bg">
-  <div class="bg-blob bb1"></div>
-  <div class="bg-blob bb2"></div>
-  <div class="bg-blob bb3"></div>
-</div>
-<div class="particles" id="particles"></div>
-<div class="offline-banner" id="offline-banner">⚠️ ออฟไลน์ — คำอวยพรจะบันทึกในเครื่องและส่งเมื่อออนไลน์</div>
+<div class="bg-deco"><div class="bb bb1"></div><div class="bb bb2"></div><div class="bb bb3"></div></div>
+<div class="offline-banner" id="offlineBanner">⚠️ ออฟไลน์</div>
 
-<div class="container">
-
-  <!-- SYNC STATUS (visible to all) -->
-  <div id="syncStatus" style="font-size:.7rem;color:rgba(255,255,255,.35);text-align:center;min-height:1.2rem;margin-bottom:.25rem"></div>
-
-  <!-- ADMIN BAR (hidden by default) -->
-  <div class="admin-bar" id="apiBar">
-    <span style="font-size:.65rem;color:rgba(255,200,66,.6);flex-shrink:0">🔐 Script URL:</span>
-    <input id="apiUrl" type="text" placeholder="วาง Web App URL ของ Google Apps Script..." oninput="saveApiUrl()">
-    <span class="api-status api-pending" id="apiStatus">—</span>
-    <button onclick="testApi()" style="background:none;border:1px solid rgba(255,200,66,.2);border-radius:7px;color:rgba(255,200,66,.6);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.22rem .55rem;cursor:pointer">ทดสอบ</button>
-    <button onclick="reloadPersons()" style="background:none;border:1px solid rgba(255,200,66,.2);border-radius:7px;color:rgba(255,200,66,.6);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.22rem .55rem;cursor:pointer">🔄 รีโหลดพนักงาน</button>
-    <button onclick="showAdminSettings()" style="background:none;border:1px solid rgba(255,200,66,.2);border-radius:7px;color:rgba(255,200,66,.6);font-family:'Kanit',sans-serif;font-size:.7rem;padding:.22rem .55rem;cursor:pointer">⚙️ ตั้งค่า</button>
-  </div>
-
-  <!-- ADMIN MONTH CONTROL (visible to admin only) -->
-  <div class="admin-month-ctrl" id="adminMonthCtrl">
-    <div class="amc-title">
-      <span>🗓 เลือกเดือนที่แสดงให้พนักงานเห็น</span>
-      <button onclick="toggleAllMonths()" style="background:none;border:1px solid rgba(255,200,66,.3);border-radius:6px;color:var(--gold);font-family:'Kanit',sans-serif;font-size:.65rem;padding:.15rem .5rem;cursor:pointer">เลือกทั้งหมด</button>
-    </div>
-    <div class="amc-grid" id="amcGrid"></div>
-    <div class="amc-hint">พนักงานทั่วไปจะเห็นเฉพาะเดือนที่เปิดใช้งาน</div>
-  </div>
-
-  <!-- PERSON SELECTOR -->
-  <div class="person-selector">
-    <div class="person-selector-label">เลือกเดือนเกิด</div>
-    <div class="month-tabs" id="monthTabs"></div>
-    <div class="person-selector-label" style="margin-top:.25rem">เลือกพนักงานเจ้าของวันเกิด</div>
-    <div class="person-chips" id="personChips"><div style="font-size:.78rem;color:rgba(255,255,255,.3)">เลือกเดือนก่อน</div></div>
-  </div>
-
-  <!-- HERO -->
-  <div class="hero" id="hero">
-    <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.25rem">
-      <div class="hero-tag" style="margin:0">🎂 Happy Birthday</div>
-      <span class="admin-badge">ADMIN MODE</span>
-    </div>
-    <div class="photo-frame-wrap">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:.2rem">
-        <div class="photo-frame" id="empPhotoFrame" onclick="adminUploadPhoto()">
-          <span id="empPhotoEmoji">🎂</span>
-          <img id="empPhoto" src="" style="display:none;position:absolute;inset:0">
-          <div class="photo-badge">🎉</div>
-        </div>
-        <div class="photo-upload-hint admin-mode-only" id="photoUploadHint" style="display:none">📷 คลิกเพื่ออัปโหลดรูป</div>
-        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
-      </div>
-    </div>
-    <div class="hero-name" id="hero-name">เลือกพนักงาน</div>
-    <div class="hero-pos" id="hero-pos">—</div>
-    <div class="hero-date" id="hero-date"><span>🎂</span><span>เกิดเดือน...</span></div>
-    <div class="wish-counter">
-      <span>คำอวยพรทั้งหมด</span>
-      <span class="wish-count-num" id="wish-count">0</span>
-      <span>ข้อความ</span>
-    </div>
-  </div>
-
-  <!-- WISH FORM -->
-  <div class="wish-form" id="wish-form">
-    <div class="form-title">✍️ เขียนคำอวยพร</div>
-    <div class="form-row">
-      <div>
-        <div class="field-label">ชื่อของคุณ *</div>
-        <input class="field-input" id="wf-name" placeholder="ชื่อ-นามสกุล หรือ ชื่อเล่น" maxlength="50">
-      </div>
-      <div>
-        <div class="field-label">แผนก / ทีม</div>
-        <input class="field-input" id="wf-dept" placeholder="เช่น PDI, HR&GA, Yard...">
-      </div>
-    </div>
-    <div class="form-row-full">
-      <div class="field-label">คำอวยพร *</div>
-      <textarea class="field-input field-textarea" id="wf-text" placeholder="เขียนคำอวยพรให้เพื่อนร่วมงาน..."></textarea>
-    </div>
-    <div class="emoji-row" id="emojiRow"></div>
-    <button class="send-btn" id="send-btn" onclick="submitWish()">🎊 ส่งคำอวยพร!</button>
-    <div class="success-msg" id="success-msg">🎉 ส่งคำอวยพรสำเร็จแล้ว! ขอบคุณนะ ❤️</div>
-  </div>
-
-  <!-- GAME SECTION -->
-  <div class="game-section" id="gameSection" style="display:none">
-    <div class="game-header">
-      <div class="game-title-text" id="gameTitleText">🎯 คุณเป็นแฟนพันธุ์แท้ของเจ้าของวันเกิดหรือไม่?</div>
-      <div style="display:flex;align-items:center;gap:.4rem">
-        <div class="game-score" id="gameScore">0 คะแนน</div>
-        <div id="gameNameHint" style="font-size:.62rem;color:rgba(255,255,255,.35);display:none">⬇ กรอกชื่อในคำอวยพรก่อนนะ</div>
-        <button onclick="startGame()" style="background:none;border:1px solid rgba(255,255,255,.12);border-radius:7px;color:rgba(255,255,255,.4);font-family:'Kanit',sans-serif;font-size:.65rem;padding:.18rem .45rem;cursor:pointer">🔄</button>
-      </div>
-    </div>
-    <div id="gameBody">
-      <div style="text-align:center;color:rgba(255,255,255,.3);font-size:.82rem;padding:1rem">เลือกพนักงานก่อนเล่นเกม</div>
-    </div>
-    <!-- ADMIN: Quiz Editor -->
-    <div class="quiz-editor" id="quizEditor">
-      <div class="qe-title">✏️ Admin — เพิ่มคำถามของคุณเอง</div>
-      <div class="qe-list" id="customQList"></div>
-      <div class="qe-form">
-        <input class="qe-input" id="qeQuestion" placeholder="คำถาม เช่น คุณ... ชอบอาหารอะไร?">
-        <div class="qe-opts-row">
-          <input class="qe-input" id="qeOpt1" placeholder="ตัวเลือก 1 (คำตอบถูก)">
-          <input class="qe-input" id="qeOpt2" placeholder="ตัวเลือก 2">
-        </div>
-        <div class="qe-opts-row">
-          <input class="qe-input" id="qeOpt3" placeholder="ตัวเลือก 3">
-          <input class="qe-input" id="qeOpt4" placeholder="ตัวเลือก 4 (ไม่บังคับ)">
-        </div>
-        <button class="qe-add-btn" onclick="addCustomQuestion()">+ เพิ่มคำถาม (ตัวเลือก 1 = คำตอบถูก)</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- VOTE SECTION -->
-  <div class="vote-section" id="voteSection" style="display:none">
-    <div class="vote-header">❤️ คำอวยพรยอดฮิต — กดไลก์คำอวยพรที่ชอบ</div>
-    <div id="voteList"><div class="vote-empty">ยังไม่มีคำอวยพรให้โหวต</div></div>
-  </div>
-
-  <!-- PARTICIPANTS -->
-  <div class="part-section" id="partSection">
-    <div class="part-header">
-      <div class="part-title">👥 ผู้ร่วมตอบคำถาม</div>
-      <div class="part-count" id="partCount">0 คน</div>
-    </div>
-    <div class="part-grid" id="partGrid">
-      <div class="part-empty">ยังไม่มีผู้เข้าร่วม</div>
-    </div>
-  </div>
-
-  <!-- WHEEL -->
-  <div class="wheel-section" id="wheelSection">
-    <div class="wheel-header">🎡 วงล้อสุ่มรางวัล</div>
-    <div class="wheel-wrap">
-      <div class="wheel-canvas-wrap">
-        <canvas id="wheelCanvas" width="260" height="260"></canvas>
-        <div class="wheel-pointer"></div>
-      </div>
-      <div class="wheel-result" id="wheelResult">กด หมุน! เพื่อสุ่มผู้โชคดี</div>
-      <div id="wheelAdminArea" style="display:none;flex-direction:column;align-items:center;gap:.5rem;width:100%">
-        <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">🎡 หมุน!</button>
-        <button class="wheel-export-btn" onclick="exportScoresExcel()">📊 Export คะแนนเป็น Excel</button>
-      </div>
-      <div id="wheelPublicHint" style="font-size:.72rem;color:rgba(255,255,255,.25);text-align:center">
-        รอ Admin เป็นคนหมุนวงล้อสุ่มรางวัล 🎡
-      </div>
-    </div>
-  </div>
-
-  <!-- LEADERBOARD -->
-  <div class="lb-section" id="lbSection">
-    <div class="lb-header">
-      <div class="lb-title">🏆 กระดานคะแนน</div>
-      <div class="lb-tabs">
-        <button class="lb-tab active" id="lbTabGame" onclick="switchLbTab('game')">🎯 เกม</button>
-        <button class="lb-tab" id="lbTabLike" onclick="switchLbTab('like')">❤️ ไลก์</button>
-      </div>
-    </div>
-    <div class="lb-list" id="lbList">
-      <div class="lb-empty">เล่นเกมเพื่อขึ้นกระดานคะแนน!</div>
-    </div>
-  </div>
-
-  <!-- WISH WALL -->
-  <div>
-    <div class="wall-header">
-      <div class="wall-title">💌 กำแพงคำอวยพร</div>
-      <button class="wall-refresh" onclick="loadWishes()">🔄 รีเฟรช</button>
-    </div>
-    <div class="wish-grid" id="wish-grid">
-      <div class="wish-empty"><div class="wish-empty-icon">💭</div><div>ยังไม่มีคำอวยพร<br><span style="font-size:.75rem">เป็นคนแรกที่ส่งคำอวยพร!</span></div></div>
-    </div>
+<div class="topbar">
+  <div class="tb-logo">🎂 SML Birthday</div>
+  <div id="syncStatus"></div>
+  <div class="tb-right">
+    <span class="admin-top-badge">ADMIN</span>
+    <button class="tb-btn" id="adminLock" onclick="showAdminPrompt()" title="Admin">🔒</button>
   </div>
 </div>
 
-<!-- Admin lock floating button -->
-<button class="admin-lock" id="adminLock" onclick="showAdminPrompt()" title="Admin Login">🔒</button>
+<div class="admin-strip" id="apiBar">
+  <span class="as-lbl">Script URL</span>
+  <input class="as-inp" id="apiUrl" type="text" placeholder="วาง Google Apps Script URL..." oninput="saveApiUrl()">
+  <div class="api-dot pending" id="apiDot"></div>
+  <button class="as-btn" onclick="testApi()">ทดสอบ</button>
+  <button class="as-btn" onclick="reloadPersons()">🔄 พนักงาน</button>
+  <button class="as-btn" onclick="toggleMonthCtrl()">🗓</button>
+  <button class="as-btn" onclick="showAdminSettings()">⚙️</button>
+</div>
 
+<div class="admin-month-panel" id="adminMonthCtrl">
+  <div class="amp-hdr">
+    <span class="amp-lbl">เดือนที่แสดงให้พนักงาน</span>
+    <button onclick="toggleAllMonths()" style="background:none;border:1px solid rgba(245,200,66,.22);border-radius:6px;color:rgba(245,200,66,.6);font-family:'Kanit',sans-serif;font-size:.6rem;padding:.1rem .42rem;cursor:pointer">เลือกทั้งหมด</button>
+  </div>
+  <div id="amcGrid" class="amp-grid"></div>
+</div>
+
+<div class="month-row" id="monthTabs"></div>
+<div class="person-row" id="personChips"><div class="person-locked">เลือกเดือนด้านบน</div></div>
+
+<div class="hero" id="hero">
+  <div class="hero-photo-wrap">
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="hero-photo" id="empPhotoFrame" onclick="adminUploadPhoto()">
+        <span id="empPhotoEmoji" style="position:relative;z-index:1">🎂</span>
+        <img id="empPhoto" src="" style="display:none">
+        <div class="photo-badge-inner">🎉</div>
+      </div>
+      <div class="photo-hint" id="photoUploadHint">📷 คลิกอัปโหลดรูป</div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
+    </div>
+  </div>
+  <div class="hero-name" id="hero-name">เลือกพนักงาน</div>
+  <div class="hero-pos" id="hero-pos">—</div>
+  <div class="hero-pill" id="hero-date"><span>🎂</span><span>เกิดเดือน...</span></div>
+  <div class="stat-row">
+    <div class="stat-item"><div class="stat-n" id="wish-count">0</div><div class="stat-l">คำอวยพร</div></div>
+    <div class="stat-item"><div class="stat-n" id="like-total">0</div><div class="stat-l">❤️ ไลก์</div></div>
+    <div class="stat-item"><div class="stat-n" id="player-count">0</div><div class="stat-l">ผู้เล่น</div></div>
+  </div>
+</div>
+
+<!-- GAME BANNER -->
+<div class="game-banner" id="gameBanner" onclick="document.getElementById('quizInline').scrollIntoView({behavior:'smooth'})">
+  <div class="gb-icon">🎯</div>
+  <div class="gb-body">
+    <div class="gb-title" id="gameBannerTitle">คุณเป็นแฟนพันธุ์แท้ของเจ้าของวันเกิดหรือไม่?</div>
+    <div class="gb-sub">ตอบคำถาม · ลุ้นรับรางวัล 🎡 · ขึ้นกระดานคะแนน 🏆</div>
+  </div>
+  <div class="gb-score" id="gameScore">0 แต้ม</div>
+</div>
+
+<!-- QUIZ INLINE -->
+<div class="quiz-inline" id="quizInline">
+  <div class="qi-score-bar">
+    <span class="qi-score-txt" id="gameTitleText">เลือกพนักงานเพื่อเริ่มเกม</span>
+    <button onclick="startGame()" style="background:none;border:1px solid var(--b);border-radius:7px;color:var(--mute);font-size:.68rem;padding:.15rem .42rem;cursor:pointer">🔄</button>
+  </div>
+  <div id="gameBody"><div style="text-align:center;color:var(--mute);font-size:.8rem;padding:.75rem">เลือกพนักงานก่อนเล่นเกม</div></div>
+  <div class="game-name-hint" id="gameNameHint" style="font-size:.65rem;color:rgba(245,200,66,.5);text-align:center;margin-top:.3rem;display:none">กรอกชื่อในช่องอวยพรด้านล่างเพื่อขึ้นกระดาน</div>
+</div>
+
+<!-- ADMIN QUIZ EDITOR -->
+<div class="qe-panel" id="quizEditor">
+  <div class="qe-lbl">✏️ Admin — เพิ่มคำถามเอง</div>
+  <div class="qe-list" id="customQList"></div>
+  <input class="qe-inp" id="qeQuestion" placeholder="คำถาม เช่น คุณ... ชอบอาหารอะไร?" style="width:100%;margin-bottom:.28rem">
+  <div class="qe-form-grid">
+    <input class="qe-inp" id="qeOpt1" placeholder="ตัวเลือก 1 (ถูก)">
+    <input class="qe-inp" id="qeOpt2" placeholder="ตัวเลือก 2">
+    <input class="qe-inp" id="qeOpt3" placeholder="ตัวเลือก 3">
+    <input class="qe-inp" id="qeOpt4" placeholder="ตัวเลือก 4">
+  </div>
+  <button class="qe-add" onclick="addCustomQuestion()" style="margin-top:.28rem">+ เพิ่มคำถาม (ตัวเลือก 1 = ถูก)</button>
+</div>
+
+<!-- WISH FORM -->
+<div class="wish-form" id="wish-form">
+  <div class="sec-hdr">
+    <div class="sec-title">✍️ เขียนคำอวยพร</div>
+  </div>
+  <div class="form-grid">
+    <div class="fi"><div class="fl">ชื่อของคุณ *</div><input class="finput" id="wf-name" placeholder="ชื่อเล่น / ชื่อ-สกุล" maxlength="50"></div>
+    <div class="fi"><div class="fl">แผนก / ทีม</div><input class="finput" id="wf-dept" placeholder="PDI, HR, Yard..."></div>
+    <div class="fi fi-full"><div class="fl">คำอวยพร *</div><textarea class="finput ftextarea" id="wf-text" placeholder="เขียนคำอวยพรให้เพื่อนร่วมงาน..."></textarea></div>
+  </div>
+  <div class="emoji-bar" id="emojiBar"></div>
+  <button class="send-btn" id="send-btn" onclick="submitWish()">🎊 ส่งคำอวยพร!</button>
+  <div class="success-msg" id="success-msg">🎉 ส่งคำอวยพรสำเร็จ! ขอบคุณนะ ❤️</div>
+</div>
+
+<!-- VOTE -->
+<div class="vote-sec" id="voteSection" style="display:none">
+  <div class="sec-hdr"><div class="sec-title">❤️ คำอวยพรยอดฮิต</div><div class="sec-badge">โหวตได้ 1 ครั้ง</div></div>
+  <div id="voteList"><div class="vote-empty">ยังไม่มีคำอวยพรให้โหวต</div></div>
+</div>
+
+<!-- WISH WALL -->
+<div class="wish-wall">
+  <div class="wall-hdr">
+    <div class="sec-title">💌 กำแพงคำอวยพร</div>
+    <button class="wall-refresh" onclick="loadWishes()">🔄 รีเฟรช</button>
+  </div>
+  <div class="wish-grid" id="wish-grid">
+    <div class="wish-empty"><div class="wish-empty-icon">💭</div><div>ยังไม่มีคำอวยพร<br><span style="font-size:.7rem">เป็นคนแรกที่ส่งคำอวยพร!</span></div></div>
+  </div>
+</div>
+
+<!-- PARTICIPANTS -->
+<div class="part-sec" id="partSection">
+  <div class="sec-hdr"><div class="sec-title">👥 ผู้ร่วมตอบคำถาม</div><div class="sec-badge" id="partCount">0 คน</div></div>
+  <div class="part-chips" id="partGrid"><div class="part-empty">ยังไม่มีผู้เข้าร่วม</div></div>
+</div>
+
+<!-- WHEEL -->
+<div class="wheel-sec" id="wheelSection">
+  <div class="sec-hdr"><div class="sec-title">🎡 วงล้อสุ่มรางวัล</div><div class="sec-badge">Admin กดหมุน</div></div>
+  <div class="wheel-wrap">
+    <div class="wheel-frame"><canvas id="wheelCanvas" width="240" height="240"></canvas><div class="wheel-ptr"></div></div>
+    <div class="wheel-result-txt" id="wheelResult">รอ Admin กดหมุน 🎡</div>
+    <div class="wheel-admin-btns" id="wheelAdminArea">
+      <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">🎡 หมุน!</button>
+      <button class="wheel-export-btn" onclick="exportScoresExcel()">📊 Export คะแนน Excel</button>
+    </div>
+    <div class="wheel-pub-hint" id="wheelPublicHint">Admin เป็นผู้กดหมุนครับ</div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="lb-sec" id="lbSection">
+  <div class="sec-hdr"><div class="sec-title">🏆 กระดานคะแนน</div></div>
+  <div class="lb-tabs">
+    <button class="lb-tab active" id="lbTabGame" onclick="switchLbTab('game')">🎯 เกม</button>
+    <button class="lb-tab" id="lbTabLike" onclick="switchLbTab('like')">❤️ ไลก์</button>
+  </div>
+  <div id="lbList"><div class="lb-empty">เล่นเกมเพื่อขึ้นกระดาน!</div></div>
+</div>
+
+<div class="spacer-bottom"></div>
+
+<!-- TOAST + LIKE -->
 <div class="toast" id="toast"></div>
 <div class="like-notif" id="likeNotif"></div>
 
+<!-- MODALS -->
+<div class="modal-overlay" id="loginModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">🔐 เข้าสู่ระบบ Admin</div>
+    <div><div class="modal-label" style="margin-bottom:.25rem">รหัสผ่าน</div>
+    <input class="modal-input" id="loginPassInput" type="password" placeholder="ใส่รหัส Admin..." onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="modal-row">
+      <button class="modal-btn-ghost" onclick="document.getElementById('loginModal').style.display='none'">ยกเลิก</button>
+      <button class="modal-btn-primary" onclick="doLogin()">เข้าสู่ระบบ</button>
+    </div>
+    <div class="modal-sep"></div>
+    <button class="modal-danger" onclick="showForgotPass()">🔑 ลืมรหัสผ่าน / รีเซ็ต</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">⚙️ ตั้งค่า Admin</div>
+    <div><div class="modal-label" style="margin-bottom:.25rem">เปลี่ยนรหัสผ่าน</div>
+    <input class="modal-input" id="settOldPass" type="password" placeholder="รหัสเดิม" style="margin-bottom:.32rem">
+    <input class="modal-input" id="settNewPass" type="password" placeholder="รหัสใหม่ (อย่างน้อย 4 ตัว)" style="margin-bottom:.32rem">
+    <input class="modal-input" id="settConfPass" type="password" placeholder="ยืนยันรหัสใหม่"></div>
+    <button class="modal-btn-primary" onclick="changePassword()">💾 บันทึกรหัสใหม่</button>
+    <div class="modal-success-msg" id="settSuccessMsg">✅ เปลี่ยนรหัสสำเร็จ!</div>
+    <div class="modal-sep"></div>
+    <div class="modal-label" style="margin-bottom:.25rem">Master Key (รหัสสำรอง)</div>
+    <div style="font-size:.68rem;color:var(--mute);line-height:1.6;margin-bottom:.38rem">ใช้เข้าได้เสมอแม้ลืมรหัสหลัก<br><span style="color:var(--gold);font-weight:500;letter-spacing:.06em" id="masterKeyDisplay">••••••••</span></div>
+    <button class="modal-btn-ghost" onclick="showMasterKey()" style="font-size:.74rem">👁 แสดง Master Key</button>
+    <div class="modal-sep"></div>
+    <button class="modal-btn-ghost" onclick="document.getElementById('settingsModal').style.display='none'">ปิด</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="forgotModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">🔑 รีเซ็ตรหัสผ่าน</div>
+    <div style="font-size:.76rem;color:var(--sub);line-height:1.6">ใส่ <b style="color:var(--gold)">Master Key</b> เพื่อตั้งรหัสใหม่</div>
+    <input class="modal-input" id="forgotMasterKey" type="password" placeholder="Master Key">
+    <input class="modal-input" id="forgotNewPass" type="password" placeholder="รหัสผ่านใหม่">
+    <div class="modal-row">
+      <button class="modal-btn-ghost" onclick="document.getElementById('forgotModal').style.display='none'">ยกเลิก</button>
+      <button class="modal-btn-primary" onclick="resetWithMasterKey()">รีเซ็ต</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
+function toggleMonthCtrl(){const el=document.getElementById('adminMonthCtrl');if(el)el.classList.toggle('open');}
+function updateStatRow(){
+  const empKey=curEmp?(curEmp.code||curEmp.name):'';
+  const wishes=localWishes[empKey]||[];
+  const board=JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  const votes=JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
+  const totalLikes=Object.values(votes).reduce((a,b)=>a+b,0);
+  const wc=document.getElementById('wish-count');const lt=document.getElementById('like-total');const pc=document.getElementById('player-count');
+  if(wc)wc.textContent=wishes.length;
+  if(lt)lt.textContent='❤️ '+totalLikes;
+  if(pc)pc.textContent=board.length;
+}
+function setApiStatus(type,text){
+  const el=document.getElementById('apiStatus');if(el){el.className='api-status api-'+type;el.textContent=text;}
+  const dot=document.getElementById('apiDot');if(dot)dot.className='api-dot '+type;
+}
+</script>
+<script>
+
 const MTH=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 const EMOJIS=['🎉','🌟','💖','🎂','🥳','🌈','✨','🎁','🍀','🏆','🌺','💐','🦋','⭐'];
 let calPersons = [
@@ -663,8 +679,8 @@ function renderWishes(wishes){
     if(!isAdmin && isHidden) return '';
     return `<div class="wish-card wc-${i%6}${isHidden?' wish-hidden':''}" style="animation-delay:${i*0.05}s;position:relative">
       <div class="wish-actions">
-        <button class="wish-act-btn wish-act-hide" onclick="toggleHideWish('${wid.replace(/'/g,"\'")}',this)" title="${isHidden?'แสดง':'ซ่อน'}">${isHidden?'👁':'🙈'}</button>
-        <button class="wish-act-btn wish-act-del" onclick="deleteWish('${wid.replace(/'/g,"\'")}',this)" title="ลบ">🗑</button>
+        <button class="wact wact-hide" onclick="toggleHideWish('${wid.replace(/'/g,"\'")}',this)" title="${isHidden?'แสดง':'ซ่อน'}">${isHidden?'👁':'🙈'}</button>
+        <button class="wact wact-del" onclick="deleteWish('${wid.replace(/'/g,"\'")}',this)" title="ลบ">🗑</button>
       </div>
       <div class="wish-emoji">${w.emoji||'🎉'}</div>
       <div class="wish-msg">${escHtml(w.msg||w.message||'')}</div>
@@ -865,9 +881,10 @@ function buildAmcGrid(){
   const active=getActiveMonths();
   const grid=document.getElementById('amcGrid');
   if(!grid) return;
-  grid.innerHTML=MTH.map((m,i)=>
-    `<button class="amc-chip${active.includes(i)?' on':''}" onclick="toggleAdminMonth(${i})" id="amc-${i}">${m.substring(0,3)}</button>`
-  ).join('');
+  grid.innerHTML=MTH.map((m,i)=>{
+    const on=active.includes(i);
+    return `<button onclick="toggleAdminMonth(${i})" id="amc-${i}" style="padding:.28rem .2rem;border-radius:6px;border:1px solid ${on?'var(--gold)':'rgba(255,255,255,.08)'};background:${on?'rgba(245,200,66,.15)':'transparent'};color:${on?'var(--gold)':'rgba(255,255,255,.28)'};font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;text-align:center">${m.substring(0,3)}</button>`;
+  }).join('');
 }
 
 function toggleAdminMonth(mi){
@@ -906,7 +923,6 @@ function showAdminPrompt(){
 
 function enterAdmin(){
   document.body.classList.add('admin-mode');
-  document.getElementById('apiBar').classList.add('show');
   document.getElementById('adminLock').classList.add('active');
   document.getElementById('adminLock').textContent='🔓';
   document.getElementById('adminLock').title='ออกจาก Admin Mode';
@@ -915,14 +931,13 @@ function enterAdmin(){
   if(ph) ph.style.display='block';
   const pf = document.getElementById('empPhotoFrame');
   if(pf) pf.style.cursor='pointer';
-  // Load saved URL
   const saved=getApiUrl();
   if(saved){ document.getElementById('apiUrl').value=saved; testApi(); }
   // Build admin month grid
   buildAmcGrid();
   // Render custom questions
   renderCustomQList();
-  // Show admin-only wheel controls
+  // Wheel admin controls
   const wa=document.getElementById('wheelAdminArea');
   const wh=document.getElementById('wheelPublicHint');
   if(wa) wa.style.display='flex';
@@ -937,7 +952,6 @@ function enterAdmin(){
 
 function exitAdmin(){
   document.body.classList.remove('admin-mode');
-  document.getElementById('apiBar').classList.remove('show');
   document.getElementById('adminLock').classList.remove('active');
   document.getElementById('adminLock').textContent='🔒';
   document.getElementById('adminLock').title='Admin Login';
@@ -946,7 +960,6 @@ function exitAdmin(){
   if(ph) ph.style.display='none';
   const pf = document.getElementById('empPhotoFrame');
   if(pf) pf.style.cursor='default';
-  // Hide admin-only wheel controls
   const wa=document.getElementById('wheelAdminArea');
   const wh=document.getElementById('wheelPublicHint');
   if(wa) wa.style.display='none';
@@ -989,8 +1002,8 @@ async function deleteWish(wid, btn){
     showToast('ลบจากหน้าเว็บแล้ว (Sheet อาจต้องลบเอง)','warn');
   }
   // 4. Force reload from server
-  const empId=curEmp?curEmp.code||curEmp.name:'';
-  const fresh=await apiGet({action:'getWishes',empId});
+  const empId2=curEmp?curEmp.code||curEmp.name:'';
+  const fresh=await apiGet({action:'getWishes',empId:empId2});
   if(fresh&&Array.isArray(fresh)){
     localWishes[empId]=fresh;
     localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
@@ -1756,66 +1769,35 @@ function resetWithMasterKey(){
   setTimeout(showAdminLoginModal, 1000);
 }
 
+
+// ── PATCH: fix class names for new UI ─────────────────────────
+// wish-act-btn → wact
+// setApiStatus already defined above
+// updateStatRow hooked into loadWishes and saveGameScore
+
+// Patch renderWishes to use new class names
+const _origRW = renderWishes;
+function renderWishes(wishes){
+  _origRW(wishes);
+  updateStatRow();
+}
+const _origSGS = saveGameScore;
+function saveGameScore(name,score,total){
+  _origSGS(name,score,total);
+  updateStatRow();
+  // update game banner score
+  const gs=document.getElementById('gameScore');
+  if(gs) gs.textContent=gameState.score+' แต้ม';
+}
+// Update game banner title when person selected
+const _origSP = selectPerson;
+function selectPerson(code){
+  _origSP(code);
+  if(curEmp){
+    const bt=document.getElementById('gameBannerTitle');
+    if(bt) bt.textContent='คุณเป็นแฟนพันธุ์แท้ของคุณ'+curEmp.name.split(' ')[0]+' หรือไม่?';
+  }
+}
 </script>
-
-<!-- ADMIN LOGIN MODAL -->
-<div class="modal-overlay" id="loginModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
-  <div class="modal-box">
-    <div class="modal-title">🔐 เข้าสู่ระบบ Admin</div>
-    <div>
-      <div class="modal-label" style="margin-bottom:.3rem">รหัสผ่าน</div>
-      <input class="modal-input" id="loginPassInput" type="password" placeholder="ใส่รหัส Admin..."
-        onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div class="modal-row">
-      <button class="modal-btn-ghost" onclick="document.getElementById('loginModal').style.display='none'">ยกเลิก</button>
-      <button class="modal-btn-primary" onclick="doLogin()">เข้าสู่ระบบ</button>
-    </div>
-    <div class="modal-sep"></div>
-    <button class="modal-danger" onclick="showForgotPass()">🔑 ลืมรหัสผ่าน / รีเซ็ต</button>
-  </div>
-</div>
-
-<!-- ADMIN SETTINGS MODAL -->
-<div class="modal-overlay" id="settingsModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
-  <div class="modal-box">
-    <div class="modal-title">⚙️ ตั้งค่า Admin</div>
-    <div>
-      <div class="modal-label" style="margin-bottom:.3rem">เปลี่ยนรหัสผ่าน</div>
-      <input class="modal-input" id="settOldPass" type="password" placeholder="รหัสเดิม" style="margin-bottom:.4rem">
-      <input class="modal-input" id="settNewPass" type="password" placeholder="รหัสใหม่ (อย่างน้อย 4 ตัว)" style="margin-bottom:.4rem">
-      <input class="modal-input" id="settConfPass" type="password" placeholder="ยืนยันรหัสใหม่">
-    </div>
-    <button class="modal-btn-primary" onclick="changePassword()">💾 บันทึกรหัสใหม่</button>
-    <div class="modal-success-msg" id="settSuccessMsg">✅ เปลี่ยนรหัสสำเร็จ!</div>
-    <div class="modal-sep"></div>
-    <div class="modal-label" style="margin-bottom:.3rem">รหัสสำรอง (Master Key)</div>
-    <div style="font-size:.72rem;color:rgba(255,255,255,.35);line-height:1.6;margin-bottom:.4rem">
-      ใช้เข้าได้เสมอแม้ลืมรหัสหลัก — เก็บไว้ในที่ปลอดภัย<br>
-      <span style="color:var(--gold);font-weight:500;letter-spacing:.08em" id="masterKeyDisplay">••••••••</span>
-    </div>
-    <button class="modal-btn-ghost" onclick="showMasterKey()" style="font-size:.78rem">👁 แสดง / สร้าง Master Key</button>
-    <div class="modal-sep"></div>
-    <button class="modal-btn-ghost" onclick="document.getElementById('settingsModal').style.display='none'">ปิด</button>
-  </div>
-</div>
-
-<!-- FORGOT PASSWORD MODAL -->
-<div class="modal-overlay" id="forgotModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
-  <div class="modal-box">
-    <div class="modal-title">🔑 รีเซ็ตรหัสผ่าน</div>
-    <div style="font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.6">
-      ใส่ <b style="color:var(--gold)">Master Key</b> เพื่อตั้งรหัสใหม่<br>
-      <span style="font-size:.7rem">(ดู Master Key ได้ที่ ⚙️ ตั้งค่า → เข้า Admin ก่อน)</span>
-    </div>
-    <input class="modal-input" id="forgotMasterKey" type="password" placeholder="Master Key">
-    <input class="modal-input" id="forgotNewPass" type="password" placeholder="รหัสผ่านใหม่">
-    <div class="modal-row">
-      <button class="modal-btn-ghost" onclick="document.getElementById('forgotModal').style.display='none'">ยกเลิก</button>
-      <button class="modal-btn-primary" onclick="resetWithMasterKey()">รีเซ็ต</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
