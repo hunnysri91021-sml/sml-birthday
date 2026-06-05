@@ -639,9 +639,11 @@ function selectPerson(code){
   document.getElementById('hero-date').innerHTML=`<span>🎂</span><span>เกิดเดือน${MTH[curEmp.month]}</span>`;
   // Load saved photo for this employee
   loadEmpPhoto(curEmp.code||curEmp.name);
-  // Update game title
+  // Update game titles
   const gtt = document.getElementById('gameTitleText');
   if(gtt) gtt.textContent = '🎯 คุณเป็นแฟนพันธุ์แท้ของคุณ'+curEmp.name.split(' ')[0]+' หรือไม่?';
+  const gbt = document.getElementById('gameBannerTitle');
+  if(gbt) gbt.textContent = 'คุณเป็นแฟนพันธุ์แท้ของคุณ'+curEmp.name.split(' ')[0]+' หรือไม่?';
   // Show game section
   const gs=document.getElementById('gameSection');
   if(gs) gs.style.display='block';
@@ -709,6 +711,8 @@ function renderWishes(wishes){
 
   // Update vote list with visible wishes
   renderVoteList(visible.slice(0,10));
+  // Update stats
+  if(typeof updateStatRow==='function') updateStatRow();
 }
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
@@ -1402,6 +1406,9 @@ function saveGameScore(playerName, score, total) {
   localStorage.setItem(key, JSON.stringify(board.slice(0,50)));
   renderLeaderboard();
   renderParticipants();
+  if(typeof updateStatRow==='function') updateStatRow();
+  const gsBadge=document.getElementById('gameScore');
+  if(gsBadge) gsBadge.textContent=score+' แต้ม';
   // Show wheel and participants
   const ps = document.getElementById('partSection');
   const ws = document.getElementById('wheelSection');
@@ -1805,34 +1812,6 @@ function resetWithMasterKey(){
 }
 
 
-// ── PATCH: fix class names for new UI ─────────────────────────
-// wish-act-btn → wact
-// setApiStatus already defined above
-// updateStatRow hooked into loadWishes and saveGameScore
-
-// Patch renderWishes to use new class names
-const _origRW = renderWishes;
-function renderWishes(wishes){
-  _origRW(wishes);
-  updateStatRow();
-}
-const _origSGS = saveGameScore;
-function saveGameScore(name,score,total){
-  _origSGS(name,score,total);
-  updateStatRow();
-  // update game banner score
-  const gs=document.getElementById('gameScore');
-  if(gs) gs.textContent=gameState.score+' แต้ม';
-}
-// Update game banner title when person selected
-const _origSP = selectPerson;
-function selectPerson(code){
-  _origSP(code);
-  if(curEmp){
-    const bt=document.getElementById('gameBannerTitle');
-    if(bt) bt.textContent='คุณเป็นแฟนพันธุ์แท้ของคุณ'+curEmp.name.split(' ')[0]+' หรือไม่?';
-  }
-}
 </script>
 </body>
 </html>
