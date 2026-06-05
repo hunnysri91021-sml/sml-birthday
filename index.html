@@ -22,23 +22,34 @@ html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'K
 .tb-right{display:flex;align-items:center;gap:.35rem}
 .tb-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--b2);background:transparent;color:var(--sub);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .tb-btn:hover,.tb-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,.1)}
-.admin-top-badge{font-size:.6rem;background:rgba(245,200,66,.15);border:1px solid rgba(245,200,66,.3);border-radius:20px;padding:.12rem .5rem;color:var(--gold);display:none}
+.admin-top-badge{font-size:.62rem;background:linear-gradient(135deg,rgba(245,200,66,.25),rgba(247,166,33,.2));border:1px solid rgba(245,200,66,.45);border-radius:20px;padding:.18rem .65rem;color:var(--gold);display:none;font-weight:600;letter-spacing:.05em;box-shadow:0 0 8px rgba(245,200,66,.2)}
 .admin-mode .admin-top-badge{display:inline-block}
+.admin-mode .tb-btn#adminLock{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,.15);box-shadow:0 0 10px rgba(245,200,66,.3)}
 /* ADMIN STRIP */
-.admin-strip{display:none;background:rgba(245,200,66,.05);border-bottom:1px solid rgba(245,200,66,.1);padding:.5rem 1rem;gap:.35rem;flex-wrap:wrap;align-items:center}
+.admin-strip{display:none;background:linear-gradient(135deg,rgba(30,15,60,.95),rgba(20,10,45,.98));border-bottom:2px solid rgba(245,200,66,.35);padding:.65rem 1rem;gap:.4rem;flex-wrap:wrap;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .admin-mode .admin-strip{display:flex}
-.as-lbl{font-size:.62rem;color:rgba(245,200,66,.55);letter-spacing:.05em}
-.as-inp{flex:1;min-width:120px;background:rgba(255,255,255,.06);border:1px solid rgba(245,200,66,.18);border-radius:7px;padding:.3rem .6rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.7rem;outline:none}
-.as-btn{padding:.28rem .6rem;border-radius:7px;border:1px solid rgba(245,200,66,.22);background:transparent;color:rgba(245,200,66,.7);font-family:'Kanit',sans-serif;font-size:.65rem;cursor:pointer;white-space:nowrap;transition:all .15s}
-.as-btn:hover{background:rgba(245,200,66,.1);color:var(--gold);border-color:var(--gold)}
-.api-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.api-dot.ok{background:var(--mint)}.api-dot.err{background:var(--rose)}.api-dot.pending{background:var(--gold)}
+.as-lbl{font-size:.6rem;color:rgba(245,200,66,.5);letter-spacing:.08em;text-transform:uppercase;flex-shrink:0}
+.as-inp{flex:1;min-width:120px;background:rgba(255,255,255,.07);border:1px solid rgba(245,200,66,.25);border-radius:8px;padding:.32rem .65rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.7rem;outline:none;transition:border-color .2s}
+.as-inp:focus{border-color:rgba(245,200,66,.6)}
+.as-btn{padding:.3rem .65rem;border-radius:8px;border:1px solid rgba(245,200,66,.28);background:rgba(245,200,66,.06);color:rgba(245,200,66,.8);font-family:'Kanit',sans-serif;font-size:.67rem;cursor:pointer;white-space:nowrap;transition:all .15s;font-weight:500}
+.as-btn:hover{background:rgba(245,200,66,.18);color:var(--gold);border-color:var(--gold);transform:translateY(-1px)}
+.api-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
+.api-dot.ok{background:var(--mint);color:var(--mint)}.api-dot.err{background:var(--rose);color:var(--rose)}.api-dot.pending{background:var(--gold);color:var(--gold)}
 /* ADMIN MONTH PANEL */
-.admin-month-panel{display:none;background:rgba(245,200,66,.04);border-bottom:1px solid rgba(245,200,66,.08);padding:.55rem 1rem}
+.admin-month-panel{display:none;background:linear-gradient(135deg,rgba(25,12,55,.97),rgba(18,8,40,.99));border-bottom:2px solid rgba(245,200,66,.25);padding:.75rem 1rem}
 .admin-mode .admin-month-panel.open{display:block}
-.amp-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
-.amp-lbl{font-size:.62rem;color:rgba(245,200,66,.55);letter-spacing:.07em;text-transform:uppercase}
-.amp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.25rem}
+.amp-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem}
+.amp-lbl{font-size:.65rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:.35rem}
+.amp-lbl::before{content:'🗓';font-size:.85rem}
+.amp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.3rem}
+.amp-chip{padding:.32rem .2rem;border-radius:8px;font-family:'Kanit',sans-serif;font-size:.7rem;cursor:pointer;text-align:center;transition:all .18s;font-weight:500;border:1.5px solid}
+.amp-chip.on{background:rgba(245,200,66,.2);border-color:var(--gold);color:var(--gold);box-shadow:0 0 8px rgba(245,200,66,.25)}
+.amp-chip.off{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.35)}
+.amp-chip.off:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
+.amp-confirm{margin-top:.55rem;display:flex;align-items:center;gap:.5rem;background:rgba(0,229,204,.06);border:1px solid rgba(0,229,204,.18);border-radius:10px;padding:.45rem .75rem}
+.amp-confirm-icon{font-size:.95rem;flex-shrink:0}
+.amp-confirm-text{font-size:.7rem;color:rgba(0,229,204,.8);flex:1;line-height:1.45}
+.amp-confirm-text b{color:var(--mint)}
 /* MONTH SCROLL */
 .month-row{display:flex;gap:.3rem;overflow-x:auto;padding:.65rem 1rem .35rem;scrollbar-width:none}
 .month-row::-webkit-scrollbar{display:none}
@@ -250,6 +261,10 @@ canvas#wheelCanvas{border-radius:50%}
     <button onclick="toggleAllMonths()" style="background:none;border:1px solid rgba(245,200,66,.22);border-radius:6px;color:rgba(245,200,66,.6);font-family:'Kanit',sans-serif;font-size:.6rem;padding:.1rem .42rem;cursor:pointer">เลือกทั้งหมด</button>
   </div>
   <div id="amcGrid" class="amp-grid"></div>
+  <div class="amp-confirm" id="ampConfirm" style="display:none">
+    <div class="amp-confirm-icon">✅</div>
+    <div class="amp-confirm-text" id="ampConfirmText">เปิดใช้งาน <b>0 เดือน</b> — พนักงานจะเห็นเฉพาะเดือนเหล่านี้</div>
+  </div>
 </div>
 
 <div class="month-row" id="monthTabs"></div>
@@ -883,8 +898,9 @@ function buildAmcGrid(){
   if(!grid) return;
   grid.innerHTML=MTH.map((m,i)=>{
     const on=active.includes(i);
-    return `<button onclick="toggleAdminMonth(${i})" id="amc-${i}" style="padding:.28rem .2rem;border-radius:6px;border:1px solid ${on?'var(--gold)':'rgba(255,255,255,.08)'};background:${on?'rgba(245,200,66,.15)':'transparent'};color:${on?'var(--gold)':'rgba(255,255,255,.28)'};font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;text-align:center">${m.substring(0,3)}</button>`;
+    return `<button onclick="toggleAdminMonth(${i})" id="amc-${i}" class="amp-chip ${on?'on':'off'}">${m.substring(0,3)}</button>`;
   }).join('');
+  renderAmpConfirm();
 }
 
 function toggleAdminMonth(mi){
@@ -895,10 +911,28 @@ function toggleAdminMonth(mi){
   saveActiveMonths(active);
   buildAmcGrid();
   buildMonthTabs();
-  // If current selMonth is now hidden, clear person list
   if(!active.includes(selMonth)){
     document.getElementById('personChips').innerHTML='<div class="person-locked">🔒 ยังไม่เปิดให้ดูเดือนนี้</div>';
   }
+}
+
+function renderAmpConfirm(){
+  const active=getActiveMonths();
+  const conf=document.getElementById('ampConfirm');
+  const txt=document.getElementById('ampConfirmText');
+  if(!conf||!txt) return;
+  if(!active.length){
+    conf.style.display='flex';
+    conf.style.background='rgba(255,107,157,.06)';
+    conf.style.borderColor='rgba(255,107,157,.18)';
+    txt.innerHTML='<span style="color:rgba(255,107,157,.8)">⚠️ ยังไม่ได้เลือกเดือน — พนักงานจะไม่เห็นใครเลย</span>';
+    return;
+  }
+  conf.style.display='flex';
+  conf.style.background='rgba(0,229,204,.06)';
+  conf.style.borderColor='rgba(0,229,204,.18)';
+  const names=active.slice().sort((a,b)=>a-b).map(i=>MTH[i].substring(0,3)).join(', ');
+  txt.innerHTML=`เปิดใช้งาน <b style="color:var(--mint)">${active.length} เดือน</b> — พนักงานเห็น: <span style="color:rgba(255,255,255,.65)">${names}</span>`;
 }
 
 function toggleAllMonths(){
@@ -935,6 +969,7 @@ function enterAdmin(){
   if(saved){ document.getElementById('apiUrl').value=saved; testApi(); }
   // Build admin month grid
   buildAmcGrid();
+  renderAmpConfirm();
   // Render custom questions
   renderCustomQList();
   // Wheel admin controls
