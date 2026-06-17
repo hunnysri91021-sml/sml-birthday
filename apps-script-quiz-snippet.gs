@@ -18,6 +18,8 @@ function doGet(e) {
     if (action === 'addWish')       return resp(addWish(p));
     if (action === 'deleteWish')    return resp(deleteWish(p.wid || ''));
     if (action === 'addQuizResult') return resp(addQuizResult(p));
+    if (action === 'getQuizResults')   return resp(getQuizResults());
+    if (action === 'deleteQuizResult') return resp(deleteQuizResult(p.empCode || '', p.playerName || ''));
     return resp({error:'unknown action'});
   } catch(err) {
     return resp({error: err.message});
@@ -94,7 +96,7 @@ function getPersons() {
       name:    (String(r[1] || '') + ' ' + String(r[2] || '')).trim(),
       pos:     String(r[3] || '').trim(),
       faction: String(r[4] || '').trim(),
-      day:     parseInt(r[5]) || 1,
+      // หมายเหตุ: ไม่ส่งวันเกิดที่ชัดเจนกลับไป (เฉพาะเดือน) ตามข้อกำหนด PDPA
       month:   Math.max(0, parseInt(r[6] || 1) - 1),
     }));
 }
@@ -117,6 +119,38 @@ function addQuizResult(p) {
     p.total || 0
   ]);
   return {ok: true};
+}
+
+// อ่านผลตอบคำถามทั้งหมดของทุกพนักงาน (ใช้เป็นฐานข้อมูลเดียวสำหรับกระดานคะแนน/วงล้อ/หน้า admin)
+function getQuizResults() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const ws = ss.getSheetByName(SHEET_QUIZ);
+  if (!ws) return [];
+  const rows = ws.getDataRange().getValues();
+  if (rows.length <= 1) return [];
+  return rows.slice(1)
+    .filter(r => r[1] || r[3])
+    .map(r => ({
+      ts: r[0], empCode: String(r[1]||'').trim(), empName: r[2],
+      playerName: r[3], score: r[4], total: r[5]
+    }));
+}
+
+// ลบผลตอบคำถามของผู้เล่นคนหนึ่งสำหรับพนักงานคนหนึ่ง (ลบทุกแถวที่ตรงกัน)
+function deleteQuizResult(empCode, playerName) {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const ws = ss.getSheetByName(SHEET_QUIZ);
+  if (!ws) return {ok:false, msg:'sheet not found'};
+  const decodedName = decodeURIComponent(playerName || '');
+  const rows = ws.getDataRange().getValues();
+  let deleted = 0;
+  for (let i = rows.length-1; i >= 1; i--) {
+    if (String(rows[i][1]) === String(empCode) && String(rows[i][3]) === decodedName) {
+      ws.deleteRow(i+1);
+      deleted++;
+    }
+  }
+  return deleted > 0 ? {ok:true, deleted} : {ok:false, msg:'not found'};
 }
 
 function setupSheets() {

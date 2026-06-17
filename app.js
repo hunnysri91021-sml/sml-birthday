@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded',function(){
 function updateStatRow(){
   const empKey=curEmp?(curEmp.code||curEmp.name):'';
   const wishes=localWishes[empKey]||[];
-  const board=JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  const board=getBoard(empKey);
   const votes=JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
   const totalLikes=Object.values(votes).reduce((a,b)=>a+b,0);
   const wc=document.getElementById('wish-count');const lt=document.getElementById('like-total');const pc=document.getElementById('player-count');
@@ -24,6 +24,7 @@ let localWishes = JSON.parse(localStorage.getItem('sml_wishes') || '{}');
 let pendingQueue = JSON.parse(localStorage.getItem('sml_pending') || '[]');
 let gameState = {score:0, qIdx:0, questions:[], answered:false};
 let lbTab = 'game';
+let quizResultsCache = {};
 let wheelAngle = 0;
 let wheelSpinning = false;
 const WHEEL_COLORS = [
@@ -347,7 +348,8 @@ async function loadPersonsFromSheet(){
     const data = await apiGet({action:'getPersons'});
     if(!data || !Array.isArray(data) || data.length === 0) return false;
     // Convert sheet format → calPersons format
-    // Sheet: {code, name(fname+lname), pos, faction, day, month(0-based)}
+    // Sheet: {code, name(fname+lname), pos, faction, month(0-based)}
+    // หมายเหตุ: ไม่ดึง/เก็บวันเกิดที่ชัดเจน (เฉพาะเดือน) ตามข้อกำหนด PDPA
     const parsed = data
       .filter(p => p.name && String(p.name).trim())
       .map(p => ({
@@ -355,7 +357,6 @@ async function loadPersonsFromSheet(){
         name:    String(p.name||'').trim().replace(/\s+/,' '),
         pos:     String(p.pos||'').trim(),
         faction: String(p.faction||'').trim(),
-        day:     parseInt(p.day)||1,
         month:   typeof p.month==='number' ? p.month : Math.max(0,parseInt(p.month||0)-1),
       }));
     if(parsed.length === 0) return false;
@@ -367,6 +368,39 @@ async function loadPersonsFromSheet(){
     console.error('loadPersons error:', e);
     return false;
   }
+}
+
+// ── QUIZ RESULTS: GOOGLE SHEET AS SINGLE SOURCE OF TRUTH ─────────────
+function getBoard(empKey) {
+  if (quizResultsCache[empKey]) return quizResultsCache[empKey];
+  if (!getApiUrl()) return JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  return [];
+}
+
+async function loadQuizResultsFromSheet() {
+  if (!getApiUrl()) return false;
+  const data = await apiGet({action:'getQuizResults'});
+  if (!data || !Array.isArray(data)) return false;
+  const grouped = {};
+  data.forEach(r=>{
+    const empKey = String(r.empCode||r.empName||'').trim();
+    const name = String(r.playerName||'').trim();
+    if (!empKey || !name) return;
+    const score = parseInt(r.score)||0;
+    grouped[empKey] = grouped[empKey] || [];
+    let row = grouped[empKey].find(x=>x.name===name);
+    if (!row) {
+      row = {name, score:0, games:0, lastScore:0, lastTs:''};
+      grouped[empKey].push(row);
+    }
+    row.score = Math.max(row.score, score);
+    row.games += 1;
+    row.lastScore = score;
+    row.lastTs = r.ts||'';
+  });
+  Object.keys(grouped).forEach(k=>grouped[k].sort((a,b)=>b.score-a.score));
+  quizResultsCache = grouped;
+  return true;
 }
 
 
@@ -449,8 +483,9 @@ function onTextInput(){
   if(savedUrl){
     document.getElementById('apiUrl').value=savedUrl;
     testApi();
-    // Load persons from Sheet before building UI
+    // Load persons + quiz results from Sheet before building UI
     await loadPersonsFromSheet();
+    await loadQuizResultsFromSheet();
   }
   // Build UI
   buildMonthTabs();
@@ -471,6 +506,11 @@ function onTextInput(){
   setInterval(async()=>{
     const ok = await loadPersonsFromSheet();
     if(ok){ buildMonthTabs(); if(selMonth>=0) selectMonth(selMonth); }
+  }, 5*60*1000);
+  // Auto-refresh quiz results every 5 minutes
+  setInterval(async()=>{
+    const ok = await loadQuizResultsFromSheet();
+    if(ok){ renderLeaderboard(); renderParticipants(); }
   }, 5*60*1000);
 })();
 
@@ -658,11 +698,12 @@ function enterAdmin(){
   const wh=document.getElementById('wheelPublicHint');
   if(wa) wa.style.display='flex';
   if(wh) wh.style.display='none';
-  // Reload persons from sheet
+  // Reload persons + quiz results from sheet
   loadPersonsFromSheet().then(ok=>{
     buildMonthTabs();
     showToast(ok?'เข้าสู่ Admin Mode — พนักงาน '+calPersons.length+' คน':'เข้าสู่ Admin Mode แล้ว');
   });
+  loadQuizResultsFromSheet().then(()=>{ renderParticipants(); buildAdminPeopleLists(); });
   loadWishes();
 }
 
@@ -737,7 +778,7 @@ function buildAdminPeopleLists() {
   const playerRows = [];
   calPersons.forEach(p=>{
     const empKey = p.code||p.name;
-    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+    const board = getBoard(empKey);
     board.forEach(r=>{
       playerRows.push({empKey, ownerName:p.name, ownerMonth:p.month, playerName:r.name, score:r.score, games:r.games, lastTs:r.lastTs});
     });
@@ -783,16 +824,18 @@ function buildAdminPeopleLists() {
   }
 }
 
-function deleteQuizPlayer(empKey, playerName) {
+async function deleteQuizPlayer(empKey, playerName) {
   if (!confirm('ลบผู้เล่นนี้ออกจากกระดานคะแนน?')) return;
-  const key = 'lbGame_'+empKey;
-  let board = JSON.parse(localStorage.getItem(key)||'[]');
-  board = board.filter(r=>r.name!==playerName);
-  localStorage.setItem(key, JSON.stringify(board));
+  if (quizResultsCache[empKey]) {
+    quizResultsCache[empKey] = quizResultsCache[empKey].filter(r=>r.name!==playerName);
+  }
+  localStorage.removeItem('lbGame_'+empKey);
+  const result = await apiGet({action:'deleteQuizResult', empCode:empKey, playerName:encodeURIComponent(playerName)});
+  await loadQuizResultsFromSheet();
   buildAdminPeopleLists();
   renderParticipants();
   renderLeaderboard();
-  showToast('ลบผู้เล่นแล้ว');
+  showToast(result&&result.ok ? 'ลบผู้เล่นแล้ว (Google Sheet)' : 'ลบผู้เล่นแล้ว (เฉพาะหน้านี้)', result&&result.ok?undefined:'warn');
 }
 
 async function adminDeleteWish(empKey, wid) {
@@ -811,15 +854,23 @@ async function adminDeleteWish(empKey, wid) {
 }
 
 async function loadAllWishesForAdmin() {
-  showToast('กำลังโหลดคำอวยพรทั้งหมด...');
-  for (const p of calPersons) {
-    const empId = p.code||p.name;
-    const remote = await apiGet({action:'getWishes', empId});
-    if (remote && Array.isArray(remote)) localWishes[empId] = remote;
+  showToast('กำลังโหลดข้อมูลทั้งหมดจาก Google...');
+  await loadQuizResultsFromSheet();
+  const remote = await apiGet({action:'getWishes', empId:''});
+  if (remote && Array.isArray(remote)) {
+    const grouped = {};
+    remote.forEach(w=>{
+      const empId = String(w.empId||'').trim();
+      if (!empId) return;
+      grouped[empId] = grouped[empId]||[];
+      grouped[empId].push(w);
+    });
+    localWishes = grouped;
+    localStorage.setItem('sml_wishes', JSON.stringify(localWishes));
   }
-  localStorage.setItem('sml_wishes', JSON.stringify(localWishes));
   buildAdminPeopleLists();
-  showToast('โหลดคำอวยพรทั้งหมดแล้ว');
+  renderParticipants();
+  showToast('โหลดข้อมูลทั้งหมดแล้ว');
 }
 
 async function reloadPersons(){
@@ -1175,8 +1226,7 @@ function switchLbTab(tab) {
 
 function saveGameScore(playerName, score, total) {
   const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
-  const key = 'lbGame_' + empKey;
-  const board = JSON.parse(localStorage.getItem(key)||'[]');
+  const board = getBoard(empKey).slice();
   const ts = new Date().toLocaleString('th-TH');
   const existing = board.find(r=>r.name===playerName);
   if (existing) {
@@ -1188,7 +1238,8 @@ function saveGameScore(playerName, score, total) {
     board.push({name:playerName, score, games:1, lastScore:score, lastTs:ts});
   }
   board.sort((a,b)=>b.score-a.score);
-  localStorage.setItem(key, JSON.stringify(board.slice(0,50)));
+  quizResultsCache[empKey] = board.slice(0,50);
+  if (!getApiUrl()) localStorage.setItem('lbGame_'+empKey, JSON.stringify(quizResultsCache[empKey]));
   renderLeaderboard();
   renderParticipants();
   // Show wheel and participants
@@ -1197,7 +1248,10 @@ function saveGameScore(playerName, score, total) {
   if(ps) ps.style.display='block';
   if(ws) ws.style.display='block';
   drawWheel();
-  syncQuizResult(playerName, score, total, ts);
+  syncQuizResult(playerName, score, total, ts).then(()=>loadQuizResultsFromSheet()).then(()=>{
+    renderLeaderboard();
+    renderParticipants();
+  });
 }
 
 // ─── SYNC QUIZ RESULT TO GOOGLE SHEET ─────────────────────
@@ -1223,7 +1277,7 @@ function renderLeaderboard() {
   const medals = ['🥇','🥈','🥉'];
 
   if (lbTab === 'game') {
-    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+    const board = getBoard(empKey);
     if (!board.length) {
       el.innerHTML='<div class="lb-empty">ยังไม่มีคะแนน — เล่นเกมเพื่อขึ้นกระดาน!</div>'; return;
     }
@@ -1293,7 +1347,7 @@ function autoSaveThenRestart() {
 // ══════════════════════════════════════════════════
 function renderParticipants() {
   const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
-  const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  const board = getBoard(empKey);
   const grid = document.getElementById('partGrid');
   const cnt  = document.getElementById('partCount');
   if (!grid) return;
@@ -1331,7 +1385,7 @@ function getWheelParticipants() {
   calPersons.forEach(p=>{
     if (!months.includes(p.month)) return;
     const empKey = p.code || p.name;
-    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+    const board = getBoard(empKey);
     board.forEach(r=>{
       const existing = byName.get(r.name);
       if (!existing || r.score > existing.score) byName.set(r.name, r);
