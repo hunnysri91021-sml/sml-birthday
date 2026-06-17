@@ -88,8 +88,10 @@ function getPersons() {
   return rows.slice(1)
     .filter(r => r[0] || r[1])
     .filter(r => {
-      const status = String(r[7] || 'Active').trim();
-      return status !== 'Resigned' && status !== 'Leave';
+      const rawStatus = String(r[9] || '').trim();
+      const fallbackStatus = String(r[7] || '').trim();
+      const status = rawStatus || (isStatusValue(fallbackStatus) ? fallbackStatus : 'Active');
+      return !isInactiveStatus(status);
     })
     .map(r => ({
       code:    String(r[0] || '').trim(),
@@ -97,8 +99,16 @@ function getPersons() {
       pos:     String(r[3] || '').trim(),
       faction: String(r[4] || '').trim(),
       // หมายเหตุ: ไม่ส่งวันเกิดที่ชัดเจนกลับไป (เฉพาะเดือน) ตามข้อกำหนด PDPA
-      month:   Math.max(0, parseInt(r[6] || 1) - 1),
+      month:   Math.min(11, Math.max(0, (parseInt(r[6], 10) || 1) - 1)),
     }));
+}
+
+function isStatusValue(value) {
+  return ['Active','Resigned','Leave','ลาออก','พักงาน','ออก','ไม่ใช้งาน'].indexOf(String(value || '').trim()) >= 0;
+}
+
+function isInactiveStatus(value) {
+  return ['Resigned','Leave','ลาออก','พักงาน','ออก','ไม่ใช้งาน'].indexOf(String(value || '').trim()) >= 0;
 }
 
 // บันทึกผลเกม/คำตอบของพนักงานลงชีต QuizResults (สร้างให้อัตโนมัติถ้ายังไม่มี)
@@ -115,8 +125,8 @@ function addQuizResult(p) {
     p.empCode || '',
     p.empName || '',
     p.playerName || '',
-    p.score || 0,
-    p.total || 0
+    Number(p.score) || 0,
+    Number(p.total) || 0
   ]);
   return {ok: true};
 }
