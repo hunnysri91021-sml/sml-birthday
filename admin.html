@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-<title>SML Birthday Wishes 🎂</title>
+<title>SML Birthday Wishes — Admin 🎂🔐</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Dancing+Script:wght@700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -231,6 +231,17 @@ canvas#wheelCanvas{border-radius:50%}
 .wheel-export-btn{padding:.35rem 1rem;background:transparent;border:1px solid rgba(245,200,66,.2);border-radius:20px;color:rgba(245,200,66,.65);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
 .wheel-export-btn:hover{background:rgba(245,200,66,.08);color:var(--gold)}
 .wheel-pub-hint{font-size:.68rem;color:var(--mute);text-align:center}
+/* MONTH PLAY RANGE */
+.mrc-row{display:flex;align-items:center;gap:.35rem;margin-bottom:.32rem}
+.mrc-month{width:46px;font-size:.68rem;color:var(--sub);flex-shrink:0}
+.mrc-date{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--b2);border-radius:7px;padding:.22rem .4rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.66rem;outline:none}
+.mrc-sep{color:var(--mute);font-size:.7rem}
+.mrc-clear{background:none;border:none;color:rgba(255,107,157,.5);cursor:pointer;font-size:.75rem;flex-shrink:0}
+.mrc-clear:hover{color:var(--rose)}
+/* ADMIN PEOPLE MANAGEMENT */
+.admin-people-sec{display:none;margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid rgba(245,200,66,.18)}
+.admin-mode .admin-people-sec{display:block}
+.apl-list{display:flex;flex-direction:column;gap:.3rem;max-height:240px;overflow-y:auto;margin-top:.4rem}
 /* LEADERBOARD */
 .lb-sec{margin:.4rem 1rem .4rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
 .lb-tabs{display:flex;gap:.28rem;margin-bottom:.7rem}
@@ -280,8 +291,54 @@ canvas#wheelCanvas{border-radius:50%}
   <div class="tb-logo">🎂 SML Birthday</div>
   <div id="syncStatus"></div>
   <div class="tb-right">
-    <a class="tb-btn" href="admin.html" title="Admin" style="text-decoration:none">⚙️</a>
+    <span class="admin-top-badge">ADMIN</span>
+    <button class="tb-btn" id="adminLock" onclick="showAdminPrompt()" title="Admin">🔒</button>
   </div>
+</div>
+
+<div class="admin-strip" id="apiBar">
+  <span class="as-lbl">Script URL</span>
+  <input class="as-inp" id="apiUrl" type="text" placeholder="วาง Google Apps Script URL..." oninput="saveApiUrl()">
+  <div class="api-dot pending" id="apiDot"></div>
+  <button class="as-btn" onclick="testApi()">ทดสอบ</button>
+  <button class="as-btn" onclick="reloadPersons()">🔄 พนักงาน</button>
+  <button class="as-btn" onclick="toggleMonthCtrl()">🗓</button>
+  <button class="as-btn" onclick="toggleWheelMonthCtrl()">🎡</button>
+  <button class="as-btn" onclick="toggleMonthRangeCtrl()">📅</button>
+  <button class="as-btn" onclick="showAdminSettings()">⚙️</button>
+  <a class="as-btn" href="stats.html" target="_blank" style="text-decoration:none">📊 สถิติ</a>
+</div>
+
+<div class="admin-month-panel" id="adminMonthCtrl">
+  <div class="amp-hdr">
+    <span class="amp-lbl">เดือนที่แสดงให้พนักงาน</span>
+    <button onclick="toggleAllMonths()" style="background:none;border:1px solid rgba(245,200,66,.22);border-radius:6px;color:rgba(245,200,66,.6);font-family:'Kanit',sans-serif;font-size:.6rem;padding:.1rem .42rem;cursor:pointer">เลือกทั้งหมด</button>
+  </div>
+  <div id="amcGrid" class="amp-grid"></div>
+  <div class="amp-confirm" id="ampConfirm" style="display:none">
+    <div class="amp-confirm-icon">✅</div>
+    <div class="amp-confirm-text" id="ampConfirmText">เปิดใช้งาน <b>0 เดือน</b> — พนักงานจะเห็นเฉพาะเดือนเหล่านี้</div>
+  </div>
+</div>
+
+<div class="admin-month-panel" id="wheelMonthCtrl">
+  <div class="amp-hdr">
+    <span class="amp-lbl">🎡 รวมผู้เล่นจากเดือนไหนเข้าวงล้อ</span>
+    <button onclick="toggleAllWheelMonths()" style="background:none;border:1px solid rgba(245,200,66,.22);border-radius:6px;color:rgba(245,200,66,.6);font-family:'Kanit',sans-serif;font-size:.6rem;padding:.1rem .42rem;cursor:pointer">เลือกทั้งหมด</button>
+  </div>
+  <div id="wmcGrid" class="amp-grid"></div>
+  <div class="amp-confirm" id="wmcConfirm">
+    <div class="amp-confirm-icon">🎉</div>
+    <div class="amp-confirm-text" id="wmcConfirmText">รวมผู้เล่น <b>0 คน</b> เข้าวงล้อ</div>
+  </div>
+</div>
+
+<div class="admin-month-panel" id="monthRangeCtrl">
+  <div class="amp-hdr">
+    <span class="amp-lbl">📅 ช่วงวันที่เปิดให้ตอบคำถามแต่ละเดือน</span>
+  </div>
+  <div id="mrcGrid"></div>
+  <div style="font-size:.6rem;color:var(--mute);margin-top:.4rem">เว้นว่างไว้ = เปิดตลอดเวลา</div>
 </div>
 
 <div class="month-row" id="monthTabs"></div>
@@ -370,6 +427,21 @@ canvas#wheelCanvas{border-radius:50%}
   <div class="game-name-hint" id="gameNameHint" style="font-size:.65rem;color:rgba(245,200,66,.5);text-align:center;margin-top:.3rem;display:none">กรอกชื่อในช่องอวยพรด้านล่างเพื่อขึ้นกระดาน</div>
 </div>
 
+<!-- ADMIN QUIZ EDITOR -->
+<div class="qe-panel" id="quizEditor">
+  <div class="qe-lbl">✏️ Admin — เพิ่มคำถามเอง</div>
+  <div class="qe-list" id="customQList"></div>
+  <input class="qe-inp" id="qeQuestion" placeholder="คำถาม เช่น คุณ... ชอบอาหารอะไร?" style="width:100%;margin-bottom:.28rem">
+  <div class="qe-form-grid">
+    <label style="display:flex;align-items:center;gap:.3rem"><input type="radio" name="qeCorrect" value="0" checked><input class="qe-inp" id="qeOpt1" placeholder="ตัวเลือก 1" style="flex:1"></label>
+    <label style="display:flex;align-items:center;gap:.3rem"><input type="radio" name="qeCorrect" value="1"><input class="qe-inp" id="qeOpt2" placeholder="ตัวเลือก 2" style="flex:1"></label>
+    <label style="display:flex;align-items:center;gap:.3rem"><input type="radio" name="qeCorrect" value="2"><input class="qe-inp" id="qeOpt3" placeholder="ตัวเลือก 3" style="flex:1"></label>
+    <label style="display:flex;align-items:center;gap:.3rem"><input type="radio" name="qeCorrect" value="3"><input class="qe-inp" id="qeOpt4" placeholder="ตัวเลือก 4" style="flex:1"></label>
+  </div>
+  <div class="qe-lbl" style="margin-top:.1rem;text-transform:none;letter-spacing:0">เลือกวงกลม ⚪ หน้าตัวเลือกที่เป็นคำตอบที่ถูก</div>
+  <button class="qe-add" onclick="addCustomQuestion()" style="margin-top:.28rem">+ เพิ่มคำถาม</button>
+</div>
+
 <!-- VOTE -->
 <div class="vote-sec" id="voteSection" style="display:none">
   <div class="sec-hdr"><div class="sec-title">❤️ คำอวยพรยอดฮิต</div><div class="sec-badge">โหวตได้ 1 ครั้ง</div></div>
@@ -399,6 +471,11 @@ canvas#wheelCanvas{border-radius:50%}
   <div class="wheel-wrap">
     <div class="wheel-frame"><canvas id="wheelCanvas" width="240" height="240"></canvas><div class="wheel-ptr"></div></div>
     <div class="wheel-result-txt" id="wheelResult">รอ Admin กดหมุน 🎡</div>
+    <div class="wheel-admin-btns" id="wheelAdminArea">
+      <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">🎡 หมุน!</button>
+      <button class="wheel-export-btn" onclick="exportScoresExcel()">📊 Export คะแนน Excel</button>
+      <button class="wheel-export-btn" onclick="resetWheelWinner()">🔄 รีเซ็ตวงล้อ</button>
+    </div>
     <div class="wheel-pub-hint" id="wheelPublicHint">Admin เป็นผู้กดหมุนครับ</div>
   </div>
 </div>
@@ -419,14 +496,86 @@ canvas#wheelCanvas{border-radius:50%}
   <div id="lbList"><div class="lb-empty">เล่นเกมเพื่อขึ้นกระดาน!</div></div>
 </div>
 
+<!-- ADMIN: PEOPLE MANAGEMENT -->
+<div class="admin-people-sec" id="adminPeopleSec">
+  <div class="sec-hdr">
+    <div class="sec-title">🗂 จัดการคนตอบคำถาม / คนอวยพร</div>
+    <button class="wall-refresh" onclick="loadAllWishesForAdmin()">🔄 โหลดทั้งหมด</button>
+  </div>
+  <div class="qe-lbl" style="margin-top:.3rem">🎯 คนที่ตอบคำถาม (ทุกเดือน)</div>
+  <div class="apl-list" id="adminPlayersList"></div>
+  <div class="qe-lbl" style="margin-top:.6rem">💌 คนที่อวยพร (ทุกเดือน)</div>
+  <div class="apl-list" id="adminWishesList"></div>
+</div>
+
 <div class="spacer-bottom"></div>
 
 <!-- TOAST + LIKE -->
 <div class="toast" id="toast"></div>
 <div class="like-notif" id="likeNotif"></div>
 
+<!-- MODALS -->
+<div class="modal-overlay" id="loginModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">🔐 เข้าสู่ระบบ Admin</div>
+    <div><div class="modal-label" style="margin-bottom:.25rem">รหัสผ่าน</div>
+    <input class="modal-input" id="loginPassInput" type="password" placeholder="ใส่รหัส Admin..." onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="modal-row">
+      <button class="modal-btn-ghost" onclick="document.getElementById('loginModal').style.display='none'">ยกเลิก</button>
+      <button class="modal-btn-primary" onclick="doLogin()">เข้าสู่ระบบ</button>
+    </div>
+    <div class="modal-sep"></div>
+    <button class="modal-danger" onclick="showForgotPass()">🔑 ลืมรหัสผ่าน / รีเซ็ต</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">⚙️ ตั้งค่า Admin</div>
+    <div><div class="modal-label" style="margin-bottom:.25rem">เปลี่ยนรหัสผ่าน</div>
+    <input class="modal-input" id="settOldPass" type="password" placeholder="รหัสเดิม" style="margin-bottom:.32rem">
+    <input class="modal-input" id="settNewPass" type="password" placeholder="รหัสใหม่ (อย่างน้อย 4 ตัว)" style="margin-bottom:.32rem">
+    <input class="modal-input" id="settConfPass" type="password" placeholder="ยืนยันรหัสใหม่"></div>
+    <button class="modal-btn-primary" onclick="changePassword()">💾 บันทึกรหัสใหม่</button>
+    <div class="modal-success-msg" id="settSuccessMsg">✅ เปลี่ยนรหัสสำเร็จ!</div>
+    <div class="modal-sep"></div>
+    <div class="modal-label" style="margin-bottom:.25rem">Master Key (รหัสสำรอง)</div>
+    <div style="font-size:.68rem;color:var(--mute);line-height:1.6;margin-bottom:.38rem">ใช้เข้าได้เสมอแม้ลืมรหัสหลัก<br><span style="color:var(--gold);font-weight:500;letter-spacing:.06em" id="masterKeyDisplay">••••••••</span></div>
+    <button class="modal-btn-ghost" onclick="showMasterKey()" style="font-size:.74rem">👁 แสดง Master Key</button>
+    <div class="modal-sep"></div>
+    <button class="modal-btn-ghost" onclick="document.getElementById('settingsModal').style.display='none'">ปิด</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="forgotModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">🔑 รีเซ็ตรหัสผ่าน</div>
+    <div style="font-size:.76rem;color:var(--sub);line-height:1.6">ใส่ <b style="color:var(--gold)">Master Key</b> เพื่อตั้งรหัสใหม่</div>
+    <input class="modal-input" id="forgotMasterKey" type="password" placeholder="Master Key">
+    <input class="modal-input" id="forgotNewPass" type="password" placeholder="รหัสผ่านใหม่">
+    <div class="modal-row">
+      <button class="modal-btn-ghost" onclick="document.getElementById('forgotModal').style.display='none'">ยกเลิก</button>
+      <button class="modal-btn-primary" onclick="resetWithMasterKey()">รีเซ็ต</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="employees.js"></script>
 <script src="app.js"></script>
+<script>
+// admin.html: this is the dedicated admin entry point.
+// Auto-prompt the admin login modal once the app has finished its initial setup,
+// instead of requiring a click on the lock icon (same login/auth logic as index.html).
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    if(!document.body.classList.contains('admin-mode') && typeof showAdminPrompt==='function'){
+      showAdminPrompt();
+    }
+  }, 400);
+});
+</script>
 
 </body>
 </html>
