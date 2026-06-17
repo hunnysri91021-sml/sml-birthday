@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>สถิติการเข้าร่วม — SML Birthday 📊</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0d1a;--c1:#16162a;--c2:#1e1e35;--gold:#f5c842;--gold2:#f7a621;--rose:#ff6b9d;--mint:#00e5cc;--purple:#a78bfa;--text:#fff;--sub:rgba(255,255,255,.55);--mute:rgba(255,255,255,.28);--b:rgba(255,255,255,.08);--b2:rgba(255,255,255,.14)}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Kanit',sans-serif;overflow-x:hidden}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,13,26,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--b);padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.tb-logo{font-family:'Mitr',sans-serif;font-size:.95rem;font-weight:500;color:var(--gold);letter-spacing:.05em}
+.tb-back{font-size:.7rem;color:var(--sub);text-decoration:none;border:1px solid var(--b2);border-radius:20px;padding:.3rem .8rem;transition:.2s}
+.tb-back:hover{color:var(--gold);border-color:var(--gold)}
+.wrap{max-width:880px;margin:0 auto;padding:1.2rem 1rem 3rem}
+.hero{text-align:center;margin:1.2rem 0 1.8rem}
+.hero h1{font-family:'Mitr',sans-serif;font-size:1.3rem;color:var(--gold);margin-bottom:.3rem}
+.hero p{font-size:.78rem;color:var(--sub)}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.7rem;margin-bottom:1.6rem}
+.sum-card{background:linear-gradient(135deg,var(--c1),var(--c2));border:1px solid var(--b2);border-radius:14px;padding:1rem;text-align:center}
+.sum-card .num{font-size:1.6rem;font-weight:600;color:var(--gold)}
+.sum-card .lbl{font-size:.65rem;color:var(--sub);margin-top:.2rem;letter-spacing:.04em}
+.panel{background:linear-gradient(135deg,var(--c1),var(--c2));border:1px solid var(--b2);border-radius:16px;padding:1.1rem;margin-bottom:1.3rem}
+.panel h2{font-size:.85rem;color:var(--gold);margin-bottom:.9rem;display:flex;align-items:center;gap:.4rem}
+.bar-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
+.bar-lbl{width:78px;flex-shrink:0;font-size:.66rem;color:var(--sub);text-align:right}
+.bar-track{flex:1;height:16px;background:rgba(255,255,255,.06);border-radius:8px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--gold2),var(--gold));transition:width .6s ease}
+.bar-val{font-size:.65rem;color:var(--text);width:34px;text-align:left}
+.person-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem .6rem;border-radius:10px;background:rgba(255,255,255,.03);margin-bottom:.4rem;font-size:.75rem}
+.person-row .pname{display:flex;align-items:center;gap:.5rem}
+.person-row .prank{width:22px;height:22px;border-radius:50%;background:rgba(245,200,66,.12);color:var(--gold);font-size:.65rem;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0}
+.person-row .pscore{color:var(--gold);font-weight:600}
+.empty-hint{text-align:center;color:var(--mute);font-size:.78rem;padding:1.5rem 0}
+.note{font-size:.65rem;color:var(--mute);text-align:center;margin-top:1rem;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="tb-logo">📊 SML Birthday — สถิติ</div>
+  <a class="tb-back" href="index.html">← กลับหน้าหลัก</a>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>สถิติการเข้าร่วมกิจกรรม</h1>
+    <p>ดูจำนวนครั้งที่พนักงานเข้าร่วมเล่นเกมวันเกิด แยกตามเดือนและรายบุคคล</p>
+  </div>
+
+  <div class="summary-grid" id="summaryGrid"></div>
+
+  <div class="panel">
+    <h2>📅 จำนวนผู้เล่นแยกตามเดือนเกิด</h2>
+    <div id="monthChart"></div>
+  </div>
+
+  <div class="panel">
+    <h2>🏆 อันดับผู้เข้าร่วมมากที่สุด (ตามจำนวนครั้งที่เล่น)</h2>
+    <div id="topPlayers"></div>
+  </div>
+
+  <div class="note">
+    * สถิติเหล่านี้เก็บไว้ในเบราว์เซอร์ของอุปกรณ์ที่ใช้เล่นเกม (localStorage) เท่านั้น<br>
+    หากเล่นจากหลายอุปกรณ์ ข้อมูลอาจไม่รวมกันอัตโนมัติ
+  </div>
+</div>
+
+<script src="employees.js"></script>
+<script>
+function collectStats(){
+  // Map empKey -> board (array of {name,score,games,...})
+  const perPerson = []; // {name, games, score, month}
+  const monthCounts = new Array(12).fill(0);
+  let totalGames = 0;
+  const uniquePlayers = new Set();
+
+  calPersons.forEach(p=>{
+    const empKey = p.code || p.name;
+    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+    board.forEach(r=>{
+      perPerson.push({name:r.name, games:r.games||1, score:r.score||0, month:p.month, owner:p.name});
+      monthCounts[p.month] += (r.games||1);
+      totalGames += (r.games||1);
+      uniquePlayers.add(r.name);
+    });
+  });
+
+  // Merge by player name (sum games across employees they played for, keep max score)
+  const merged = new Map();
+  perPerson.forEach(r=>{
+    const ex = merged.get(r.name);
+    if(ex){ ex.games += r.games; ex.score = Math.max(ex.score, r.score); }
+    else merged.set(r.name, {name:r.name, games:r.games, score:r.score});
+  });
+
+  return {
+    monthCounts, totalGames,
+    uniquePlayers: uniquePlayers.size,
+    topPlayers: Array.from(merged.values()).sort((a,b)=>b.games-a.games || b.score-a.score)
+  };
+}
+
+function escHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function render(){
+  const stats = collectStats();
+  const sg = document.getElementById('summaryGrid');
+  sg.innerHTML = `
+    <div class="sum-card"><div class="num">${stats.totalGames}</div><div class="lbl">ครั้งที่เล่นทั้งหมด</div></div>
+    <div class="sum-card"><div class="num">${stats.uniquePlayers}</div><div class="lbl">ผู้เล่นที่ไม่ซ้ำกัน</div></div>
+    <div class="sum-card"><div class="num">${calPersons.length}</div><div class="lbl">พนักงานในระบบ</div></div>
+  `;
+
+  const maxMonth = Math.max(1, ...stats.monthCounts);
+  document.getElementById('monthChart').innerHTML = MTH.map((m,i)=>`
+    <div class="bar-row">
+      <div class="bar-lbl">${m}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(stats.monthCounts[i]/maxMonth*100)}%"></div></div>
+      <div class="bar-val">${stats.monthCounts[i]}</div>
+    </div>`).join('');
+
+  const top = stats.topPlayers.slice(0,15);
+  const tp = document.getElementById('topPlayers');
+  if(!top.length){
+    tp.innerHTML = '<div class="empty-hint">ยังไม่มีข้อมูลการเล่นในเบราว์เซอร์นี้</div>';
+  } else {
+    tp.innerHTML = top.map((r,i)=>`
+      <div class="person-row">
+        <div class="pname"><span class="prank">${i+1}</span>${escHtml(r.name)}</div>
+        <div class="pscore">${r.games} ครั้ง · ${r.score} แต้ม</div>
+      </div>`).join('');
+  }
+}
+
+render();
+</script>
+</body>
+</html>

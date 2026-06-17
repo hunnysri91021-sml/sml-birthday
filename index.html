@@ -292,7 +292,9 @@ canvas#wheelCanvas{border-radius:50%}
   <button class="as-btn" onclick="testApi()">ทดสอบ</button>
   <button class="as-btn" onclick="reloadPersons()">🔄 พนักงาน</button>
   <button class="as-btn" onclick="toggleMonthCtrl()">🗓</button>
+  <button class="as-btn" onclick="toggleWheelMonthCtrl()">🎡</button>
   <button class="as-btn" onclick="showAdminSettings()">⚙️</button>
+  <a class="as-btn" href="stats.html" target="_blank" style="text-decoration:none">📊 สถิติ</a>
 </div>
 
 <div class="admin-month-panel" id="adminMonthCtrl">
@@ -304,6 +306,18 @@ canvas#wheelCanvas{border-radius:50%}
   <div class="amp-confirm" id="ampConfirm" style="display:none">
     <div class="amp-confirm-icon">✅</div>
     <div class="amp-confirm-text" id="ampConfirmText">เปิดใช้งาน <b>0 เดือน</b> — พนักงานจะเห็นเฉพาะเดือนเหล่านี้</div>
+  </div>
+</div>
+
+<div class="admin-month-panel" id="wheelMonthCtrl">
+  <div class="amp-hdr">
+    <span class="amp-lbl">🎡 รวมผู้เล่นจากเดือนไหนเข้าวงล้อ</span>
+    <button onclick="toggleAllWheelMonths()" style="background:none;border:1px solid rgba(245,200,66,.22);border-radius:6px;color:rgba(245,200,66,.6);font-family:'Kanit',sans-serif;font-size:.6rem;padding:.1rem .42rem;cursor:pointer">เลือกทั้งหมด</button>
+  </div>
+  <div id="wmcGrid" class="amp-grid"></div>
+  <div class="amp-confirm" id="wmcConfirm">
+    <div class="amp-confirm-icon">🎉</div>
+    <div class="amp-confirm-text" id="wmcConfirmText">รวมผู้เล่น <b>0 คน</b> เข้าวงล้อ</div>
   </div>
 </div>
 
@@ -532,61 +546,10 @@ function setApiStatus(type,text){
   const dot=document.getElementById('apiDot');if(dot)dot.className='api-dot '+type;
 }
 </script>
+<script src="employees.js"></script>
 <script>
 
-const MTH=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 const EMOJIS=['🎉','🌟','💖','🎂','🥳','🌈','✨','🎁','🍀','🏆','🌺','💐','🦋','⭐'];
-let calPersons = [
-  {code:'90245',name:'ประจักษ์ แก้วหานาม',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:23,month:0},
-  {code:'90308',name:'สกุล พรมมี',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:29,month:0},
-  {code:'90576',name:'อานนท์ โสธรรมมงคล',pos:'พนักงานปรับแต่ง',faction:'Accessories Installetion',day:24,month:0},
-  {code:'90954',name:'วิรัตน์ สมศรี',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:5,month:0},
-  {code:'91038',name:'เสรี คะรัมย์',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:13,month:0},
-  {code:'91115',name:'ชาญวิทย์ ฤทธิ์สยาม',pos:'พนักงานติดตั้งอุปกรณ์',faction:'Accessories Installetion',day:21,month:0},
-  {code:'90239',name:'กิตติกา จันทร์สายทอง',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:5,month:1},
-  {code:'90615',name:'ประธาน แช่มโชติ',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:19,month:1},
-  {code:'90638',name:'รังสรรค์ แจ่มประเสริฐ',pos:'หัวหน้าหน่วยล้างรถใหม่',faction:'PDI Operation',day:21,month:1},
-  {code:'91021',name:'โชสิญา ดานเรือง',pos:'ผู้ช่วย้จัดการส่วน HR&GA',faction:'HR&GA',day:2,month:1},
-  {code:'90057',name:'ทวี กัณหา',pos:'เจ้าหน้าที่เคลม',faction:'Accessories Installetion',day:8,month:2},
-  {code:'90841',name:'สัมพันธ์ สำนวน',pos:'หัวหน้ากลุ่มงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:26,month:2},
-  {code:'91100',name:'วิระพงษ์ กิระหัด',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:27,month:2},
-  {code:'91112',name:'กุหลาบ กองทอง',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:28,month:2},
-  {code:'90040',name:'ภูวดล ปาราลิตร์',pos:'พนักงานธุรการทั่วไป',faction:'HR&GA',day:2,month:3},
-  {code:'90258',name:'นาเรณ มูฮำหมัด',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:17,month:3},
-  {code:'90566',name:'ยืนยง กันหา',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:24,month:3},
-  {code:'90715',name:'ณธีพัฒน์ รัตนอธิพัฒน์',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:5,month:3},
-  {code:'90835',name:'คำภา ปานิสัย',pos:'เจ้าหน้าที่สโตร์',faction:'Accessories Installetion',day:24,month:3},
-  {code:'91059',name:'ปัทมา เห็มบุตร',pos:'เจ้าหน้าที่บัญชี',faction:'บัญชีและการเงิน',day:16,month:3},
-  {code:'91079',name:'ณัฐวุฒิ เลิศวงษ์วรรณ',pos:'ผู้ช่วยผู้จัดการส่วน Yrad Control',faction:'Yard Operation',day:30,month:3},
-  {code:'91116',name:'คณิน บุญอยู่',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:5,month:3},
-  {code:'90354',name:'นำพล เล็กใจกล้า',pos:'เจ้าหน้าที่จัดซื้อ',faction:'HR&GA',day:31,month:4},
-  {code:'90439',name:'ปุณยนุช ม่วงศรี',pos:'ผู้ช่วยผู้จัดการส่วนบัญชีและการเงิน',faction:'บัญชีและการเงิน',day:19,month:4},
-  {code:'90713',name:'บุญเลี้ยง เหมภูมิ',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:3,month:4},
-  {code:'90939',name:'สุรกิจ ตันกุล',pos:'ผู้จัดกรส่วนอาวุโส',faction:'PC&PDI Operation',day:21,month:4},
-  {code:'90459',name:'ดนุพล วังใจ',pos:'หัวหน้าหน่วยติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:15,month:5},
-  {code:'90495',name:'บุญช่วย เนียมมาก',pos:'พนักงานอาวุโสเทียบเท่าหัวหน้างาน(Final Judgement)',faction:'PDI Operation',day:24,month:5},
-  {code:'90570',name:'ชาญณรงค์ ดวงสิน',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:3,month:5},
-  {code:'91010',name:'โสภา สุดตาภักดี',pos:'เจ้าหน้าที่บัญชีทรัพย์สิน',faction:'บัญชีและการเงิน',day:18,month:5},
-  {code:'91146',name:'อลงกรณ์ สัตยาคุณ',pos:'เจ้าหน้าที่เคลม',faction:'Accessories Installetion',day:9,month:5},
-  {code:'90714',name:'วัชรินทร์ จันทำ',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:24,month:6},
-  {code:'91155',name:'สุนิษา เกษพิจิตร',pos:'จป.วิชาชีพ',faction:'HR&GA',day:5,month:6},
-  {code:'91147',name:'ณัฐวิช เลิศวงษ์วรรณ',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:3,month:7},
-  {code:'91152',name:'วิวัฒน์ ตันติวีรกุล',pos:'ผู้จัดการส่วน Accessories Installetion',faction:'Accessories Installetion',day:15,month:7},
-  {code:'90352',name:'อาทิตย์ ภูแล่นคู่',pos:'หัวหน้าหน่วยตรวจสอบรถใหม่',faction:'PDI Operation',day:15,month:8},
-  {code:'90498',name:'อำนาจ ศุลญลา',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:23,month:8},
-  {code:'90526',name:'ยศศักดิ์ ทัศนพงษ์',pos:'เจ้าหน้าที่ IT',faction:'HR&GA',day:24,month:8},
-  {code:'91064',name:'วิภาวดี โตประดิษฐ์',pos:'หัวหน้าแผนก Yard Operation',faction:'Yard Operation',day:30,month:8},
-  {code:'91118',name:'อดิเรก บัวจันทร์',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:18,month:8},
-  {code:'90368',name:'ฤทธิรงค์ อุปถัมภ์',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:26,month:9},
-  {code:'90986',name:'พรรณเชษฐ์ นครรัตน์',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:26,month:9},
-  {code:'90325',name:'ระวิ จันทโรทัย',pos:'หัวหน้าแผนก PDI Operation',faction:'PDI Operation',day:7,month:10},
-  {code:'90696',name:'ดลลดา ใจแก้ว',pos:'เจ้าหน้าที่สรรหา',faction:'HR&GA',day:6,month:10},
-  {code:'90722',name:'ธนโชติ โพธิ์ใต้',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:23,month:10},
-  {code:'91068',name:'วราภรณ์ ใสสม',pos:'หัวหน้าหน่วย Yard Control',faction:'Yard Operation',day:3,month:10},
-  {code:'90179',name:'ณุชัย หาญรักษ์',pos:'หัวหน้าหน่วยปรับแต่ง',faction:'PDI Operation',day:28,month:11},
-  {code:'90934',name:'เชิดชัย มิกขุนทด',pos:'ผู้ช่วยกรมการผู้จัดการ',faction:'-',day:17,month:11},
-  {code:'91133',name:'กฤษณะ เหลืองมิวาย',pos:'เจ้าหน้าที่สโตร์(Accessories)',faction:'Accessories Installetion',day:24,month:11},
-];
 
 let curEmp = null;
 let selMonth = -1;
@@ -1054,7 +1017,7 @@ function buildAmcGrid(){
   const grid=document.getElementById('amcGrid');
   if(!grid) return;
   grid.innerHTML=MTH.map((m,i)=>
-    `<button class="amc-chip${active.includes(i)?' on':''}" onclick="toggleAdminMonth(${i})" id="amc-${i}">${m.substring(0,3)}</button>`
+    `<button class="amp-chip ${active.includes(i)?'on':'off'}" onclick="toggleAdminMonth(${i})" id="amc-${i}">${m.substring(0,3)}</button>`
   ).join('');
 }
 
@@ -1078,6 +1041,59 @@ function toggleAllMonths(){
   saveActiveMonths(newActive);
   buildAmcGrid();
   buildMonthTabs();
+}
+
+// ── WHEEL MONTH CONTROL (which months' players get pooled into the wheel) ──
+function toggleWheelMonthCtrl(){
+  const el=document.getElementById('wheelMonthCtrl');
+  if(el) el.classList.toggle('open');
+  buildWmcGrid();
+}
+
+function getWheelMonths(){
+  const saved=localStorage.getItem('wheel_active_months');
+  if(saved) return JSON.parse(saved);
+  // Default: current month only
+  return [new Date().getMonth()];
+}
+
+function saveWheelMonths(arr){
+  localStorage.setItem('wheel_active_months', JSON.stringify(arr));
+}
+
+function buildWmcGrid(){
+  const active=getWheelMonths();
+  const grid=document.getElementById('wmcGrid');
+  if(!grid) return;
+  grid.innerHTML=MTH.map((m,i)=>
+    `<button class="amp-chip ${active.includes(i)?'on':'off'}" onclick="toggleWheelMonth(${i})" id="wmc-${i}">${m.substring(0,3)}</button>`
+  ).join('');
+  updateWmcConfirm();
+}
+
+function toggleWheelMonth(mi){
+  const active=getWheelMonths();
+  const idx=active.indexOf(mi);
+  if(idx>=0) active.splice(idx,1);
+  else active.push(mi);
+  saveWheelMonths(active);
+  buildWmcGrid();
+  renderParticipants();
+}
+
+function toggleAllWheelMonths(){
+  const active=getWheelMonths();
+  const newActive = active.length===12 ? [] : MTH.map((_,i)=>i);
+  saveWheelMonths(newActive);
+  buildWmcGrid();
+  renderParticipants();
+}
+
+function updateWmcConfirm(){
+  const txt=document.getElementById('wmcConfirmText');
+  if(!txt) return;
+  const count = getWheelParticipants().length;
+  txt.innerHTML = `รวมผู้เล่น <b>${count} คน</b> เข้าวงล้อ`;
 }
 
 // ── ADMIN MODE ──────────────────────────────────────────────────────
@@ -1108,6 +1124,8 @@ function enterAdmin(){
   if(saved){ document.getElementById('apiUrl').value=saved; testApi(); }
   // Build admin month grid
   buildAmcGrid();
+  buildWmcGrid();
+  renderParticipants();
   // Render custom questions
   renderCustomQList();
   // Show admin-only wheel controls
@@ -1636,18 +1654,19 @@ function renderParticipants() {
   const ws = document.getElementById('wheelSection');
   if (!board.length) {
     if(ps) ps.style.display='none';
-    if(ws) ws.style.display='none';
-    return;
+  } else {
+    if(ps) ps.style.display='block';
+    if(cnt) cnt.textContent = board.length + ' คน';
+    const winner = localStorage.getItem('wheelWinner_'+empKey)||'';
+    grid.innerHTML = board.map(r=>`
+      <div class="part-chip${r.name===winner?' winner':''}">
+        ${r.name===winner?'🏆 ':''}${escHtml(r.name)}
+        <span style="opacity:.5;font-size:.65rem">${r.score}แต้ม</span>
+      </div>`).join('');
   }
-  if(ps) ps.style.display='block';
-  if(ws) ws.style.display='block';
-  if(cnt) cnt.textContent = board.length + ' คน';
-  const winner = localStorage.getItem('wheelWinner_'+empKey)||'';
-  grid.innerHTML = board.map(r=>`
-    <div class="part-chip${r.name===winner?' winner':''}">
-      ${r.name===winner?'🏆 ':''}${escHtml(r.name)}
-      <span style="opacity:.5;font-size:.65rem">${r.score}แต้ม</span>
-    </div>`).join('');
+  const wheelNames = getWheelParticipants();
+  if (ws) ws.style.display = wheelNames.length ? 'block' : 'none';
+  updateWmcConfirm();
   drawWheel();
 }
 
@@ -1662,10 +1681,27 @@ const WHEEL_COLORS = [
 let wheelAngle = 0;
 let wheelSpinning = false;
 
+function getWheelScopeKey(){
+  return getWheelMonths().slice().sort((a,b)=>a-b).join('-') || 'none';
+}
+
+function getWheelParticipants() {
+  const months = getWheelMonths();
+  const byName = new Map();
+  calPersons.forEach(p=>{
+    if (!months.includes(p.month)) return;
+    const empKey = p.code || p.name;
+    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+    board.forEach(r=>{
+      const existing = byName.get(r.name);
+      if (!existing || r.score > existing.score) byName.set(r.name, r);
+    });
+  });
+  return Array.from(byName.values());
+}
+
 function getWheelNames() {
-  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
-  const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
-  return board.map(r=>r.name);
+  return getWheelParticipants().map(r=>r.name);
 }
 
 function drawWheel(highlightIdx=-1) {
@@ -1787,9 +1823,8 @@ function spinWheel() {
       btn.textContent = '🎡 หมุนอีกครั้ง!';
       const winner = names[winIdx];
       if(resEl) resEl.innerHTML = `🏆 ผู้โชคดีคือ <span style="color:#f5c842;font-weight:600">${escHtml(winner)}</span>!`;
-      // Save winner
-      const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
-      localStorage.setItem('wheelWinner_'+empKey, winner);
+      // Save winner (scoped to the currently pooled wheel months)
+      localStorage.setItem('wheelWinner_months_'+getWheelScopeKey(), winner);
       renderParticipants();
       fireConfetti();
       showToast('🏆 ผู้โชคดี: ' + winner);
