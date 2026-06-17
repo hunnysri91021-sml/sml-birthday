@@ -1567,6 +1567,23 @@ function saveGameScore(playerName, score, total) {
   if(ps) ps.style.display='block';
   if(ws) ws.style.display='block';
   drawWheel();
+  syncQuizResult(playerName, score, total, ts);
+}
+
+// ─── SYNC QUIZ RESULT TO GOOGLE SHEET ─────────────────────
+async function syncQuizResult(playerName, score, total, ts) {
+  if (!getApiUrl()) return;
+  const result = {
+    action: 'addQuizResult',
+    empCode: curEmp ? (curEmp.code||'') : '',
+    empName: curEmp ? curEmp.name : '',
+    playerName, score, total, ts
+  };
+  const r = await apiPost(result);
+  if (!r || r.error) {
+    pendingQueue.push(result);
+    localStorage.setItem('sml_pending', JSON.stringify(pendingQueue));
+  }
 }
 
 function renderLeaderboard() {
