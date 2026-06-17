@@ -231,6 +231,17 @@ canvas#wheelCanvas{border-radius:50%}
 .wheel-export-btn{padding:.35rem 1rem;background:transparent;border:1px solid rgba(245,200,66,.2);border-radius:20px;color:rgba(245,200,66,.65);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
 .wheel-export-btn:hover{background:rgba(245,200,66,.08);color:var(--gold)}
 .wheel-pub-hint{font-size:.68rem;color:var(--mute);text-align:center}
+/* MONTH PLAY RANGE */
+.mrc-row{display:flex;align-items:center;gap:.35rem;margin-bottom:.32rem}
+.mrc-month{width:46px;font-size:.68rem;color:var(--sub);flex-shrink:0}
+.mrc-date{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--b2);border-radius:7px;padding:.22rem .4rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.66rem;outline:none}
+.mrc-sep{color:var(--mute);font-size:.7rem}
+.mrc-clear{background:none;border:none;color:rgba(255,107,157,.5);cursor:pointer;font-size:.75rem;flex-shrink:0}
+.mrc-clear:hover{color:var(--rose)}
+/* ADMIN PEOPLE MANAGEMENT */
+.admin-people-sec{display:none;margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid rgba(245,200,66,.18)}
+.admin-mode .admin-people-sec{display:block}
+.apl-list{display:flex;flex-direction:column;gap:.3rem;max-height:240px;overflow-y:auto;margin-top:.4rem}
 /* LEADERBOARD */
 .lb-sec{margin:.4rem 1rem .4rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
 .lb-tabs{display:flex;gap:.28rem;margin-bottom:.7rem}
@@ -293,6 +304,7 @@ canvas#wheelCanvas{border-radius:50%}
   <button class="as-btn" onclick="reloadPersons()">🔄 พนักงาน</button>
   <button class="as-btn" onclick="toggleMonthCtrl()">🗓</button>
   <button class="as-btn" onclick="toggleWheelMonthCtrl()">🎡</button>
+  <button class="as-btn" onclick="toggleMonthRangeCtrl()">📅</button>
   <button class="as-btn" onclick="showAdminSettings()">⚙️</button>
   <a class="as-btn" href="stats.html" target="_blank" style="text-decoration:none">📊 สถิติ</a>
 </div>
@@ -319,6 +331,14 @@ canvas#wheelCanvas{border-radius:50%}
     <div class="amp-confirm-icon">🎉</div>
     <div class="amp-confirm-text" id="wmcConfirmText">รวมผู้เล่น <b>0 คน</b> เข้าวงล้อ</div>
   </div>
+</div>
+
+<div class="admin-month-panel" id="monthRangeCtrl">
+  <div class="amp-hdr">
+    <span class="amp-lbl">📅 ช่วงวันที่เปิดให้ตอบคำถามแต่ละเดือน</span>
+  </div>
+  <div id="mrcGrid"></div>
+  <div style="font-size:.6rem;color:var(--mute);margin-top:.4rem">เว้นว่างไว้ = เปิดตลอดเวลา</div>
 </div>
 
 <div class="month-row" id="monthTabs"></div>
@@ -454,9 +474,16 @@ canvas#wheelCanvas{border-radius:50%}
     <div class="wheel-admin-btns" id="wheelAdminArea">
       <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">🎡 หมุน!</button>
       <button class="wheel-export-btn" onclick="exportScoresExcel()">📊 Export คะแนน Excel</button>
+      <button class="wheel-export-btn" onclick="resetWheelWinner()">🔄 รีเซ็ตวงล้อ</button>
     </div>
     <div class="wheel-pub-hint" id="wheelPublicHint">Admin เป็นผู้กดหมุนครับ</div>
   </div>
+</div>
+
+<!-- WHEEL WINNER HISTORY -->
+<div class="wheel-sec" id="wheelHistorySection" style="display:none">
+  <div class="sec-hdr"><div class="sec-title">🏆 ผู้โชคดีที่ผ่านมา</div><div class="sec-badge">อันดับ 1 - 2</div></div>
+  <div id="wheelHistoryList"></div>
 </div>
 
 <!-- LEADERBOARD -->
@@ -467,6 +494,18 @@ canvas#wheelCanvas{border-radius:50%}
     <button class="lb-tab" id="lbTabLike" onclick="switchLbTab('like')">❤️ ไลก์</button>
   </div>
   <div id="lbList"><div class="lb-empty">เล่นเกมเพื่อขึ้นกระดาน!</div></div>
+</div>
+
+<!-- ADMIN: PEOPLE MANAGEMENT -->
+<div class="admin-people-sec" id="adminPeopleSec">
+  <div class="sec-hdr">
+    <div class="sec-title">🗂 จัดการคนตอบคำถาม / คนอวยพร</div>
+    <button class="wall-refresh" onclick="loadAllWishesForAdmin()">🔄 โหลดทั้งหมด</button>
+  </div>
+  <div class="qe-lbl" style="margin-top:.3rem">🎯 คนที่ตอบคำถาม (ทุกเดือน)</div>
+  <div class="apl-list" id="adminPlayersList"></div>
+  <div class="qe-lbl" style="margin-top:.6rem">💌 คนที่อวยพร (ทุกเดือน)</div>
+  <div class="apl-list" id="adminWishesList"></div>
 </div>
 
 <div class="spacer-bottom"></div>

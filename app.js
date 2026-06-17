@@ -24,6 +24,13 @@ let localWishes = JSON.parse(localStorage.getItem('sml_wishes') || '{}');
 let pendingQueue = JSON.parse(localStorage.getItem('sml_pending') || '[]');
 let gameState = {score:0, qIdx:0, questions:[], answered:false};
 let lbTab = 'game';
+let wheelAngle = 0;
+let wheelSpinning = false;
+const WHEEL_COLORS = [
+  '#E94560','#F5A623','#7ED321','#4A90D9','#9B59B6',
+  '#1ABC9C','#E67E22','#E91E63','#00BCD4','#8BC34A',
+  '#FF5722','#3F51B5','#009688','#FF9800','#673AB7'
+];
 
 // ─── API ───────────────────────────────────────────────────
 function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim(); }
@@ -456,6 +463,7 @@ function onTextInput(){
   setInterval(loadWishes, 30000);
   // Draw placeholder wheel on load
   setTimeout(drawWheel, 300);
+  renderWheelHistory();
   // Init emoji grid + templates
   initStickerSystem();
   renderTemplates();
@@ -508,6 +516,54 @@ function toggleAllMonths(){
   saveActiveMonths(newActive);
   buildAmcGrid();
   buildMonthTabs();
+}
+
+// ── MONTH PLAY DATE RANGE (when answering can happen, per birth month) ──
+function getMonthRanges() {
+  return JSON.parse(localStorage.getItem('sml_month_ranges')||'{}');
+}
+function saveMonthRanges(obj) {
+  localStorage.setItem('sml_month_ranges', JSON.stringify(obj));
+}
+function isMonthPlayOpen(mi) {
+  const r = getMonthRanges()[mi];
+  if (!r || (!r.start && !r.end)) return true;
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (r.start) { const s = new Date(r.start); s.setHours(0,0,0,0); if (today < s) return false; }
+  if (r.end) { const e = new Date(r.end); e.setHours(23,59,59,999); if (today > e) return false; }
+  return true;
+}
+function setMonthRange(mi, key, val) {
+  const ranges = getMonthRanges();
+  ranges[mi] = ranges[mi] || {};
+  ranges[mi][key] = val;
+  saveMonthRanges(ranges);
+}
+function clearMonthRange(mi) {
+  const ranges = getMonthRanges();
+  delete ranges[mi];
+  saveMonthRanges(ranges);
+  buildMrcGrid();
+}
+function buildMrcGrid() {
+  const ranges = getMonthRanges();
+  const grid = document.getElementById('mrcGrid');
+  if (!grid) return;
+  grid.innerHTML = MTH.map((m,i)=>{
+    const r = ranges[i]||{};
+    return `<div class="mrc-row">
+      <span class="mrc-month">${m}</span>
+      <input type="date" class="mrc-date" value="${r.start||''}" onchange="setMonthRange(${i},'start',this.value)">
+      <span class="mrc-sep">–</span>
+      <input type="date" class="mrc-date" value="${r.end||''}" onchange="setMonthRange(${i},'end',this.value)">
+      <button class="mrc-clear" onclick="clearMonthRange(${i})" title="ล้าง">✕</button>
+    </div>`;
+  }).join('');
+}
+function toggleMonthRangeCtrl() {
+  const el = document.getElementById('monthRangeCtrl');
+  if (el) el.classList.toggle('open');
+  buildMrcGrid();
 }
 
 // ── WHEEL MONTH CONTROL (which months' players get pooled into the wheel) ──
@@ -592,7 +648,9 @@ function enterAdmin(){
   // Build admin month grid
   buildAmcGrid();
   buildWmcGrid();
+  buildMrcGrid();
   renderParticipants();
+  buildAdminPeopleLists();
   // Render custom questions
   renderCustomQList();
   // Show admin-only wheel controls
@@ -671,6 +729,98 @@ async function deleteWish(wid, btn){
   loadWishes();
 }
 
+
+// ══════════════════════════════════════════════════
+// ADMIN: PEOPLE MANAGEMENT (quiz players + wishes, all months)
+// ══════════════════════════════════════════════════
+function buildAdminPeopleLists() {
+  const playerRows = [];
+  calPersons.forEach(p=>{
+    const empKey = p.code||p.name;
+    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+    board.forEach(r=>{
+      playerRows.push({empKey, ownerName:p.name, ownerMonth:p.month, playerName:r.name, score:r.score, games:r.games, lastTs:r.lastTs});
+    });
+  });
+  const plEl = document.getElementById('adminPlayersList');
+  if (plEl) {
+    plEl.innerHTML = !playerRows.length
+      ? '<div class="lb-empty">ยังไม่มีคนตอบคำถาม</div>'
+      : playerRows.map(r=>`
+        <div class="lb-row">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.75rem;color:#fff">${escHtml(r.playerName)}</div>
+            <div style="font-size:.62rem;color:var(--mute)">ตอบคำถามของคุณ${escHtml(r.ownerName.split(' ')[0])} (${MTH[r.ownerMonth]}) · ${r.score} แต้ม · ${r.games} รอบ</div>
+          </div>
+          <button class="wact wact-del" style="position:static" onclick="deleteQuizPlayer('${r.empKey}','${String(r.playerName).replace(/'/g,"\\'")}')" title="ลบ">🗑</button>
+        </div>`).join('');
+  }
+
+  const wishRows = [];
+  Object.keys(localWishes).forEach(empKey=>{
+    const p = calPersons.find(pp=>(pp.code||pp.name)===empKey);
+    (localWishes[empKey]||[]).forEach(w=>{
+      wishRows.push({
+        empKey, ownerName: p?p.name:empKey,
+        msg: w.msg||w.message||'', sender: w.senderName||w.name||'ไม่ระบุ',
+        ts: w.ts||w.timestamp||'',
+        wid: String(w.ts||w.timestamp||w.senderName||w.msg)
+      });
+    });
+  });
+  const wEl = document.getElementById('adminWishesList');
+  if (wEl) {
+    wEl.innerHTML = !wishRows.length
+      ? '<div class="lb-empty">ยังไม่มีคำอวยพร (กด "โหลดทั้งหมด" เพื่อดึงข้อมูลทุกเดือน)</div>'
+      : wishRows.map(r=>`
+        <div class="lb-row">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.75rem;color:#fff">${escHtml(r.sender)} → ${escHtml((r.ownerName||'').split(' ')[0])}</div>
+            <div style="font-size:.62rem;color:var(--mute)">"${escHtml(r.msg)}" · ${escHtml(String(r.ts))}</div>
+          </div>
+          <button class="wact wact-del" style="position:static" onclick="adminDeleteWish('${r.empKey}','${r.wid.replace(/'/g,"\\'")}')" title="ลบ">🗑</button>
+        </div>`).join('');
+  }
+}
+
+function deleteQuizPlayer(empKey, playerName) {
+  if (!confirm('ลบผู้เล่นนี้ออกจากกระดานคะแนน?')) return;
+  const key = 'lbGame_'+empKey;
+  let board = JSON.parse(localStorage.getItem(key)||'[]');
+  board = board.filter(r=>r.name!==playerName);
+  localStorage.setItem(key, JSON.stringify(board));
+  buildAdminPeopleLists();
+  renderParticipants();
+  renderLeaderboard();
+  showToast('ลบผู้เล่นแล้ว');
+}
+
+async function adminDeleteWish(empKey, wid) {
+  if (!confirm('ลบคำอวยพรนี้? ไม่สามารถกู้คืนได้')) return;
+  if (localWishes[empKey]) {
+    localWishes[empKey] = localWishes[empKey].filter(w=>String(w.ts||w.timestamp||w.senderName||w.msg)!==wid);
+    localStorage.setItem('sml_wishes', JSON.stringify(localWishes));
+  }
+  const hidden = JSON.parse(localStorage.getItem('sml_hidden')||'[]');
+  const hi = hidden.indexOf(wid);
+  if (hi>=0) { hidden.splice(hi,1); localStorage.setItem('sml_hidden', JSON.stringify(hidden)); }
+  const result = await apiGet({action:'deleteWish', wid:encodeURIComponent(wid)});
+  showToast(result&&result.ok ? 'ลบออกจาก Google Sheet แล้ว' : 'ลบจากหน้าเว็บแล้ว (Sheet อาจต้องลบเอง)', result&&result.ok?undefined:'warn');
+  buildAdminPeopleLists();
+  if (curEmp && (curEmp.code||curEmp.name)===empKey) loadWishes();
+}
+
+async function loadAllWishesForAdmin() {
+  showToast('กำลังโหลดคำอวยพรทั้งหมด...');
+  for (const p of calPersons) {
+    const empId = p.code||p.name;
+    const remote = await apiGet({action:'getWishes', empId});
+    if (remote && Array.isArray(remote)) localWishes[empId] = remote;
+  }
+  localStorage.setItem('sml_wishes', JSON.stringify(localWishes));
+  buildAdminPeopleLists();
+  showToast('โหลดคำอวยพรทั้งหมดแล้ว');
+}
 
 async function reloadPersons(){
   const ok = await loadPersonsFromSheet();
@@ -756,8 +906,21 @@ function generateQuestionsAuto(emp) {
 
 function startGame() {
   if (!curEmp) return;
+  if (!document.body.classList.contains('admin-mode') && !isMonthPlayOpen(curEmp.month)) {
+    gameState = {score:0, qIdx:0, questions:[], answered:false};
+    renderGameLocked();
+    return;
+  }
   gameState = {score:0, qIdx:0, questions:generateQuestions(curEmp), answered:false};
   renderGame();
+}
+
+function renderGameLocked() {
+  const body = document.getElementById('gameBody');
+  if (!body) return;
+  const r = getMonthRanges()[curEmp.month]||{};
+  const rangeTxt = (r.start||r.end) ? `(${r.start||'?'} – ${r.end||'?'})` : '';
+  body.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,.4);padding:1rem;font-size:.8rem">🔒 ยังไม่เปิดให้ตอบคำถามเดือนนี้ ${escHtml(rangeTxt)}</div>`;
 }
 
 function renderGame() {
@@ -1152,19 +1315,12 @@ function renderParticipants() {
   if (ws) ws.style.display = wheelNames.length ? 'block' : 'none';
   updateWmcConfirm();
   drawWheel();
+  renderWheelHistory();
 }
 
 // ══════════════════════════════════════════════════
 // WHEEL OF FORTUNE
 // ══════════════════════════════════════════════════
-const WHEEL_COLORS = [
-  '#E94560','#F5A623','#7ED321','#4A90D9','#9B59B6',
-  '#1ABC9C','#E67E22','#E91E63','#00BCD4','#8BC34A',
-  '#FF5722','#3F51B5','#009688','#FF9800','#673AB7'
-];
-let wheelAngle = 0;
-let wheelSpinning = false;
-
 function getWheelScopeKey(){
   return getWheelMonths().slice().sort((a,b)=>a-b).join('-') || 'none';
 }
@@ -1306,15 +1462,65 @@ function spinWheel() {
       btn.disabled = false;
       btn.textContent = '🎡 หมุนอีกครั้ง!';
       const winner = names[winIdx];
-      if(resEl) resEl.innerHTML = `🏆 ผู้โชคดีคือ <span style="color:#f5c842;font-weight:600">${escHtml(winner)}</span>!`;
-      // Save winner (scoped to the currently pooled wheel months)
-      localStorage.setItem('wheelWinner_months_'+getWheelScopeKey(), winner);
+      let runnerUp = '';
+      if (names.length > 1) {
+        const rest = names.filter((_,i)=>i!==winIdx);
+        runnerUp = rest[Math.floor(Math.random()*rest.length)];
+      }
+      if(resEl) resEl.innerHTML = `🥇 อันดับ 1: <span style="color:#f5c842;font-weight:600">${escHtml(winner)}</span>`
+        + (runnerUp ? `<br>🥈 อันดับ 2: <span style="color:#f5c842;font-weight:600">${escHtml(runnerUp)}</span>` : '');
+      saveWheelWinnerRecord(winner, runnerUp);
       renderParticipants();
+      renderWheelHistory();
       fireConfetti();
-      showToast('🏆 ผู้โชคดี: ' + winner);
+      showToast('🏆 อันดับ 1: ' + winner + (runnerUp ? ' · 🥈 ' + runnerUp : ''));
     }
   }
   requestAnimationFrame(animate);
+}
+
+// ── WHEEL WINNER HISTORY (rank 1 / rank 2 per pooled month-set, kept for last 3 spins) ──
+function saveWheelWinnerRecord(rank1, rank2) {
+  const scopeKey = getWheelScopeKey();
+  const months = getWheelMonths().slice().sort((a,b)=>a-b);
+  localStorage.setItem('wheelWinner_months_'+scopeKey, JSON.stringify({rank1, rank2}));
+  let history = JSON.parse(localStorage.getItem('wheel_winner_history')||'[]');
+  history = history.filter(h=>h.scopeKey!==scopeKey);
+  history.push({scopeKey, months, rank1, rank2, ts: new Date().toLocaleString('th-TH')});
+  history = history.slice(-3);
+  localStorage.setItem('wheel_winner_history', JSON.stringify(history));
+}
+
+function resetWheelWinner() {
+  if (!document.body.classList.contains('admin-mode')) return;
+  if (!confirm('รีเซ็ตผู้ชนะวงล้อของกลุ่มเดือนที่เลือกอยู่ตอนนี้?')) return;
+  const scopeKey = getWheelScopeKey();
+  localStorage.removeItem('wheelWinner_months_'+scopeKey);
+  let history = JSON.parse(localStorage.getItem('wheel_winner_history')||'[]');
+  history = history.filter(h=>h.scopeKey!==scopeKey);
+  localStorage.setItem('wheel_winner_history', JSON.stringify(history));
+  const resEl = document.getElementById('wheelResult');
+  if (resEl) resEl.textContent = 'รอ Admin กดหมุน 🎡';
+  wheelAngle = 0;
+  drawWheel();
+  renderWheelHistory();
+  showToast('รีเซ็ตวงล้อแล้ว');
+}
+
+function renderWheelHistory() {
+  const sec = document.getElementById('wheelHistorySection');
+  const list = document.getElementById('wheelHistoryList');
+  if (!sec || !list) return;
+  const history = JSON.parse(localStorage.getItem('wheel_winner_history')||'[]');
+  if (!history.length) { sec.style.display='none'; return; }
+  sec.style.display = 'block';
+  list.innerHTML = history.slice().reverse().map(h=>{
+    const monthLabel = (h.months||[]).map(mi=>MTH[mi]).join(', ');
+    return `<div class="lb-row" style="flex-direction:column;align-items:flex-start;gap:.2rem">
+      <div style="font-size:.65rem;color:var(--mute)">เดือน ${escHtml(monthLabel)}</div>
+      <div style="font-size:.78rem;color:#fff">🥇 ${escHtml(h.rank1||'-')} &nbsp; 🥈 ${escHtml(h.rank2||'-')}</div>
+    </div>`;
+  }).join('');
 }
 
 // ══════════════════════════════════════════════════
