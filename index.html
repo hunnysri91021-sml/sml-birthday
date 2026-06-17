@@ -399,12 +399,13 @@ canvas#wheelCanvas{border-radius:50%}
   <div class="qe-list" id="customQList"></div>
   <input class="qe-inp" id="qeQuestion" placeholder="คำถาม เช่น คุณ... ชอบอาหารอะไร?" style="width:100%;margin-bottom:.28rem">
   <div class="qe-form-grid">
-    <input class="qe-inp" id="qeOpt1" placeholder="ตัวเลือก 1 (ถูก)">
-    <input class="qe-inp" id="qeOpt2" placeholder="ตัวเลือก 2">
-    <input class="qe-inp" id="qeOpt3" placeholder="ตัวเลือก 3">
-    <input class="qe-inp" id="qeOpt4" placeholder="ตัวเลือก 4">
+    <label style="display:flex;align-items:center;gap:.3rem"><input type="radio" name="qeCorrect" value="0" checked><input class="qe-inp" id="qeOpt1" placeholder="ตัวเลือก 1" style="flex:1"></label>
+    <label style="display:flex;align-items:center;gap:.3rem"><input type="radio" name="qeCorrect" value="1"><input class="qe-inp" id="qeOpt2" placeholder="ตัวเลือก 2" style="flex:1"></label>
+    <label style="display:flex;align-items:center;gap:.3rem"><input type="radio" name="qeCorrect" value="2"><input class="qe-inp" id="qeOpt3" placeholder="ตัวเลือก 3" style="flex:1"></label>
+    <label style="display:flex;align-items:center;gap:.3rem"><input type="radio" name="qeCorrect" value="3"><input class="qe-inp" id="qeOpt4" placeholder="ตัวเลือก 4" style="flex:1"></label>
   </div>
-  <button class="qe-add" onclick="addCustomQuestion()" style="margin-top:.28rem">+ เพิ่มคำถาม (ตัวเลือก 1 = ถูก)</button>
+  <div class="qe-lbl" style="margin-top:.1rem;text-transform:none;letter-spacing:0">เลือกวงกลม ⚪ หน้าตัวเลือกที่เป็นคำตอบที่ถูก</div>
+  <button class="qe-add" onclick="addCustomQuestion()" style="margin-top:.28rem">+ เพิ่มคำถาม</button>
 </div>
 
 <!-- VOTE -->
@@ -591,6 +592,8 @@ let curEmp = null;
 let selMonth = -1;
 let localWishes = JSON.parse(localStorage.getItem('sml_wishes') || '{}');
 let pendingQueue = JSON.parse(localStorage.getItem('sml_pending') || '[]');
+let gameState = {score:0, qIdx:0, questions:[], answered:false};
+let lbTab = 'game';
 
 // ─── API ───────────────────────────────────────────────────
 function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim(); }
@@ -1243,9 +1246,7 @@ function onPhotoSelected(evt) {
 // ══════════════════════════════════════════════════
 // GAME FEATURE
 // ══════════════════════════════════════════════════
-let gameState = {score:0, qIdx:0, questions:[], answered:false};
-
-function generateQuestions(emp) {
+function generateQuestionsAuto(emp) {
   if (!emp) return [];
   const qs = [];
   const mthName = MTH[emp.month];
@@ -1298,7 +1299,7 @@ function renderGame() {
       saveGameScore(savedName, s, total);
     }
     const hasName = !!savedName;
-    body.innerHTML = `<div class="quiz-result">
+    body.innerHTML = `<div class="qi-result">
       <div style="font-size:2rem;margin-bottom:.5rem">${s===total?'🏆':s>total/2?'🌟':'💪'}</div>
       <div style="font-size:1rem;font-weight:500;margin-bottom:.3rem">${msg}</div>
       <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:.65rem">${s}/${total} ข้อถูก</div>
@@ -1306,7 +1307,7 @@ function renderGame() {
         ? `<div style="font-size:.78rem;color:rgba(245,200,66,.8);margin-bottom:.5rem">✅ บันทึกคะแนนของ <b>${escHtml(savedName)}</b> แล้ว</div>`
         : `<div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:.45rem">กรอกชื่อในช่องเขียนคำอวยพรก่อนนะ เพื่อขึ้นกระดานคะแนน</div>`
       }
-      <button class="quiz-next" onclick="${!hasName?`autoSaveThenRestart();`:'startGame()'}">
+      <button class="qi-next" onclick="${!hasName?`autoSaveThenRestart();`:'startGame()'}">
         ${!hasName?'⬇ เลื่อนลงกรอกชื่อ':'🔄 เล่นอีกครั้ง'}
       </button>
     </div>`;
@@ -1314,16 +1315,16 @@ function renderGame() {
   }
   const q = qs[gameState.qIdx];
   body.innerHTML = `
-    <div class="quiz-question">${q.q}${q.fun?' <span style="font-size:.72rem;color:var(--gold)">(ข้อสนุก!)</span>':''}</div>
-    <div class="quiz-options">
-      ${q.opts.map(o=>`<button class="quiz-opt" onclick="answerGame(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}','${q.fun?'fun':''}')">${o}</button>`).join('')}
+    <div class="qi-q">${q.q}${q.fun?' <span style="font-size:.72rem;color:var(--gold)">(ข้อสนุก!)</span>':''}</div>
+    <div class="qi-opts">
+      ${q.opts.map(o=>`<button class="qopt" onclick="answerGame(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}','${q.fun?'fun':''}')">${o}</button>`).join('')}
     </div>`;
 }
 
 function answerGame(btn, selected, ans, type) {
   if (gameState.answered) return;
   gameState.answered = true;
-  const opts = document.querySelectorAll('.quiz-opt');
+  const opts = document.querySelectorAll('.qopt');
   const isCorrect = type==='fun' || selected===ans;
   opts.forEach(o => {
     o.disabled = true;
@@ -1471,15 +1472,21 @@ function addCustomQuestion() {
   const o4 = document.getElementById('qeOpt4').value.trim();
   if (!q || !o1 || !o2) { showToast('กรอกคำถาม + ตัวเลือก 1-2 ก่อนนะ','warn'); return; }
   const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
-  const opts = [o1, o2, o3, o4].filter(Boolean);
+  const allOpts = [o1, o2, o3, o4];
+  const correctIdx = Number((document.querySelector('input[name="qeCorrect"]:checked')||{}).value || 0);
+  const ans = allOpts[correctIdx];
+  if (!ans) { showToast('ตัวเลือกที่เลือกเป็นคำตอบที่ถูกต้องยังไม่ได้กรอก','warn'); return; }
+  const opts = allOpts.filter(Boolean);
   const qs = getCustomQuestions(empKey);
-  qs.push({ q, opts, ans: o1 });
+  qs.push({ q, opts, ans });
   saveCustomQuestions(empKey, qs);
   // Clear inputs
   ['qeQuestion','qeOpt1','qeOpt2','qeOpt3','qeOpt4'].forEach(id => {
     document.getElementById(id).value = '';
   });
+  document.querySelector('input[name="qeCorrect"][value="0"]').checked = true;
   renderCustomQList();
+  startGame();
   showToast('เพิ่มคำถามแล้ว! ' + qs.length + ' คำถามทั้งหมด');
 }
 
@@ -1492,10 +1499,9 @@ function deleteCustomQ(idx) {
   showToast('ลบคำถามแล้ว');
 }
 
-// Override generateQuestions to include custom questions
-const _origGenQ = generateQuestions;
+// Combine auto-generated questions with admin's custom questions
 function generateQuestions(emp) {
-  const auto = _origGenQ(emp);
+  const auto = generateQuestionsAuto(emp);
   const empKey = emp ? (emp.code||emp.name) : '';
   const custom = getCustomQuestions(empKey).map(q => ({
     ...q,
@@ -1512,8 +1518,6 @@ function generateQuestions(emp) {
 // ══════════════════════════════════════════════════
 // LEADERBOARD
 // ══════════════════════════════════════════════════
-let lbTab = 'game';
-
 function switchLbTab(tab) {
   lbTab = tab;
   document.getElementById('lbTabGame').classList.toggle('active', tab==='game');
