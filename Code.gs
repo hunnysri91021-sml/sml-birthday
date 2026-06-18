@@ -108,7 +108,9 @@ function doGet(e) {
     else if (action === 'uploadPhoto')    result = uploadPhoto(p);
     else if (action === 'getCustomQuestions')    result = getCustomQuestions(p);
     else if (action === 'addCustomQuestion')     result = addCustomQuestion(p);
+    else if (action === 'updateCustomQuestion')  result = updateCustomQuestion(p);
     else if (action === 'deleteCustomQuestion')  result = deleteCustomQuestion(p);
+    else if (action === 'bulkAddCustomQuestions') result = bulkAddCustomQuestions(p);
     else result = {error: 'unknown action: ' + action};
 
     return jsonOut(result, cb);
@@ -130,8 +132,10 @@ function doPost(e) {
   try {
     var result;
     if (action === 'uploadPhoto') result = uploadPhoto(p);
-    else if (action === 'addCustomQuestion')    result = addCustomQuestion(p);
-    else if (action === 'deleteCustomQuestion') result = deleteCustomQuestion(p);
+    else if (action === 'addCustomQuestion')     result = addCustomQuestion(p);
+    else if (action === 'updateCustomQuestion')  result = updateCustomQuestion(p);
+    else if (action === 'deleteCustomQuestion')  result = deleteCustomQuestion(p);
+    else if (action === 'bulkAddCustomQuestions') result = bulkAddCustomQuestions(p);
     else result = {error: 'unknown action: ' + action};
     return jsonOut(result);
   } catch(err) {
@@ -287,6 +291,54 @@ function deleteCustomQuestion(p) {
     }
   }
   return {ok: false, error: 'not found'};
+}
+
+function updateCustomQuestion(p) {
+  var id = String(p.id || '').trim();
+  var q     = String(p.q     || '').trim();
+  var opts  = [String(p.opt1||'').trim(), String(p.opt2||'').trim(), String(p.opt3||'').trim(), String(p.opt4||'').trim()];
+  var ans   = String(p.ans   || '').trim();
+  if (!id || !q || !opts[0] || !opts[1] || !ans) {
+    return {ok: false, error: 'id/q/opt1/opt2/ans required'};
+  }
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureCustomQSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === id) {
+      // คอลัมน์: 3=Question 4=Opt1 5=Opt2 6=Opt3 7=Opt4 8=Answer
+      ws.getRange(i + 1, 3, 1, 6).setValues([[q, opts[0], opts[1], opts[2], opts[3], ans]]);
+      return {ok: true};
+    }
+  }
+  return {ok: false, error: 'not found'};
+}
+
+// Import หลายคำถามพร้อมกัน — ใช้สำหรับนำเข้าจากไฟล์ Excel (เช่นผลสำรวจ)
+// p.items = [{empId, q, opt1, opt2, opt3, opt4, ans}, ...]
+function bulkAddCustomQuestions(p) {
+  var items = p.items;
+  if (!items || !items.length) return {ok: false, error: 'items required'};
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureCustomQSheet(ss);
+  var now = new Date();
+  var rowsToAppend = [];
+  var count = 0;
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    var empId = String(it.empId || '').trim();
+    var q     = String(it.q     || '').trim();
+    var opts  = [String(it.opt1||'').trim(), String(it.opt2||'').trim(), String(it.opt3||'').trim(), String(it.opt4||'').trim()];
+    var ans   = String(it.ans   || '').trim();
+    if (!empId || !q || !opts[0] || !ans) continue;
+    var id = 'Q' + new Date().getTime() + '_' + i;
+    rowsToAppend.push([id, empId, q, opts[0], opts[1], opts[2], opts[3], ans, now]);
+    count++;
+  }
+  if (rowsToAppend.length) {
+    ws.getRange(ws.getLastRow() + 1, 1, rowsToAppend.length, 9).setValues(rowsToAppend);
+  }
+  return {ok: true, count: count};
 }
 
 function jsonOut(data, cb) {
