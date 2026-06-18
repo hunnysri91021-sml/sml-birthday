@@ -106,6 +106,9 @@ function doGet(e) {
     else if (action === 'getGameLeaderboard') result = getGameLeaderboard(p);
     else if (action === 'ping')           result = {ok: true, time: new Date().toISOString()};
     else if (action === 'uploadPhoto')    result = uploadPhoto(p);
+    else if (action === 'getCustomQuestions')    result = getCustomQuestions(p);
+    else if (action === 'addCustomQuestion')     result = addCustomQuestion(p);
+    else if (action === 'deleteCustomQuestion')  result = deleteCustomQuestion(p);
     else result = {error: 'unknown action: ' + action};
 
     return jsonOut(result, cb);
@@ -127,6 +130,8 @@ function doPost(e) {
   try {
     var result;
     if (action === 'uploadPhoto') result = uploadPhoto(p);
+    else if (action === 'addCustomQuestion')    result = addCustomQuestion(p);
+    else if (action === 'deleteCustomQuestion') result = deleteCustomQuestion(p);
     else result = {error: 'unknown action: ' + action};
     return jsonOut(result);
   } catch(err) {
@@ -212,6 +217,76 @@ function getPhotosMap() {
     map[String(r[0])] = r[1] || '';
   }
   return map;
+}
+
+// ============================================================
+// ── CUSTOM QUIZ QUESTIONS (Admin เพิ่มคำถามเฉพาะคนเกิดแต่ละคน) ──
+// เก็บไว้ที่ Sheet กลาง เพื่อให้พนักงานทุกคน/ทุกเครื่อง เห็นคำถาม
+// และตอบคำถามเดียวกันเมื่อมาอวยพรคนเกิด
+// ============================================================
+var SHEET_CUSTOMQ = 'CustomQuestions';
+
+function ensureCustomQSheet(ss) {
+  var ws = ss.getSheetByName(SHEET_CUSTOMQ);
+  if (!ws) {
+    ws = ss.insertSheet(SHEET_CUSTOMQ);
+    ws.appendRow(['Id','EmpId','Question','Opt1','Opt2','Opt3','Opt4','Answer','Ts']);
+    ws.setFrozenRows(1);
+    ws.getRange(1, 1, 1, 9).setBackground('#9B6DFF').setFontColor('#fff').setFontWeight('bold');
+  }
+  return ws;
+}
+
+function getCustomQuestions(p) {
+  var empId = String((p && p.empId) || '').trim();
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureCustomQSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  var list = [];
+  for (var i = 1; i < rows.length; i++) {
+    var r = rows[i];
+    if (!r[0]) continue;
+    if (empId && String(r[1]) !== empId) continue;
+    var opts = [r[3], r[4], r[5], r[6]].filter(function(o){ return o !== '' && o != null; });
+    list.push({
+      id:     r[0],
+      empId:  String(r[1] || ''),
+      q:      r[2] || '',
+      opts:   opts,
+      ans:    r[7] || ''
+    });
+  }
+  return list;
+}
+
+function addCustomQuestion(p) {
+  var empId = String(p.empId || '').trim();
+  var q     = String(p.q     || '').trim();
+  var opts  = [String(p.opt1||'').trim(), String(p.opt2||'').trim(), String(p.opt3||'').trim(), String(p.opt4||'').trim()];
+  var ans   = String(p.ans   || '').trim();
+  if (!empId || !q || !opts[0] || !opts[1] || !ans) {
+    return {ok: false, error: 'empId/q/opt1/opt2/ans required'};
+  }
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureCustomQSheet(ss);
+  var id = 'Q' + new Date().getTime();
+  ws.appendRow([id, empId, q, opts[0], opts[1], opts[2], opts[3], ans, new Date()]);
+  return {ok: true, id: id};
+}
+
+function deleteCustomQuestion(p) {
+  var id = String(p.id || '').trim();
+  if (!id) return {ok: false, error: 'id required'};
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureCustomQSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === id) {
+      ws.deleteRow(i + 1);
+      return {ok: true};
+    }
+  }
+  return {ok: false, error: 'not found'};
 }
 
 function jsonOut(data, cb) {
