@@ -97,9 +97,9 @@ function doGet(e) {
     else if (action === 'addWish')        result = addWish(p);
     else if (action === 'deleteWish')     result = deleteWish(p);
     else if (action === 'getPersons')     result = getPersons();
-    else if (action === 'getPoints')      result = getPoints(p);
-    else if (action === 'addPoints')      result = addPoints(p);
-    else if (action === 'getLeaderboard') result = getLeaderboard(p);
+    else if (action === 'addWishPoint')   result = addWishPoint(p);
+    else if (action === 'addQuizPoint')   result = addQuizPoint(p);
+    else if (action === 'getMonthlyLeaderboard') result = getMonthlyLeaderboard(p);
     else if (action === 'getMonthlyStats')result = getMonthlyStats();
     else if (action === 'seedPersons')    result = seedPersons();
     else if (action === 'saveGameScore')  result = saveGameScore(p);
@@ -514,127 +514,127 @@ function getPersons() {
 // ── POINTS ────────────────────────────────────────────────
 // ============================================================
 
-// GET: ?action=getPoints&name=สมใจ&quarter=มิ.ย.-2569
-function getPoints(p) {
-  var name    = (p.name || '').trim();
-  var quarter = p.quarter || '';
+// คะแนนถูกเก็บเป็นรายคู่ (ผู้อวยพร, เจ้าของวันเกิด) — กันการนับซ้ำ:
+// 1 คนเขียนอวยพรให้เจ้าของวันเกิด 1 คน นับได้สูงสุด 1 ครั้ง
+// 1 คนตอบ Quiz ของเจ้าของวันเกิด 1 คน นับได้สูงสุด 1 ครั้ง (ถูกหมด=2, ผิดบ้าง=1)
+// Month = เดือนเกิดของเจ้าของวันเกิด (1-12) ใช้สำหรับสรุปกระดานคะแนนรายเดือน
+
+function findPointsRow(ws, headers, IDX, name, empId) {
+  var rows = ws.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (normName(rows[i][IDX['Name']]) === normName(name) && String(rows[i][IDX['EmpId']]) === String(empId)) {
+      return i + 1; // 1-indexed sheet row
+    }
+  }
+  return -1;
+}
+
+// GET: ?action=addWishPoint&name=สมใจ&empId=90245&month=6
+function addWishPoint(p) {
+  var name  = (p.name  || '').trim();
+  var empId = String(p.empId || '').trim();
+  var month = parseInt(p.month || '0', 10);
+  if (!name || !empId) return {ok: false, error: 'name/empId required'};
+
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensurePointsSheet(ss);
+  var rows0 = ws.getDataRange().getValues();
+  var headers = rows0[0];
+  var IDX = makeIdx(headers);
+  var now = new Date();
+
+  var rowIdx = findPointsRow(ws, headers, IDX, name, empId);
+  if (rowIdx === -1) {
+    ws.appendRow([name, empId, month, 0, 0, 0, false, false, now]);
+    rowIdx = ws.getLastRow();
+  }
+
+  var curRow = ws.getRange(rowIdx, 1, 1, headers.length).getValues()[0];
+  var wishDone = curRow[IDX['WishDone']] === true || curRow[IDX['WishDone']] === 'TRUE';
+  if (wishDone) return {ok: false, error: 'already_done', msg: 'อวยพรคนนี้ไปแล้ว'};
+
+  var quizPts = parseFloat(curRow[IDX['QuizPts']]) || 0;
+  ws.getRange(rowIdx, IDX['WishPts']    + 1).setValue(1);
+  ws.getRange(rowIdx, IDX['WishDone']   + 1).setValue(true);
+  ws.getRange(rowIdx, IDX['Month']      + 1).setValue(month);
+  ws.getRange(rowIdx, IDX['TotalPts']   + 1).setValue(1 + quizPts);
+  ws.getRange(rowIdx, IDX['LastUpdated']+ 1).setValue(now);
+  updateMonthlyStat(now, 'wish', name);
+
+  return {ok: true, earned: 1, totalPts: 1 + quizPts};
+}
+
+// GET: ?action=addQuizPoint&name=สมใจ&empId=90245&month=6&score=3&total=3
+function addQuizPoint(p) {
+  var name  = (p.name  || '').trim();
+  var empId = String(p.empId || '').trim();
+  var month = parseInt(p.month || '0', 10);
+  var score = parseInt(p.score || '0', 10);
+  var total = parseInt(p.total || '0', 10);
+  if (!name || !empId) return {ok: false, error: 'name/empId required'};
+
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensurePointsSheet(ss);
+  var rows0 = ws.getDataRange().getValues();
+  var headers = rows0[0];
+  var IDX = makeIdx(headers);
+  var now = new Date();
+
+  var rowIdx = findPointsRow(ws, headers, IDX, name, empId);
+  if (rowIdx === -1) {
+    ws.appendRow([name, empId, month, 0, 0, 0, false, false, now]);
+    rowIdx = ws.getLastRow();
+  }
+
+  var curRow = ws.getRange(rowIdx, 1, 1, headers.length).getValues()[0];
+  var quizDone = curRow[IDX['QuizDone']] === true || curRow[IDX['QuizDone']] === 'TRUE';
+  if (quizDone) return {ok: false, error: 'already_done', msg: 'ตอบ Quiz คนนี้ไปแล้ว'};
+
+  var earned  = (score === total && total > 0) ? 2 : 1;
+  var wishPts = parseFloat(curRow[IDX['WishPts']]) || 0;
+  ws.getRange(rowIdx, IDX['QuizPts']    + 1).setValue(earned);
+  ws.getRange(rowIdx, IDX['QuizDone']   + 1).setValue(true);
+  ws.getRange(rowIdx, IDX['Month']      + 1).setValue(month);
+  ws.getRange(rowIdx, IDX['TotalPts']   + 1).setValue(wishPts + earned);
+  ws.getRange(rowIdx, IDX['LastUpdated']+ 1).setValue(now);
+  updateMonthlyStat(now, 'quiz', name);
+
+  return {ok: true, earned: earned, totalPts: wishPts + earned};
+}
+
+// GET: ?action=getMonthlyLeaderboard&month=6&limit=10
+// สรุปคะแนนสะสมของแต่ละคน ตามเดือนเกิดของเจ้าของวันเกิดที่เขาไปอวยพร/ตอบคำถามให้
+function getMonthlyLeaderboard(p) {
+  var month = parseInt(p.month || (new Date().getMonth() + 1), 10);
+  var limit = parseInt(p.limit || '10', 10);
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var ws = ensurePointsSheet(ss);
   var rows = ws.getDataRange().getValues();
-  if (rows.length < 2) return {found: false, totalPts: 0};
-
+  if (rows.length < 2) return {month: month, board: []};
   var headers = rows[0];
   var IDX = makeIdx(headers);
 
+  var totals = {}; // name(lower) -> {name, totalPts}
   for (var i = 1; i < rows.length; i++) {
     var r = rows[i];
-    if (normName(r[IDX['Name']]) === normName(name) && r[IDX['Quarter']] === quarter) {
-      return {
-        found:     true,
-        name:      r[IDX['Name']],
-        wishPts:   r[IDX['WishPts']]  || 0,
-        quizPts:   r[IDX['QuizPts']]  || 0,
-        totalPts:  r[IDX['TotalPts']] || 0,
-        wishDone:  r[IDX['WishDone']] === true || r[IDX['WishDone']] === 'TRUE',
-        quizDone:  r[IDX['QuizDone']] === true || r[IDX['QuizDone']] === 'TRUE',
-        quarter:   r[IDX['Quarter']]
-      };
-    }
-  }
-  return {found: false, totalPts: 0, wishDone: false, quizDone: false};
-}
-
-// GET: ?action=addPoints&type=wish&name=สมใจ&quarter=มิ.ย.-2569
-// GET: ?action=addPoints&type=quiz&name=สมใจ&score=3&total=3&quarter=มิ.ย.-2569
-function addPoints(p) {
-  var type    = p.type    || '';
-  var name    = (p.name   || '').trim();
-  var quarter = p.quarter || getCurrentQuarter();
-  var score   = parseInt(p.score  || '0', 10);
-  var total   = parseInt(p.total  || '0', 10);
-  if (!name) return {ok: false, error: 'name required'};
-
-  var ss  = SpreadsheetApp.openById(SHEET_ID);
-  var ws  = ensurePointsSheet(ss);
-  var rows = ws.getDataRange().getValues();
-  var headers = rows[0];
-  var IDX = makeIdx(headers);
-
-  // หาแถวของคนนี้ใน quarter นี้
-  var rowIdx = -1;
-  for (var i = 1; i < rows.length; i++) {
-    if (normName(rows[i][IDX['Name']]) === normName(name) && rows[i][IDX['Quarter']] === quarter) {
-      rowIdx = i + 1; // 1-indexed sheet row
-      break;
-    }
+    if (parseInt(r[IDX['Month']], 10) !== month) continue;
+    var pts = parseFloat(r[IDX['TotalPts']]) || 0;
+    if (pts <= 0) continue;
+    var key = normName(r[IDX['Name']]);
+    if (!totals[key]) totals[key] = {name: r[IDX['Name']], totalPts: 0};
+    totals[key].totalPts += pts;
   }
 
-  var now = new Date();
-
-  if (rowIdx === -1) {
-    // สร้างแถวใหม่
-    ws.appendRow([name, 0, 0, 0, false, false, quarter, now]);
-    rows = ws.getDataRange().getValues();
-    rowIdx = rows.length;
-    headers = rows[0];
-    IDX = makeIdx(headers);
-  }
-
-  // อ่านค่าปัจจุบัน
-  var curRow   = ws.getRange(rowIdx, 1, 1, headers.length).getValues()[0];
-  var wishDone = curRow[IDX['WishDone']] === true || curRow[IDX['WishDone']] === 'TRUE';
-  var quizDone = curRow[IDX['QuizDone']] === true || curRow[IDX['QuizDone']] === 'TRUE';
-  var wishPts  = parseFloat(curRow[IDX['WishPts']]) || 0;
-  var quizPts  = parseFloat(curRow[IDX['QuizPts']]) || 0;
-  var earned   = 0;
-
-  if (type === 'wish') {
-    if (wishDone) return {ok: false, error: 'already_done', msg: 'อวยพรแล้วในไตรมาสนี้'};
-    earned  = 1;
-    wishPts += earned;
-    ws.getRange(rowIdx, IDX['WishPts']  + 1).setValue(wishPts);
-    ws.getRange(rowIdx, IDX['WishDone'] + 1).setValue(true);
-    updateMonthlyStat(now, 'wish', name);
-
-  } else if (type === 'quiz') {
-    if (quizDone) return {ok: false, error: 'already_done', msg: 'ตอบ Quiz แล้วในไตรมาสนี้'};
-    earned  = (score === total && total > 0) ? 2 : 1;
-    quizPts += earned;
-    ws.getRange(rowIdx, IDX['QuizPts']  + 1).setValue(quizPts);
-    ws.getRange(rowIdx, IDX['QuizDone'] + 1).setValue(true);
-    updateMonthlyStat(now, 'quiz', name);
-
-  } else {
-    return {ok: false, error: 'type must be wish or quiz'};
-  }
-
-  var newTotal = wishPts + quizPts;
-  ws.getRange(rowIdx, IDX['TotalPts']    + 1).setValue(newTotal);
-  ws.getRange(rowIdx, IDX['LastUpdated'] + 1).setValue(now);
-
-  return {ok: true, earned: earned, totalPts: newTotal, wishPts: wishPts, quizPts: quizPts};
-}
-
-// GET: ?action=getLeaderboard&quarter=มิ.ย.-2569&limit=20
-function getLeaderboard(p) {
-  var quarter = p.quarter || '';
-  var limit   = parseInt(p.limit || '20', 10);
-  var ss  = SpreadsheetApp.openById(SHEET_ID);
-  var ws  = ensurePointsSheet(ss);
-  var rows = ws.getDataRange().getValues();
-  if (rows.length < 2) return {board: []};
-  var headers = rows[0];
-  var IDX = makeIdx(headers);
+  var persons = getPersons();
+  var photoByName = {};
+  for (var j = 0; j < persons.length; j++) photoByName[normName(persons[j].name)] = persons[j].photo;
 
   var board = [];
-  for (var i = 1; i < rows.length; i++) {
-    var r = rows[i];
-    if (quarter && r[IDX['Quarter']] !== quarter) continue;
-    var pts = parseFloat(r[IDX['TotalPts']]) || 0;
-    if (pts > 0) board.push({name: r[IDX['Name']], totalPts: pts, wishPts: r[IDX['WishPts']] || 0, quizPts: r[IDX['QuizPts']] || 0});
+  for (var k in totals) {
+    board.push({name: totals[k].name, totalPts: totals[k].totalPts, photo: photoByName[k] || ''});
   }
   board.sort(function(a, b) { return b.totalPts - a.totalPts; });
-  return {board: board.slice(0, limit)};
+  return {month: month, board: board.slice(0, limit)};
 }
 
 // ============================================================
@@ -856,13 +856,6 @@ function isInActivityRange(month, thaiYear) {
   return true;
 }
 
-function getCurrentQuarter() {
-  var now   = new Date();
-  var month = now.getMonth() + 1;
-  var year  = now.getFullYear() + 543;
-  return THAI_MONTHS_SHORT[month] + '-' + year;
-}
-
 function normName(s) {
   return String(s || '').replace(/\s+/g,' ').trim().toLowerCase();
 }
@@ -996,9 +989,9 @@ function ensurePointsSheet(ss) {
   var ws = ss.getSheetByName(SHEET_POINTS);
   if (!ws) {
     ws = ss.insertSheet(SHEET_POINTS);
-    ws.appendRow(['Name','WishPts','QuizPts','TotalPts','WishDone','QuizDone','Quarter','LastUpdated']);
+    ws.appendRow(['Name','EmpId','Month','WishPts','QuizPts','TotalPts','WishDone','QuizDone','LastUpdated']);
     ws.setFrozenRows(1);
-    ws.getRange(1, 1, 1, 8).setBackground('#A855F7').setFontColor('#fff').setFontWeight('bold');
+    ws.getRange(1, 1, 1, 9).setBackground('#A855F7').setFontColor('#fff').setFontWeight('bold');
   }
   return ws;
 }
