@@ -449,6 +449,7 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 
   <div class="form-grid">
     <div class="fi"><div class="fl">ชื่อของคุณ *</div><input class="finput" id="wf-name" placeholder="ชื่อเล่น / ชื่อ-สกุล" maxlength="50" oninput="onNameInput()"></div>
+    <div class="fi"><div class="fl">รหัสพนักงานของคุณ *</div><input class="finput" id="wf-empid" placeholder="เช่น 90245" maxlength="20"></div>
     <div class="fi"><div class="fl">แผนก / ทีม</div><input class="finput" id="wf-dept" placeholder="PDI, HR, Yard..."></div>
     <div class="fi fi-full">
       <div class="fl" style="display:flex;justify-content:space-between">
@@ -486,7 +487,7 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
     <button onclick="startGame()" style="background:none;border:1px solid var(--b);border-radius:7px;color:var(--mute);font-size:.68rem;padding:.15rem .42rem;cursor:pointer">🔄</button>
   </div>
   <div id="gameBody"><div style="text-align:center;color:var(--mute);font-size:.8rem;padding:.75rem">เลือกพนักงานก่อนเล่นเกม</div></div>
-  <div class="game-name-hint" id="gameNameHint" style="font-size:.65rem;color:rgba(245,200,66,.5);text-align:center;margin-top:.3rem;display:none">กรอกชื่อในช่องอวยพรด้านล่างเพื่อขึ้นกระดาน</div>
+  <div class="game-name-hint" id="gameNameHint" style="font-size:.65rem;color:rgba(245,200,66,.5);text-align:center;margin-top:.3rem;display:none">กรอกชื่อและรหัสพนักงานในช่องอวยพรด้านล่างเพื่อขึ้นกระดาน</div>
 </div>
 
 <!-- ADMIN QUIZ EDITOR -->
@@ -919,15 +920,18 @@ function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').
 async function submitWish(){
   if(!curEmp){showToast('กรุณาเลือกพนักงานก่อนครับ');return;}
   const name=document.getElementById('wf-name').value.trim();
+  const senderEmpId=document.getElementById('wf-empid').value.trim();
   const dept=document.getElementById('wf-dept').value.trim();
   const text=document.getElementById('wf-text').value.trim();
   if(!name){shake('wf-name');return;}
+  if(!senderEmpId){shake('wf-empid');showToast('กรุณาใส่รหัสพนักงานของคุณ','warn');return;}
+  if(!calPersons.find(p=>String(p.code)===senderEmpId)){shake('wf-empid');showToast('ไม่พบรหัสพนักงานนี้ ลองตรวจสอบอีกครั้ง','warn');return;}
   if(!text){shake('wf-text');return;}
 
   const empId=curEmp.code||curEmp.name;
   const wish={
     action:'addWish', empId, empName:curEmp.name,
-    senderName:name, senderDept:dept||'ทีมงาน', msg:text,
+    senderName:name, senderEmpId, senderDept:dept||'ทีมงาน', msg:text,
     emoji:EMOJIS[~~(Math.random()*EMOJIS.length)],
     ts:new Date().toLocaleString('th-TH')
   };
@@ -956,6 +960,7 @@ async function submitWish(){
   // Auto-save game score with this name if not saved yet
   if (name) {
     localStorage.setItem('playerName', name);
+    localStorage.setItem('playerEmpId', senderEmpId);
     const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
     const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
     const alreadySaved = board.find(r=>r.name===name);
@@ -963,10 +968,11 @@ async function submitWish(){
       // Mark as participant even without playing game
       saveGameScore(name, 0, 0);
     }
-    apiGet({action:'addWishPoint', name, empId, month:curEmp.month}).then(()=>loadMonthlyLeaderboard());
+    apiGet({action:'addWishPoint', name, senderEmpId, empId, month:curEmp.month}).then(()=>loadMonthlyLeaderboard());
   }
   // UI
   document.getElementById('wf-name').value='';
+  document.getElementById('wf-empid').value='';
   document.getElementById('wf-dept').value='';
   document.getElementById('wf-text').value='';
   const succ=document.getElementById('success-msg');
@@ -1422,24 +1428,30 @@ function renderGame() {
   // Show hint if name not filled
   const hint = document.getElementById('gameNameHint');
   const wfName = (document.getElementById('wf-name')||{value:''}).value.trim();
+  const wfEmpId = (document.getElementById('wf-empid')||{value:''}).value.trim();
   const saved = localStorage.getItem('playerName');
-  if(hint) hint.style.display = (!wfName && !saved) ? 'block' : 'none';
+  const savedEmpId = localStorage.getItem('playerEmpId');
+  if(hint) hint.style.display = (!wfName && !saved) || (!wfEmpId && !savedEmpId) ? 'block' : 'none';
   const qs = gameState.questions;
   if (!qs.length) { body.innerHTML='<div style="text-align:center;color:rgba(74,51,88,.3);padding:1rem">ไม่มีคำถาม</div>'; return; }
   if (gameState.qIdx >= qs.length) {
     const total = qs.length;
     const s = gameState.score;
     const msg = s===total?'เก่งมาก! 🏆':s>total/2?'ดีมาก! 👍':'ลองใหม่นะ 😊';
-    // Auto-get name from wish form (no extra input needed)
+    // Auto-get name/empid from wish form (no extra input needed)
     const wishFormName = (document.getElementById('wf-name')||{value:''}).value.trim();
     const savedName = wishFormName || localStorage.getItem('playerName') || '';
-    if (savedName) {
+    const wishFormEmpId = (document.getElementById('wf-empid')||{value:''}).value.trim();
+    const savedSenderEmpId = wishFormEmpId || localStorage.getItem('playerEmpId') || '';
+    const validSenderEmpId = savedSenderEmpId && calPersons.find(p=>String(p.code)===savedSenderEmpId) ? savedSenderEmpId : '';
+    if (savedName && validSenderEmpId) {
       localStorage.setItem('playerName', savedName);
+      localStorage.setItem('playerEmpId', validSenderEmpId);
       saveGameScore(savedName, s, total);
       const empKey = curEmp.code||curEmp.name;
-      apiGet({action:'addQuizPoint', name:savedName, empId:empKey, month:curEmp.month, score:s, total}).then(()=>loadMonthlyLeaderboard());
+      apiGet({action:'addQuizPoint', name:savedName, senderEmpId:validSenderEmpId, empId:empKey, month:curEmp.month, score:s, total}).then(()=>loadMonthlyLeaderboard());
     }
-    const hasName = !!savedName;
+    const hasName = !!(savedName && validSenderEmpId);
     body.innerHTML = `<div class="qi-result">
       <div style="font-size:2rem;margin-bottom:.5rem">${s===total?'🏆':s>total/2?'🌟':'💪'}</div>
       <div style="font-size:1rem;font-weight:500;margin-bottom:.3rem">${msg}</div>
