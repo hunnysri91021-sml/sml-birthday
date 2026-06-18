@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SML Birthday — ร่างดีไซน์ใหม่ (Draft 2)</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Dancing+Script:wght@700&family=Mitr:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:linear-gradient(160deg,#fff6e9 0%,#ffe8f3 38%,#eaf3ff 75%,#fff9e6 100%);
+  --c1:#ffffff;--c2:#fff3f8;
+  --gold:#ff9f43;--gold2:#ffc24b;--rose:#ff6b9d;--mint:#1fc8a9;--purple:#9b6dff;
+  --text:#4a3358;--sub:rgba(74,51,88,.62);--mute:rgba(74,51,88,.35);
+  --b:rgba(74,51,88,.1);--b2:rgba(74,51,88,.16);
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);background-attachment:fixed;color:var(--text);font-family:'Kanit',sans-serif}
+.note{max-width:1320px;margin:0 auto;padding:.7rem 1.2rem;font-size:.78rem;color:var(--sub);background:rgba(255,255,255,.6);border-bottom:1px solid var(--b)}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.6rem;background:rgba(255,255,255,.85);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:10;backdrop-filter:blur(8px)}
+.tb-logo{font-family:'Mitr',sans-serif;font-size:1.15rem;font-weight:600;color:var(--gold);letter-spacing:.04em}
+.tb-tabs{display:flex;gap:.4rem}
+.tb-tab{padding:.42rem 1rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--sub);font-family:'Kanit',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer}
+.tb-tab.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;border-color:transparent;font-weight:600}
+.tb-user{font-size:.8rem;color:var(--sub);display:flex;align-items:center;gap:.5rem}
+.tb-user img{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--gold2)}
+
+.grid{display:grid;grid-template-columns:280px 1fr 300px;gap:1.1rem;max-width:1320px;margin:1.2rem auto;padding:0 1.2rem}
+.card{background:var(--c1);border:1px solid var(--b);border-radius:18px;padding:1.1rem;box-shadow:0 4px 18px rgba(74,51,88,.06)}
+.card+.card{margin-top:1.1rem}
+.card-title{font-weight:700;font-size:.95rem;color:var(--text);margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem}
+
+/* LEFT: Birthday Champion */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:.5rem;margin-bottom:.8rem}
+.p-item{text-align:center}
+.p-ava{border-radius:50%;object-fit:cover;border:3px solid var(--gold2);display:block;margin:0 auto .3rem}
+.p-1 .p-ava{width:64px;height:64px;border-color:var(--gold)}
+.p-2 .p-ava,.p-3 .p-ava{width:46px;height:46px}
+.p-rank{font-size:1.1rem}
+.p-name{font-size:.68rem;font-weight:600;margin-top:.15rem;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-score{font-size:.65rem;color:var(--rose);font-weight:700}
+.badges{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.9rem}
+.badge{font-size:.68rem;padding:.3rem .55rem;border-radius:10px;background:rgba(155,109,255,.1);color:var(--purple);font-weight:600;display:flex;align-items:center;gap:.25rem}
+.rules{margin-top:.9rem;display:flex;flex-direction:column;gap:.45rem}
+.rule-row{display:flex;justify-content:space-between;font-size:.75rem;color:var(--sub);background:var(--c2);border-radius:8px;padding:.4rem .6rem}
+.rule-row b{color:var(--gold)}
+
+/* CENTER: Hero */
+.hero-card{text-align:center;padding:1.8rem 1.4rem}
+.hero-photo-wrap{position:relative;width:170px;height:170px;margin:0 auto .9rem}
+.hero-photo{width:170px;height:170px;border-radius:50%;object-fit:cover;border:5px solid var(--gold2);box-shadow:0 8px 30px rgba(255,159,67,.35)}
+.hero-confetti{position:absolute;inset:-14px;border-radius:50%;border:2px dashed var(--rose);opacity:.5;animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero-h1{font-family:'Dancing Script',cursive;font-size:2.6rem;font-weight:700;color:var(--rose);margin:.1rem 0}
+.hero-name{font-size:1.5rem;font-weight:700;color:var(--text)}
+.hero-sub{font-size:.85rem;color:var(--sub);margin-top:.2rem}
+.stat-pills{display:flex;justify-content:center;gap:.6rem;margin-top:1rem;flex-wrap:wrap}
+.pill{background:var(--c2);border:1px solid var(--b);border-radius:14px;padding:.5rem .9rem;text-align:center;min-width:80px}
+.pill b{display:block;font-size:1.05rem;color:var(--gold)}
+.pill span{font-size:.65rem;color:var(--sub)}
+.wish-form{margin-top:1.3rem;display:flex;gap:.5rem}
+.wish-form input{flex:1;padding:.6rem .9rem;border-radius:12px;border:1px solid var(--b2);font-family:'Kanit',sans-serif;font-size:.85rem;outline:none;background:var(--c2);color:var(--text)}
+.wish-form button{padding:.6rem 1.2rem;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font-weight:700;font-size:.85rem;cursor:pointer}
+.wish-feed{margin-top:1rem;display:flex;flex-direction:column;gap:.6rem;max-height:230px;overflow:auto}
+.wish-item{background:var(--c2);border-radius:12px;padding:.55rem .8rem;font-size:.8rem;text-align:left}
+.wish-item b{color:var(--rose)}
+
+/* RIGHT */
+.cal-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--b)}
+.cal-row:last-child{border-bottom:none}
+.cal-date{width:38px;height:38px;border-radius:10px;background:var(--c2);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:var(--gold)}
+.cal-info b{font-size:.8rem;display:block;color:var(--text)}
+.cal-info span{font-size:.68rem;color:var(--sub)}
+.gallery{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.4rem}
+.gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
+.gift-cta{margin-top:1rem;text-align:center;background:linear-gradient(135deg,rgba(255,107,157,.12),rgba(255,159,67,.12));border-radius:14px;padding:.9rem}
+.gift-cta button{margin-top:.5rem;padding:.5rem 1.1rem;border-radius:12px;border:none;background:linear-gradient(135deg,var(--rose),var(--purple));color:#fff;font-weight:700;font-size:.8rem;cursor:pointer}
+
+@media (max-width:1000px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="note">📝 นี่คือ "ร่าง" (draft) สำหรับดูดีไซน์เท่านั้น ใช้ข้อมูลตัวอย่าง ยังไม่เชื่อมกับระบบจริง — ดูแล้วบอกได้เลยว่าชอบ/อยากแก้จุดไหน</div>
+
+<div class="topbar">
+  <div class="tb-logo">🎂 SML BIRTHDAY</div>
+  <div class="tb-tabs">
+    <button class="tb-tab active">หน้าหลัก</button>
+    <button class="tb-tab">ปฏิทินวันเกิด</button>
+    <button class="tb-tab">เกม &amp; คะแนน</button>
+    <button class="tb-tab">แอดมิน</button>
+  </div>
+  <div class="tb-user"><img src="https://i.pravatar.cc/64?img=12" alt="">สมชาย ใจดี</div>
+</div>
+
+<div class="grid">
+  <!-- LEFT SIDEBAR -->
+  <div>
+    <div class="card">
+      <div class="card-title">🏆 Birthday Champion</div>
+      <div class="podium">
+        <div class="p-item p-2"><img class="p-ava" src="https://i.pravatar.cc/100?img=5"><div class="p-rank">🥈</div><div class="p-name">มานี รักดี</div><div class="p-score">820 pt</div></div>
+        <div class="p-item p-1"><img class="p-ava" src="https://i.pravatar.cc/120?img=8"><div class="p-rank">🥇</div><div class="p-name">วิชัย ยิ้มแย้ม</div><div class="p-score">1,250 pt</div></div>
+        <div class="p-item p-3"><img class="p-ava" src="https://i.pravatar.cc/100?img=3"><div class="p-rank">🥉</div><div class="p-name">สุดา พรพิทักษ์</div><div class="p-score">690 pt</div></div>
+      </div>
+      <div class="badges">
+        <div class="badge">🔥 มาตลอด 7 วัน</div>
+        <div class="badge">🎯 เล่นเกมครบ</div>
+        <div class="badge">💌 ส่งคำอวยพร 10+</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 วิธีสะสมคะแนน</div>
+      <div class="rules">
+        <div class="rule-row"><span>เข้าระบบรายวัน</span><b>+5</b></div>
+        <div class="rule-row"><span>เล่นมินิเกม</span><b>+10–50</b></div>
+        <div class="rule-row"><span>ส่งคำอวยพร</span><b>+15</b></div>
+        <div class="rule-row"><span>อัปโหลดรูปวันเกิด</span><b>+20</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER HERO -->
+  <div>
+    <div class="card hero-card">
+      <div class="hero-photo-wrap">
+        <div class="hero-confetti"></div>
+        <img class="hero-photo" src="https://i.pravatar.cc/200?img=8" alt="">
+      </div>
+      <div class="hero-sub">วันนี้เป็นวันพิเศษของ</div>
+      <div class="hero-name">วิชัย ยิ้มแย้ม</div>
+      <div class="hero-h1">Happy Birthday! 🎉</div>
+      <div class="stat-pills">
+        <div class="pill"><b>32</b><span>ปี</span></div>
+        <div class="pill"><b>5</b><span>ปีที่ทำงาน</span></div>
+        <div class="pill"><b>1,250</b><span>คะแนนสะสม</span></div>
+        <div class="pill"><b>48</b><span>คำอวยพร</span></div>
+      </div>
+      <div class="wish-form">
+        <input type="text" placeholder="เขียนคำอวยพรให้วิชัย...">
+        <button>ส่ง 🎁</button>
+      </div>
+      <div class="wish-feed">
+        <div class="wish-item"><b>มานี:</b> สุขสันต์วันเกิดนะคะ ขอให้สุขภาพแข็งแรง 🎂</div>
+        <div class="wish-item"><b>สุดา:</b> Happy birthday! ขอให้โชคดีตลอดปีนี้เลยค่า 🥳</div>
+        <div class="wish-item"><b>ทีม HR:</b> สุขสันต์วันเกิดค่ะ ขอบคุณที่เป็นส่วนหนึ่งของทีมเรา 💛</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div>
+    <div class="card">
+      <div class="card-title">📅 วันเกิดเดือนนี้</div>
+      <div class="cal-row"><div class="cal-date">12<br>มิ.ย.</div><div class="cal-info"><b>วิชัย ยิ้มแย้ม</b><span>ฝ่ายขาย</span></div></div>
+      <div class="cal-row"><div class="cal-date">18<br>มิ.ย.</div><div class="cal-info"><b>มานี รักดี</b><span>การตลาด</span></div></div>
+      <div class="cal-row"><div class="cal-date">25<br>มิ.ย.</div><div class="cal-info"><b>สุดา พรพิทักษ์</b><span>บัญชี</span></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📸 Birthday Memories</div>
+      <div class="gallery">
+        <img src="https://i.pravatar.cc/100?img=20"><img src="https://i.pravatar.cc/100?img=21"><img src="https://i.pravatar.cc/100?img=22">
+        <img src="https://i.pravatar.cc/100?img=23"><img src="https://i.pravatar.cc/100?img=24"><img src="https://i.pravatar.cc/100?img=25">
+      </div>
+      <div class="gift-cta">
+        🎁 มีของขวัญให้วิชัยไหม?
+        <br><button>ส่งของขวัญ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
