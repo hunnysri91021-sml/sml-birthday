@@ -100,6 +100,8 @@ function doGet(e) {
     else if (action === 'addWishPoint')   result = addWishPoint(p);
     else if (action === 'addQuizPoint')   result = addQuizPoint(p);
     else if (action === 'getMonthlyLeaderboard') result = getMonthlyLeaderboard(p);
+    else if (action === 'getLbRange')     result = getLbRange();
+    else if (action === 'setLbRange')     result = setLbRange(p);
     else if (action === 'getMonthlyStats')result = getMonthlyStats();
     else if (action === 'seedPersons')    result = seedPersons();
     else if (action === 'saveGameScore')  result = saveGameScore(p);
@@ -604,20 +606,25 @@ function addQuizPoint(p) {
 
 // GET: ?action=getMonthlyLeaderboard&month=6&limit=10
 // สรุปคะแนนสะสมของแต่ละคน ตามเดือนเกิดของเจ้าของวันเกิดที่เขาไปอวยพร/ตอบคำถามให้
+// GET: ?action=getMonthlyLeaderboard&start=1&end=6&limit=10  (สะสมหลายเดือน)
+// GET: ?action=getMonthlyLeaderboard&month=6&limit=10         (เดือนเดียว, รองรับไว้เผื่อใช้)
 function getMonthlyLeaderboard(p) {
-  var month = parseInt(p.month || (new Date().getMonth() + 1), 10);
+  var hasRange = p.start !== undefined && p.end !== undefined && p.start !== '' && p.end !== '';
+  var start = hasRange ? parseInt(p.start, 10) : parseInt(p.month || (new Date().getMonth() + 1), 10);
+  var end   = hasRange ? parseInt(p.end, 10)   : start;
   var limit = parseInt(p.limit || '10', 10);
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var ws = ensurePointsSheet(ss);
   var rows = ws.getDataRange().getValues();
-  if (rows.length < 2) return {month: month, board: []};
+  if (rows.length < 2) return {start: start, end: end, board: []};
   var headers = rows[0];
   var IDX = makeIdx(headers);
 
   var totals = {}; // name(lower) -> {name, totalPts}
   for (var i = 1; i < rows.length; i++) {
     var r = rows[i];
-    if (parseInt(r[IDX['Month']], 10) !== month) continue;
+    var m = parseInt(r[IDX['Month']], 10);
+    if (m < start || m > end) continue;
     var pts = parseFloat(r[IDX['TotalPts']]) || 0;
     if (pts <= 0) continue;
     var key = normName(r[IDX['Name']]);
@@ -634,7 +641,62 @@ function getMonthlyLeaderboard(p) {
     board.push({name: totals[k].name, totalPts: totals[k].totalPts, photo: photoByName[k] || ''});
   }
   board.sort(function(a, b) { return b.totalPts - a.totalPts; });
-  return {month: month, board: board.slice(0, limit)};
+  return {start: start, end: end, board: board.slice(0, limit)};
+}
+
+// ============================================================
+// ── SETTINGS (ค่าตั้งค่าที่ admin กำหนด ใช้ร่วมกันทุกคน) ──
+// ============================================================
+var SHEET_SETTINGS = 'Settings';
+
+function ensureSettingsSheet(ss) {
+  var ws = ss.getSheetByName(SHEET_SETTINGS);
+  if (!ws) {
+    ws = ss.insertSheet(SHEET_SETTINGS);
+    ws.appendRow(['Key', 'Value']);
+    ws.setFrozenRows(1);
+    ws.getRange(1, 1, 1, 2).setBackground('#A855F7').setFontColor('#fff').setFontWeight('bold');
+  }
+  return ws;
+}
+
+function getSetting(key, defVal) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureSettingsSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (rows[i][0] === key) return rows[i][1];
+  }
+  return defVal;
+}
+
+function setSetting(key, value) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureSettingsSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (rows[i][0] === key) {
+      ws.getRange(i + 1, 2).setValue(value);
+      return;
+    }
+  }
+  ws.appendRow([key, value]);
+}
+
+// GET: ?action=getLbRange — ช่วงเดือนที่กระดานคะแนนแสดง (ตั้งค่าโดย admin, ใช้ร่วมกันทุกคน)
+function getLbRange() {
+  var start = parseInt(getSetting('lbRangeStart', 1), 10);
+  var end   = parseInt(getSetting('lbRangeEnd', 12), 10);
+  return {start: start, end: end};
+}
+
+// GET: ?action=setLbRange&start=1&end=6
+function setLbRange(p) {
+  var start = parseInt(p.start || '1', 10);
+  var end   = parseInt(p.end   || '12', 10);
+  setSetting('lbRangeStart', start);
+  setSetting('lbRangeEnd', end);
+  return {ok: true, start: start, end: end};
 }
 
 // ============================================================

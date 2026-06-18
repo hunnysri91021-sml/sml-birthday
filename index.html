@@ -288,6 +288,13 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 .lb-tab.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
 .lb-month-row{margin-bottom:.6rem}
 .lb-month-sel{width:100%;padding:.4rem .6rem;border-radius:10px;border:1px solid var(--b2);background:var(--c2);color:var(--text);font-family:'Kanit',sans-serif;font-size:.76rem;outline:none}
+.lb-range-admin{display:none;align-items:center;gap:.32rem;margin-bottom:.6rem;flex-wrap:wrap}
+.admin-mode .lb-range-admin{display:flex}
+.lb-range-lbl{font-size:.62rem;color:rgba(245,200,66,.6);width:100%}
+.lb-range-admin .lb-month-sel{width:auto;flex:1;font-size:.7rem;padding:.3rem .4rem}
+.lb-range-dash{color:var(--mute);font-size:.7rem}
+.lb-range-save{padding:.3rem .65rem;border-radius:8px;border:1px solid rgba(245,200,66,.3);background:rgba(245,200,66,.1);color:var(--gold);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;flex-shrink:0}
+.lb-range-save:hover{background:rgba(245,200,66,.18)}
 .lb-row{display:flex;align-items:center;gap:.5rem;padding:.38rem .6rem;border-radius:9px;background:var(--c2);margin-bottom:.28rem}
 .lb-rank{font-size:.9rem;width:20px;text-align:center;flex-shrink:0}
 .lb-ava{width:24px;height:24px;border-radius:50%;background:rgba(245,200,66,.14);display:flex;align-items:center;justify-content:center;font-size:.58rem;color:var(--gold);flex-shrink:0;font-weight:600}
@@ -377,13 +384,20 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 
 <!-- LEADERBOARD -->
 <div class="lb-sec" id="lbSection">
-  <div class="sec-hdr"><div class="sec-title">🏆 กระดานคะแนน</div></div>
+  <div class="sec-hdr"><div class="sec-title">🏆 กระดานคะแนน</div><div class="sec-badge" id="lbRangeBadge"></div></div>
   <div class="lb-tabs">
     <button class="lb-tab active" id="lbTabGame" onclick="switchLbTab('game')">🏆 คะแนนสะสม</button>
     <button class="lb-tab" id="lbTabLike" onclick="switchLbTab('like')">❤️ ไลก์</button>
   </div>
   <div class="lb-month-row" id="lbMonthRow">
-    <select class="lb-month-sel" id="lbMonthSel" onchange="loadMonthlyLeaderboard(this.value)"></select>
+    <select class="lb-month-sel" id="lbMonthSel" onchange="loadMonthlyLeaderboard()"></select>
+  </div>
+  <div class="lb-range-admin" id="lbRangeAdmin">
+    <span class="lb-range-lbl">ตั้งช่วงเดือนที่แสดง:</span>
+    <select class="lb-month-sel" id="lbRangeStartSel"></select>
+    <span class="lb-range-dash">—</span>
+    <select class="lb-month-sel" id="lbRangeEndSel"></select>
+    <button class="lb-range-save" onclick="saveLbRange()">💾 บันทึก</button>
   </div>
   <div id="lbList"><div class="lb-empty">เล่นเกมเพื่อขึ้นกระดาน!</div></div>
 </div>
@@ -1807,27 +1821,60 @@ function animalEmoji(name) {
   return CUTE_ANIMALS[h % CUTE_ANIMALS.length];
 }
 
-function initLbMonthSel() {
+let lbRange = {start:1, end:12};
+
+async function initLbMonthSel() {
   const sel = document.getElementById('lbMonthSel');
-  if (!sel || sel.options.length) return;
-  const cur = new Date().getMonth() + 1;
-  sel.innerHTML = MTH.map((m,i)=>{
-    const month = i+1;
-    return `<option value="${month}" ${month===cur?'selected':''}>${m}</option>`;
-  }).join('');
+  const startSel = document.getElementById('lbRangeStartSel');
+  const endSel = document.getElementById('lbRangeEndSel');
+  if (startSel && !startSel.options.length) {
+    const opts = MTH.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+    startSel.innerHTML = opts;
+    endSel.innerHTML = opts;
+  }
+  if (sel && !sel.options.length) {
+    const res = await apiGet({action:'getLbRange'});
+    if (res && res.start) lbRange = res;
+    startSel.value = lbRange.start;
+    endSel.value = lbRange.end;
+    const cumLabel = `📊 สะสม ${MTH[lbRange.start-1]} - ${MTH[lbRange.end-1]}`;
+    const monthOpts = MTH.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+    sel.innerHTML = `<option value="cum" selected>${cumLabel}</option>` + monthOpts;
+    const badge = document.getElementById('lbRangeBadge');
+    if (badge) badge.textContent = `${MTH[lbRange.start-1]}-${MTH[lbRange.end-1]}`;
+  }
 }
 
-async function loadMonthlyLeaderboard(month) {
-  initLbMonthSel();
+async function saveLbRange() {
+  const start = parseInt(document.getElementById('lbRangeStartSel').value, 10);
+  const end = parseInt(document.getElementById('lbRangeEndSel').value, 10);
+  if (start > end) { showToast('เดือนเริ่มต้องไม่เกินเดือนสิ้นสุด','warn'); return; }
+  await apiGet({action:'setLbRange', start, end});
+  lbRange = {start, end};
   const sel = document.getElementById('lbMonthSel');
-  const m = month || (sel && sel.value) || (new Date().getMonth()+1);
-  if (sel) sel.value = m;
+  if (sel) {
+    sel.options[0].text = `📊 สะสม ${MTH[start-1]} - ${MTH[end-1]}`;
+    sel.value = 'cum';
+  }
+  const badge = document.getElementById('lbRangeBadge');
+  if (badge) badge.textContent = `${MTH[start-1]}-${MTH[end-1]}`;
+  showToast('💾 บันทึกช่วงเดือนแล้ว');
+  loadMonthlyLeaderboard();
+}
+
+async function loadMonthlyLeaderboard() {
+  await initLbMonthSel();
+  const sel = document.getElementById('lbMonthSel');
+  const v = (sel && sel.value) || 'cum';
   const el = document.getElementById('lbList');
   if (!el) return;
-  const res = await apiGet({action:'getMonthlyLeaderboard', month:m, limit:10});
+  const params = v === 'cum'
+    ? {action:'getMonthlyLeaderboard', start:lbRange.start, end:lbRange.end, limit:10}
+    : {action:'getMonthlyLeaderboard', month:v, limit:10};
+  const res = await apiGet(params);
   const board = (res && Array.isArray(res.board)) ? res.board : [];
   if (!board.length) {
-    el.innerHTML = '<div class="lb-empty">ยังไม่มีคะแนนในเดือนนี้</div>';
+    el.innerHTML = '<div class="lb-empty">ยังไม่มีคะแนนในช่วงนี้</div>';
     return;
   }
   const maxPts = Math.max(1, board[0].totalPts||1);
