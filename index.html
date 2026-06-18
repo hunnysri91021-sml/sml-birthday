@@ -66,15 +66,34 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 /* HERO */
 .hero{padding:.85rem 1rem 1rem;text-align:center;background:linear-gradient(180deg,rgba(255,178,217,.25) 0%,transparent 100%)}
 .hero-photo-wrap{display:flex;justify-content:center;margin-bottom:.75rem}
-.hero-photo{width:84px;height:84px;border-radius:50%;border:3px solid var(--gold);background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:2.4rem;position:relative;overflow:hidden;cursor:default;transition:transform .2s}
+.hero-photo{width:104px;height:104px;border-radius:50%;border:4px solid var(--gold);background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:2.8rem;position:relative;overflow:hidden;cursor:default;transition:transform .2s;box-shadow:0 8px 26px rgba(255,159,67,.3)}
 .admin-mode .hero-photo{cursor:pointer}
 .admin-mode .hero-photo:hover{transform:scale(1.04)}
 .hero-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .photo-badge-inner{position:absolute;bottom:1px;right:1px;width:22px;height:22px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:.7rem;border:2px solid var(--bg)}
 .photo-hint{font-size:.6rem;color:var(--mute);margin-top:.25rem;display:none;text-align:center}
 .admin-mode .photo-hint{display:block}
-.hero-name{font-family:'Dancing Script',cursive;font-size:1.9rem;font-weight:700;color:var(--text);line-height:1.1;margin-bottom:.18rem}
-.hero-pos{font-size:.72rem;color:var(--sub);margin-bottom:.5rem}
+.hero-name{font-family:'Dancing Script',cursive;font-size:2.2rem;font-weight:700;color:var(--rose);line-height:1.1;margin-bottom:.18rem}
+.hero-pos{font-size:.78rem;font-weight:500;color:var(--text);margin-bottom:.5rem}
+/* DASHBOARD GRID */
+.dash-grid{display:block}
+.dash-left,.dash-center,.dash-right{display:contents}
+.cal-widget{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.cal-row{display:flex;align-items:center;gap:.55rem;padding:.4rem 0;border-bottom:1px solid var(--b)}
+.cal-row:last-child{border-bottom:none}
+.cal-date{width:36px;height:36px;border-radius:10px;background:var(--c2);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:var(--gold);flex-shrink:0}
+.cal-info{flex:1;min-width:0}
+.cal-info b{font-size:.78rem;display:block;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-info span{font-size:.65rem;color:var(--sub)}
+.cal-empty{font-size:.75rem;color:var(--mute);padding:.3rem 0}
+@media(min-width:1000px){
+  .dash-grid{display:grid;grid-template-columns:300px 1fr 300px;gap:1rem;align-items:start;max-width:1400px;margin:0 auto;padding:0 1rem}
+  .dash-left,.dash-center,.dash-right{display:flex;flex-direction:column;gap:.4rem}
+  .hero-photo{width:170px;height:170px;font-size:4.2rem;border-width:5px}
+  .photo-badge-inner{width:30px;height:30px;font-size:.9rem}
+  .hero-name{font-size:2.7rem}
+  .hero-pos{font-size:.85rem}
+}
 .hero-pill{display:inline-flex;align-items:center;gap:.3rem;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:.22rem .75rem;font-size:.72rem;color:var(--gold);margin-bottom:.65rem}
 .stat-row{display:flex;justify-content:center;gap:1.25rem}
 .stat-item{text-align:center}
@@ -314,6 +333,32 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 <div class="month-row" id="monthTabs"></div>
 <div class="person-row" id="personChips"><div class="person-locked">เลือกเดือนด้านบน</div></div>
 
+<div class="dash-grid">
+<div class="dash-left">
+
+<!-- TOP 10 -->
+<div class="top10-sec" id="top10Section">
+  <div class="sec-hdr"><div class="sec-title">🏆 Top 10 คะแนนสะสม</div><div class="sec-badge" id="top10Badge">0 คน</div></div>
+  <div class="top10-list" id="top10Chart"><div class="top10-empty">ยังไม่มีผู้เข้าร่วม</div></div>
+  <div class="top10-admin-btns" id="top10AdminArea">
+    <button class="top10-export-btn" onclick="exportScoresExcel()">📊 Export คะแนน Excel</button>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="lb-sec" id="lbSection">
+  <div class="sec-hdr"><div class="sec-title">🏆 กระดานคะแนน</div></div>
+  <div class="lb-tabs">
+    <button class="lb-tab active" id="lbTabGame" onclick="switchLbTab('game')">🎯 เกม</button>
+    <button class="lb-tab" id="lbTabLike" onclick="switchLbTab('like')">❤️ ไลก์</button>
+  </div>
+  <div id="lbList"><div class="lb-empty">เล่นเกมเพื่อขึ้นกระดาน!</div></div>
+</div>
+
+</div>
+
+<div class="dash-center">
+
 <div class="hero" id="hero">
   <div class="hero-photo-wrap">
     <div style="display:flex;flex-direction:column;align-items:center">
@@ -428,29 +473,23 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
   </div>
 </div>
 
+</div>
+
+<div class="dash-right">
+
 <!-- PARTICIPANTS -->
 <div class="part-sec" id="partSection">
   <div class="sec-hdr"><div class="sec-title">👥 ผู้ร่วมตอบคำถาม</div><div class="sec-badge" id="partCount">0 คน</div></div>
   <div class="part-chips" id="partGrid"><div class="part-empty">ยังไม่มีผู้เข้าร่วม</div></div>
 </div>
 
-<!-- TOP 10 -->
-<div class="top10-sec" id="top10Section">
-  <div class="sec-hdr"><div class="sec-title">🏆 Top 10 คะแนนสะสม</div><div class="sec-badge" id="top10Badge">0 คน</div></div>
-  <div class="top10-list" id="top10Chart"><div class="top10-empty">ยังไม่มีผู้เข้าร่วม</div></div>
-  <div class="top10-admin-btns" id="top10AdminArea">
-    <button class="top10-export-btn" onclick="exportScoresExcel()">📊 Export คะแนน Excel</button>
-  </div>
+<!-- BIRTHDAY CALENDAR (this month) -->
+<div class="cal-widget" id="calWidget">
+  <div class="sec-hdr"><div class="sec-title">📅 วันเกิดเดือนนี้</div></div>
+  <div id="calList"><div class="cal-empty">เลือกเดือนด้านบน</div></div>
 </div>
 
-<!-- LEADERBOARD -->
-<div class="lb-sec" id="lbSection">
-  <div class="sec-hdr"><div class="sec-title">🏆 กระดานคะแนน</div></div>
-  <div class="lb-tabs">
-    <button class="lb-tab active" id="lbTabGame" onclick="switchLbTab('game')">🎯 เกม</button>
-    <button class="lb-tab" id="lbTabLike" onclick="switchLbTab('like')">❤️ ไลก์</button>
-  </div>
-  <div id="lbList"><div class="lb-empty">เล่นเกมเพื่อขึ้นกระดาน!</div></div>
+</div>
 </div>
 
 <div class="spacer-bottom"></div>
@@ -701,6 +740,19 @@ function selectMonth(mi){
     </div>`
   ).join('');
   if(!curEmp||curEmp.month!==mi) selectPerson(list[0].code);
+  renderBirthdayCalendar(mi);
+}
+function renderBirthdayCalendar(mi){
+  const el=document.getElementById('calList');
+  if(!el) return;
+  const list=calPersons.filter(p=>p.month===mi).sort((a,b)=>(a.day||0)-(b.day||0));
+  if(!list.length){ el.innerHTML='<div class="cal-empty">ไม่มีพนักงานเกิดเดือนนี้</div>'; return; }
+  el.innerHTML=list.map(p=>
+    `<div class="cal-row" onclick="selectPerson('${p.code}')" style="cursor:pointer">
+      <div class="cal-date">${p.day||'-'}<br>${MTH[p.month].substring(0,3)}</div>
+      <div class="cal-info"><b>${escHtml(p.name)}</b><span>${escHtml(p.faction||p.pos||'')}</span></div>
+    </div>`
+  ).join('');
 }
 function selectPerson(code){
   curEmp=calPersons.find(p=>p.code===code)||null;
