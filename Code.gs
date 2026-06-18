@@ -25,6 +25,62 @@ var THAI_MONTHS_SHORT = [
 ];
 
 // ============================================================
+// ── ข้อมูลพนักงานเก่า (Seed สำหรับ Persons sheet) ──────────
+// month: 1-12 (เดือนเกิด)
+// ============================================================
+var PERSONS_SEED = [
+  {code:'90245',name:'ประจักษ์ แก้วหานาม',dept:'PDI Operation',month:1},
+  {code:'90308',name:'สกุล พรมมี',dept:'PDI Operation',month:1},
+  {code:'90576',name:'อานนท์ โสธรรมมงคล',dept:'Accessories Installetion',month:1},
+  {code:'90954',name:'วิรัตน์ สมศรี',dept:'Yard Operation',month:1},
+  {code:'91038',name:'เสรี คะรัมย์',dept:'Accessories Installetion',month:1},
+  {code:'91115',name:'ชาญวิทย์ ฤทธิ์สยาม',dept:'Accessories Installetion',month:1},
+  {code:'90239',name:'กิตติกา จันทร์สายทอง',dept:'Yard Operation',month:2},
+  {code:'90615',name:'ประธาน แช่มโชติ',dept:'Accessories Installetion',month:2},
+  {code:'90638',name:'รังสรรค์ แจ่มประเสริฐ',dept:'PDI Operation',month:2},
+  {code:'91021',name:'โชสิญา ดานเรือง',dept:'HR&GA',month:2},
+  {code:'90057',name:'ทวี กัณหา',dept:'Accessories Installetion',month:3},
+  {code:'90841',name:'สัมพันธ์ สำนวน',dept:'Accessories Installetion',month:3},
+  {code:'91100',name:'วิระพงษ์ กิระหัด',dept:'Accessories Installetion',month:3},
+  {code:'91112',name:'กุหลาบ กองทอง',dept:'PDI Operation',month:3},
+  {code:'90040',name:'ภูวดล ปาราลิตร์',dept:'HR&GA',month:4},
+  {code:'90258',name:'นาเรณ มูฮำหมัด',dept:'PDI Operation',month:4},
+  {code:'90566',name:'ยืนยง กันหา',dept:'Yard Operation',month:4},
+  {code:'90715',name:'ณธีพัฒน์ รัตนอธิพัฒน์',dept:'PDI Operation',month:4},
+  {code:'90835',name:'คำภา ปานิสัย',dept:'Accessories Installetion',month:4},
+  {code:'91059',name:'ปัทมา เห็มบุตร',dept:'บัญชีและการเงิน',month:4},
+  {code:'91079',name:'ณัฐวุฒิ เลิศวงษ์วรรณ',dept:'Yard Operation',month:4},
+  {code:'91116',name:'คณิน บุญอยู่',dept:'PDI Operation',month:4},
+  {code:'90354',name:'นำพล เล็กใจกล้า',dept:'HR&GA',month:5},
+  {code:'90439',name:'ปุณยนุช ม่วงศรี',dept:'บัญชีและการเงิน',month:5},
+  {code:'90713',name:'บุญเลี้ยง เหมภูมิ',dept:'Accessories Installetion',month:5},
+  {code:'90939',name:'สุรกิจ ตันกุล',dept:'PC&PDI Operation',month:5},
+  {code:'90459',name:'ดนุพล วังใจ',dept:'Accessories Installetion',month:6},
+  {code:'90495',name:'บุญช่วย เนียมมาก',dept:'PDI Operation',month:6},
+  {code:'90570',name:'ชาญณรงค์ ดวงสิน',dept:'Yard Operation',month:6},
+  {code:'91010',name:'โสภา สุดตาภักดี',dept:'บัญชีและการเงิน',month:6},
+  {code:'91146',name:'อลงกรณ์ สัตยาคุณ',dept:'Accessories Installetion',month:6},
+  {code:'90714',name:'วัชรินทร์ จันทำ',dept:'Accessories Installetion',month:7},
+  {code:'91155',name:'สุนิษา เกษพิจิตร',dept:'HR&GA',month:7},
+  {code:'91147',name:'ณัฐวิช เลิศวงษ์วรรณ',dept:'Yard Operation',month:8},
+  {code:'91152',name:'วิวัฒน์ ตันติวีรกุล',dept:'Accessories Installetion',month:8},
+  {code:'90352',name:'อาทิตย์ ภูแล่นคู่',dept:'PDI Operation',month:9},
+  {code:'90498',name:'อำนาจ ศุลญลา',dept:'PDI Operation',month:9},
+  {code:'90526',name:'ยศศักดิ์ ทัศนพงษ์',dept:'HR&GA',month:9},
+  {code:'91064',name:'วิภาวดี โตประดิษฐ์',dept:'Yard Operation',month:9},
+  {code:'91118',name:'อดิเรก บัวจันทร์',dept:'Accessories Installetion',month:9},
+  {code:'90368',name:'ฤทธิรงค์ อุปถัมภ์',dept:'Accessories Installetion',month:10},
+  {code:'90986',name:'พรรณเชษฐ์ นครรัตน์',dept:'Yard Operation',month:10},
+  {code:'90325',name:'ระวิ จันทโรทัย',dept:'PDI Operation',month:11},
+  {code:'90696',name:'ดลลดา ใจแก้ว',dept:'HR&GA',month:11},
+  {code:'90722',name:'ธนโชติ โพธิ์ใต้',dept:'PDI Operation',month:11},
+  {code:'91068',name:'วราภรณ์ ใสสม',dept:'Yard Operation',month:11},
+  {code:'90179',name:'ณุชัย หาญรักษ์',dept:'PDI Operation',month:12},
+  {code:'90934',name:'เชิดชัย มิกขุนทด',dept:'-',month:12},
+  {code:'91133',name:'กฤษณะ เหลืองมิวาย',dept:'Accessories Installetion',month:12}
+];
+
+// ============================================================
 // ROUTER — GET เท่านั้น (ป้องกัน CORS)
 // ============================================================
 function doGet(e) {
@@ -41,6 +97,7 @@ function doGet(e) {
     else if (action === 'addPoints')      result = addPoints(p);
     else if (action === 'getLeaderboard') result = getLeaderboard(p);
     else if (action === 'getMonthlyStats')result = getMonthlyStats();
+    else if (action === 'seedPersons')    result = seedPersons();
     else if (action === 'ping')           result = {ok: true, time: new Date().toISOString()};
     else result = {error: 'unknown action: ' + action};
 
@@ -492,6 +549,37 @@ function makeIdx(headers) {
   return idx;
 }
 
+function ensurePersonsSheet(ss) {
+  var ws = ss.getSheetByName(SHEET_PERSONS);
+  if (!ws) {
+    ws = ss.insertSheet(SHEET_PERSONS);
+    ws.appendRow(['Code','Name','Month','Dept','Active']);
+    ws.setFrozenRows(1);
+    ws.getRange(1, 1, 1, 5).setBackground('#00E5CC').setFontColor('#000').setFontWeight('bold');
+  }
+  return ws;
+}
+
+// นำเข้าข้อมูลพนักงานเก่า (PERSONS_SEED) เข้า Persons sheet — ข้ามรายการที่มี Code อยู่แล้ว
+function seedPersons() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensurePersonsSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  var existingCodes = {};
+  for (var i = 1; i < rows.length; i++) {
+    if (rows[i][0]) existingCodes[String(rows[i][0])] = true;
+  }
+
+  var added = 0;
+  PERSONS_SEED.forEach(function(p) {
+    if (existingCodes[p.code]) return;
+    ws.appendRow([p.code, p.name, p.month, p.dept, true]);
+    added++;
+  });
+
+  return {ok: true, added: added, total: PERSONS_SEED.length};
+}
+
 function ensurePointsSheet(ss) {
   var ws = ss.getSheetByName(SHEET_POINTS);
   if (!ws) {
@@ -519,10 +607,19 @@ function ensureStatsSheet(ss) {
 // ============================================================
 function setup() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ensurePersonsSheet(ss);
   ensurePointsSheet(ss);
   var statsWs = ensureStatsSheet(ss);
   initActivityMonths(ss, statsWs);
-  SpreadsheetApp.getUi().alert('✅ Setup สำเร็จ!\n\nSheets ที่พร้อมแล้ว:\n- Wishes\n- Persons\n- Points (ใหม่)\n- Monthly_Stats มิ.ย.-ธ.ค. 2569 (ใหม่)');
+  var seedResult = seedPersons();
+  SpreadsheetApp.getUi().alert(
+    '✅ Setup สำเร็จ!\n\nSheets ที่พร้อมแล้ว:\n- Wishes\n- Persons (นำเข้าพนักงานใหม่ ' + seedResult.added + ' คน)\n- Points (ใหม่)\n- Monthly_Stats มิ.ย.-ธ.ค. 2569 (ใหม่)'
+  );
+}
+
+function importPersonsMenu() {
+  var result = seedPersons();
+  SpreadsheetApp.getUi().alert('✅ นำเข้าข้อมูลพนักงานแล้ว!\n\nเพิ่มใหม่ ' + result.added + ' คน จากทั้งหมด ' + result.total + ' คน\n(รายการที่มีรหัสซ้ำจะถูกข้าม)');
 }
 
 function recalcAllStats() {
@@ -553,6 +650,7 @@ function onOpen() {
     .createMenu('🎂 Birthday Activity')
     .addItem('▶️ Setup ครั้งแรก', 'setup')
     .addSeparator()
+    .addItem('👥 นำเข้าข้อมูลพนักงาน (Persons)', 'importPersonsMenu')
     .addItem('🔄 คำนวณยอดสะสมใหม่ทั้งหมด', 'recalcAllStats')
     .addToUi();
 }

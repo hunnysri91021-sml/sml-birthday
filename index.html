@@ -298,11 +298,13 @@ canvas#wheel{border-radius:50%;box-shadow:0 0 30px rgba(124,58,237,.5)}
     <div class="name-card">
       <label>👤 ชื่อของคุณ (สำหรับบันทึกแต้ม)</label>
       <div class="name-row">
-        <input type="text" id="myName" placeholder="พิมพ์ชื่อ-นามสกุล เช่น สมใจ ใจดี" maxlength="50"
+        <input type="text" id="myName" list="personList" placeholder="พิมพ์ชื่อ-นามสกุล เช่น สมใจ ใจดี" maxlength="50"
                onkeydown="if(event.key==='Enter') confirmName()">
+        <datalist id="personList"></datalist>
         <button class="btn-confirm" onclick="confirmName()">ยืนยัน ✓</button>
       </div>
       <div style="font-size:.75rem;color:var(--sub);margin-top:2px">* ชื่อจะใช้สะสมแต้มและแสดงบน Leaderboard</div>
+      <div id="myDeptTag" style="font-size:.78rem;color:var(--mint);margin-top:4px;display:none"></div>
     </div>
   </div>
 
@@ -391,6 +393,8 @@ canvas#wheel{border-radius:50%;box-shadow:0 0 30px rgba(124,58,237,.5)}
       <div class="card">
         <div class="sec-title">⚙️ จัดการ</div>
         <button class="btn btn-purple mt8" onclick="exportScores()">📊 Export คะแนน Excel</button>
+        <button class="btn btn-outline mt8" onclick="importPersonsAdmin()">👥 นำเข้าข้อมูลพนักงาน (Persons)</button>
+        <div style="font-size:.72rem;color:var(--sub);margin-top:6px">จำนวนพนักงานที่โหลดแล้ว: <b id="personsCount">0</b> คน</div>
       </div>
     </div>
   </div>
@@ -498,11 +502,66 @@ window.addEventListener('load', function() {
   buildQRCode();
   loadWishes();
   loadMonthlyStats();
+  loadPersons();
   renderQuiz();
   document.getElementById('wishMsg').addEventListener('input', function() {
     document.getElementById('msgCount').textContent = this.value.length + '/200';
   });
 });
+
+// ══════════════════════════════════════════════════
+// PERSONS (ข้อมูลพนักงาน — ใช้ autocomplete + ออกคำถามวันเกิด)
+// ══════════════════════════════════════════════════
+function loadPersons() {
+  api('getPersons', {}, function(r) {
+    persons = (r && r.persons) ? r.persons.filter(function(p){return p.active}) : [];
+    var dl = document.getElementById('personList');
+    if (dl) dl.innerHTML = persons.map(function(p) { return '<option value="'+escHtml(p.name)+'">'; }).join('');
+    var pc = document.getElementById('personsCount');
+    if (pc) pc.textContent = persons.length;
+    buildBirthdayQuizQuestion();
+    if (quizState.q === 0 && !quizState.done && !quizDone) renderQuiz();
+  });
+}
+
+function findPerson(name) {
+  var n = normName2(name);
+  for (var i = 0; i < persons.length; i++) {
+    if (normName2(persons[i].name) === n) return persons[i];
+  }
+  return null;
+}
+
+function normName2(s) { return String(s||'').replace(/\s+/g,' ').trim().toLowerCase(); }
+
+// เพิ่มคำถาม "เดือนนี้เป็นวันเกิดของใคร" จากข้อมูลพนักงานจริง
+function buildBirthdayQuizQuestion() {
+  if (!persons.length) return;
+  var curMonth = new Date().getMonth() + 1;
+  var bdayThisMonth = persons.filter(function(p) { return Number(p.month) === curMonth; });
+  if (!bdayThisMonth.length) return;
+
+  var correct = bdayThisMonth[Math.floor(Math.random() * bdayThisMonth.length)];
+  var others = persons.filter(function(p) { return p.code !== correct.code; });
+  if (others.length < 3) return;
+
+  // สุ่ม distractor 3 คน
+  var shuffled = others.slice().sort(function(){ return Math.random()-0.5; });
+  var distractors = shuffled.slice(0, 3);
+  var opts = distractors.concat([correct]).map(function(p){ return p.name; });
+  opts.sort(function(){ return Math.random()-0.5; });
+  var ansIdx = opts.indexOf(correct.name);
+
+  var MONTH_TH = ['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  // กันไม่ให้ซ้ำหากโหลดข้อมูลพนักงานเสร็จหลังเริ่ม quiz แล้ว
+  QUIZ_BANK = QUIZ_BANK.filter(function(q){ return !q._birthdayQ; });
+  QUIZ_BANK.push({
+    q: '🎂 เดือน' + MONTH_TH[curMonth] + ' เป็นวันเกิดของใคร?',
+    opts: opts,
+    ans: ansIdx,
+    _birthdayQ: true
+  });
+}
 
 // ══════════════════════════════════════════════════
 // NAME CONFIRM
@@ -512,6 +571,17 @@ function confirmName() {
   if (!n) return toast('⚠️ กรุณาพิมพ์ชื่อก่อนนะคะ');
   myName = n;
   document.getElementById('heroSub').textContent = 'สวัสดีคุณ ' + n + ' 👋';
+
+  var deptTag = document.getElementById('myDeptTag');
+  var matched = findPerson(n);
+  if (matched) {
+    deptTag.style.display = 'block';
+    deptTag.textContent = '✓ พบในรายชื่อพนักงาน — แผนก ' + (matched.dept || '-');
+  } else {
+    deptTag.style.display = 'block';
+    deptTag.textContent = '⚠️ ไม่พบชื่อนี้ในรายชื่อพนักงาน กรุณาตรวจสอบการสะกดชื่อ';
+  }
+
   loadMyPoints();
   toast('✅ ยืนยันชื่อแล้ว: ' + n);
 }
@@ -864,6 +934,18 @@ function logoutAdmin() {
   document.getElementById('adminPwd').value = '';
   document.getElementById('adminLoginCard').style.display = 'block';
   document.getElementById('adminPanel').style.display     = 'none';
+}
+
+function importPersonsAdmin() {
+  toast('⏳ กำลังนำเข้าข้อมูลพนักงาน...');
+  api('seedPersons', {}, function(r) {
+    if (r && r.ok) {
+      toast('✅ นำเข้าสำเร็จ! เพิ่มใหม่ ' + r.added + ' คน (รวม ' + r.total + ' คน)');
+      loadPersons();
+    } else {
+      toast('❌ นำเข้าไม่สำเร็จ ลองใหม่นะคะ');
+    }
+  });
 }
 
 function openQRModal()   { showTab('admin', document.getElementById('adminTab')); }
