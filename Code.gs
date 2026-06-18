@@ -242,7 +242,10 @@ function deleteWish(p) {
 
 // ============================================================
 // ── PERSONS ───────────────────────────────────────────────
-// Sheet columns: Code, Name, Month, Dept, Active, Pos, Day
+// Actual sheet columns (A→H): รหัสพนักงาน, ชื่อ, นามสกุล, ตำแหน่ง,
+// Faction/แผนก, วัน, เดือน (1-12), สถานะ — read positionally since
+// the live sheet's headers are Thai labels, not the English names
+// 'Name'/'Month'/'Dept'/'Pos'/'Day' the old header-lookup code expected.
 // getPersons returns a RAW ARRAY (matches loadPersonsFromSheet's
 // Array.isArray check in the uploaded UI). month returned is 1-12
 // (sheet convention); the client's loadPersonsFromSheet converts it
@@ -253,22 +256,22 @@ function getPersons() {
   var ws = ensurePersonsSheet(ss);
   var rows = ws.getDataRange().getValues();
   if (rows.length < 2) return [];
-  var headers = rows[0];
-  var IDX = makeIdx(headers);
   var persons = [];
   for (var i = 1; i < rows.length; i++) {
     var r = rows[i];
     if (!r[0]) continue;
-    var dept = r[IDX['Dept']] || '';
+    var fname = r[1] || '';
+    var lname = r[2] || '';
+    var dept  = r[4] || '';
     persons.push({
       code:    r[0],
-      name:    r[IDX['Name']],
-      month:   r[IDX['Month']],
+      name:    (String(fname) + ' ' + String(lname)).trim(),
+      pos:     r[3] || '',
       dept:    dept,
       faction: dept,
-      pos:     r[IDX['Pos']] || '',
-      day:     r[IDX['Day']] || 1,
-      active:  r[IDX['Active']] !== false && r[IDX['Active']] !== 'FALSE'
+      day:     r[5] || 1,
+      month:   r[6] || 1,
+      active:  r[7] !== false && r[7] !== 'FALSE' && r[7] !== 'Inactive'
     });
   }
   return persons;
@@ -637,19 +640,15 @@ function makeIdx(headers) {
   return idx;
 }
 
+// Columns (A→H): รหัสพนักงาน, ชื่อ, นามสกุล, ตำแหน่ง, Faction/แผนก, วัน, เดือน (1-12), สถานะ
 function ensurePersonsSheet(ss) {
   var ws = ss.getSheetByName(SHEET_PERSONS);
   if (!ws) {
     ws = ss.insertSheet(SHEET_PERSONS);
-    ws.appendRow(['Code','Name','Month','Dept','Active','Pos','Day']);
+    ws.appendRow(['รหัสพนักงาน','ชื่อ','นามสกุล','ตำแหน่ง','Faction/แผนก','วัน','เดือน (1-12)','สถานะ']);
     ws.setFrozenRows(1);
-    ws.getRange(1, 1, 1, 7).setBackground('#00E5CC').setFontColor('#000').setFontWeight('bold');
+    ws.getRange(1, 1, 1, 8).setBackground('#00E5CC').setFontColor('#000').setFontWeight('bold');
   }
-  // Backward-compat: add Pos/Day columns to older sheets that lack them
-  var headers = ws.getRange(1, 1, 1, Math.max(ws.getLastColumn(), 1)).getValues()[0];
-  if (headers.indexOf('Pos') === -1) ws.getRange(1, ws.getLastColumn() + 1).setValue('Pos');
-  headers = ws.getRange(1, 1, 1, Math.max(ws.getLastColumn(), 1)).getValues()[0];
-  if (headers.indexOf('Day') === -1) ws.getRange(1, ws.getLastColumn() + 1).setValue('Day');
   return ws;
 }
 
@@ -666,7 +665,10 @@ function seedPersons() {
   var added = 0;
   PERSONS_SEED.forEach(function(p) {
     if (existingCodes[p.code]) return;
-    ws.appendRow([p.code, p.name, p.month, p.dept, true, p.pos || '', p.day || '']);
+    var nameParts = String(p.name || '').trim().split(/\s+/);
+    var fname = nameParts.shift() || '';
+    var lname = nameParts.join(' ');
+    ws.appendRow([p.code, fname, lname, p.pos || '', p.dept || '', p.day || '', p.month, 'Active']);
     added++;
   });
 
