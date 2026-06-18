@@ -4,429 +4,1018 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>SML Birthday Wishes 🎂</title>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Dancing+Script:wght@700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d0d1a;--c1:#16162a;--c2:#1e1e35;--gold:#f5c842;--gold2:#f7a621;--rose:#ff6b9d;--mint:#00e5cc;--purple:#a78bfa;--text:#fff;--sub:rgba(255,255,255,.55);--mute:rgba(255,255,255,.28);--b:rgba(255,255,255,.08);--b2:rgba(255,255,255,.14)}
-html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Kanit',sans-serif;overflow-x:hidden}
-/* BG */
-.bg-deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.bb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.2}
-.bb1{width:550px;height:550px;background:#4a1070;top:-150px;left:-120px;animation:drift 14s ease-in-out infinite alternate}
-.bb2{width:450px;height:450px;background:#0e2560;bottom:-80px;right:-80px;animation:drift 18s ease-in-out infinite alternate-reverse}
-.bb3{width:300px;height:300px;background:#6e1a3a;top:45%;left:30%;animation:drift 11s ease-in-out infinite alternate}
-@keyframes drift{from{transform:translate(0,0)}to{transform:translate(28px,22px)}}
-/* TOPBAR */
-.topbar{position:sticky;top:0;z-index:50;background:rgba(13,13,26,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--b);padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between}
-.tb-logo{font-family:'Mitr',sans-serif;font-size:.88rem;font-weight:500;color:var(--gold);letter-spacing:.05em}
-.tb-right{display:flex;align-items:center;gap:.35rem}
-.tb-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--b2);background:transparent;color:var(--sub);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.tb-btn:hover,.tb-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,.1)}
-.admin-top-badge{font-size:.62rem;background:linear-gradient(135deg,rgba(245,200,66,.25),rgba(247,166,33,.2));border:1px solid rgba(245,200,66,.45);border-radius:20px;padding:.18rem .65rem;color:var(--gold);display:none;font-weight:600;letter-spacing:.05em;box-shadow:0 0 8px rgba(245,200,66,.2)}
-.admin-mode .admin-top-badge{display:inline-block}
-.admin-mode .tb-btn#adminLock{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,.15);box-shadow:0 0 10px rgba(245,200,66,.3)}
-/* ADMIN STRIP */
-.admin-strip{display:none;background:linear-gradient(135deg,rgba(30,15,60,.95),rgba(20,10,45,.98));border-bottom:2px solid rgba(245,200,66,.35);padding:.65rem 1rem;gap:.4rem;flex-wrap:wrap;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,.4)}
-.admin-mode .admin-strip{display:flex}
-.as-lbl{font-size:.6rem;color:rgba(245,200,66,.5);letter-spacing:.08em;text-transform:uppercase;flex-shrink:0}
-.as-inp{flex:1;min-width:120px;background:rgba(255,255,255,.07);border:1px solid rgba(245,200,66,.25);border-radius:8px;padding:.32rem .65rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.7rem;outline:none;transition:border-color .2s}
-.as-inp:focus{border-color:rgba(245,200,66,.6)}
-.as-btn{padding:.3rem .65rem;border-radius:8px;border:1px solid rgba(245,200,66,.28);background:rgba(245,200,66,.06);color:rgba(245,200,66,.8);font-family:'Kanit',sans-serif;font-size:.67rem;cursor:pointer;white-space:nowrap;transition:all .15s;font-weight:500}
-.as-btn:hover{background:rgba(245,200,66,.18);color:var(--gold);border-color:var(--gold);transform:translateY(-1px)}
-.api-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
-.api-dot.ok{background:var(--mint);color:var(--mint)}.api-dot.err{background:var(--rose);color:var(--rose)}.api-dot.pending{background:var(--gold);color:var(--gold)}
-/* ADMIN MONTH PANEL */
-.admin-month-panel{display:none;background:linear-gradient(135deg,rgba(25,12,55,.97),rgba(18,8,40,.99));border-bottom:2px solid rgba(245,200,66,.25);padding:.75rem 1rem}
-.admin-mode .admin-month-panel.open{display:block}
-.amp-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem}
-.amp-lbl{font-size:.65rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:.35rem}
-.amp-lbl::before{content:'🗓';font-size:.85rem}
-.amp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.3rem}
-.amp-chip{padding:.32rem .2rem;border-radius:8px;font-family:'Kanit',sans-serif;font-size:.7rem;cursor:pointer;text-align:center;transition:all .18s;font-weight:500;border:1.5px solid}
-.amp-chip.on{background:rgba(245,200,66,.2);border-color:var(--gold);color:var(--gold);box-shadow:0 0 8px rgba(245,200,66,.25)}
-.amp-chip.off{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.35)}
-.amp-chip.off:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
-.amp-confirm{margin-top:.55rem;display:flex;align-items:center;gap:.5rem;background:rgba(0,229,204,.06);border:1px solid rgba(0,229,204,.18);border-radius:10px;padding:.45rem .75rem}
-.amp-confirm-icon{font-size:.95rem;flex-shrink:0}
-.amp-confirm-text{font-size:.7rem;color:rgba(0,229,204,.8);flex:1;line-height:1.45}
-.amp-confirm-text b{color:var(--mint)}
-/* MONTH SCROLL */
-.month-row{display:flex;gap:.3rem;overflow-x:auto;padding:.65rem 1rem .35rem;scrollbar-width:none}
-.month-row::-webkit-scrollbar{display:none}
-.mtab{flex-shrink:0;padding:.3rem .7rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap}
-.mtab:hover{border-color:var(--b2);color:var(--sub)}
-.mtab.active{background:rgba(245,200,66,.14);border-color:var(--gold);color:var(--gold);font-weight:500}
-.mtab.hidden-month{opacity:.28;text-decoration:line-through}
-/* PERSON ROW */
-.person-row{display:flex;gap:.3rem;overflow-x:auto;padding:.15rem 1rem .6rem;scrollbar-width:none}
-.person-row::-webkit-scrollbar{display:none}
-.pchip{flex-shrink:0;padding:.28rem .78rem;border-radius:20px;border:1px solid var(--b);background:var(--c1);color:var(--sub);font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap}
-.pchip.active{background:rgba(255,107,157,.12);border-color:var(--rose);color:var(--rose);font-weight:500}
-.person-locked{font-size:.75rem;color:var(--mute);padding:.35rem 1rem}
-/* HERO */
-.hero{padding:.85rem 1rem 1rem;text-align:center;background:linear-gradient(180deg,rgba(74,16,112,.2) 0%,transparent 100%)}
-.hero-photo-wrap{display:flex;justify-content:center;margin-bottom:.75rem}
-.hero-photo{width:84px;height:84px;border-radius:50%;border:3px solid var(--gold);background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:2.4rem;position:relative;overflow:hidden;cursor:default;transition:transform .2s}
-.admin-mode .hero-photo{cursor:pointer}
-.admin-mode .hero-photo:hover{transform:scale(1.04)}
-.hero-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.photo-badge-inner{position:absolute;bottom:1px;right:1px;width:22px;height:22px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:.7rem;border:2px solid var(--bg)}
-.photo-hint{font-size:.6rem;color:var(--mute);margin-top:.25rem;display:none;text-align:center}
-.admin-mode .photo-hint{display:block}
-.hero-name{font-family:'Dancing Script',cursive;font-size:1.9rem;font-weight:700;color:#fff;line-height:1.1;margin-bottom:.18rem}
-.hero-pos{font-size:.72rem;color:var(--sub);margin-bottom:.5rem}
-.hero-pill{display:inline-flex;align-items:center;gap:.3rem;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:.22rem .75rem;font-size:.72rem;color:var(--gold);margin-bottom:.65rem}
-.stat-row{display:flex;justify-content:center;gap:1.25rem}
-.stat-item{text-align:center}
-.stat-n{font-size:1.3rem;font-weight:600;color:var(--gold)}
-.stat-l{font-size:.62rem;color:var(--mute)}
-/* GAME BANNER */
-.game-banner{margin:.6rem 1rem .4rem;background:linear-gradient(135deg,#3d1a6e,#1a2560);border-radius:16px;padding:1rem 1.1rem;display:flex;align-items:center;gap:.75rem;border:1px solid rgba(167,139,250,.22);position:relative;overflow:hidden;cursor:pointer;transition:opacity .2s}
-.game-banner:hover{opacity:.92}
-.game-banner::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(167,139,250,.08);border-radius:50%}
-.gb-icon{font-size:1.8rem;flex-shrink:0;position:relative;z-index:1}
-.gb-body{flex:1;position:relative;z-index:1}
-.gb-title{font-size:.85rem;font-weight:500;color:#fff;margin-bottom:.18rem;line-height:1.3}
-.gb-sub{font-size:.68rem;color:rgba(255,255,255,.45)}
-.gb-score{font-size:.72rem;color:var(--gold);background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:.2rem .65rem;flex-shrink:0;position:relative;z-index:1}
-/* QUIZ INLINE */
-.quiz-inline{margin:0 1rem .4rem;background:var(--c1);border-radius:14px;padding:.9rem 1rem;border:1px solid var(--b)}
-.qi-q{font-size:.85rem;color:#fff;margin-bottom:.65rem;line-height:1.5}
-.qi-opts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
-.qopt{padding:.52rem .65rem;border-radius:10px;border:1px solid var(--b2);background:transparent;color:var(--sub);font-family:'Kanit',sans-serif;font-size:.78rem;cursor:pointer;text-align:left;transition:all .15s;line-height:1.3}
-.qopt:hover:not(:disabled){background:rgba(255,255,255,.07);color:#fff}
-.qopt.correct{background:rgba(0,229,204,.1);border-color:var(--mint);color:var(--mint)}
-.qopt.wrong{background:rgba(255,107,157,.1);border-color:var(--rose);color:var(--rose)}
-.qopt:disabled{cursor:default}
-.qi-next{margin-top:.6rem;width:100%;padding:.58rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer}
-.qi-score-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem}
-.qi-score-txt{font-size:.68rem;color:var(--mute)}
-.qi-score-val{font-size:.72rem;color:var(--gold);background:rgba(245,200,66,.1);border-radius:12px;padding:.18rem .6rem}
-.qi-result{text-align:center;padding:.5rem 0}
-.qi-name-inp{width:100%;background:rgba(255,255,255,.07);border:1px solid var(--b2);border-radius:9px;padding:.45rem .7rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.82rem;outline:none;margin:.5rem 0}
-.qi-name-inp:focus{border-color:rgba(245,200,66,.4)}
-/* ADMIN QUIZ EDITOR */
-.qe-panel{display:none;margin:0 1rem .4rem;background:rgba(245,200,66,.04);border-radius:14px;padding:.85rem 1rem;border:1px solid rgba(245,200,66,.12)}
-.admin-mode .qe-panel{display:block}
-.qe-lbl{font-size:.62rem;color:rgba(245,200,66,.6);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.4rem}
-.qe-list{display:flex;flex-direction:column;gap:.3rem;max-height:130px;overflow-y:auto;margin-bottom:.4rem}
-.qe-item{display:flex;align-items:center;gap:.3rem;background:var(--c2);border-radius:8px;padding:.28rem .55rem;font-size:.7rem;color:var(--sub)}
-.qe-item-q{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.qe-del{background:none;border:none;color:rgba(255,107,157,.4);cursor:pointer;font-size:.78rem;flex-shrink:0}
-.qe-del:hover{color:var(--rose)}
-.qe-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.28rem;margin-bottom:.3rem}
-.qe-inp{background:rgba(255,255,255,.06);border:1px solid var(--b2);border-radius:8px;padding:.36rem .58rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.72rem;width:100%;outline:none}
-.qe-inp:focus{border-color:rgba(245,200,66,.38)}
-.qe-add{padding:.38rem;background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.17);border-radius:8px;color:var(--gold);font-family:'Kanit',sans-serif;font-size:.7rem;cursor:pointer;width:100%}
-.qe-add:hover{background:rgba(245,200,66,.14)}
-/* WISH FORM */
-.wish-form{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
-.sec-title{font-size:.88rem;font-weight:500;color:#fff}
-.sec-badge{font-size:.62rem;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:.15rem .55rem;color:var(--gold)}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.45rem}
-.fi{display:flex;flex-direction:column;gap:.2rem}
-.fi-full{grid-column:1/-1}
-.fl{font-size:.62rem;color:var(--mute);letter-spacing:.03em}
-.finput{background:rgba(255,255,255,.06);border:1px solid var(--b2);border-radius:9px;padding:.48rem .72rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.83rem;width:100%;outline:none;transition:border-color .2s}
-.finput:focus{border-color:rgba(245,200,66,.42)}
-.ftextarea{height:76px;resize:none;line-height:1.55}
-.emoji-bar{display:flex;gap:.22rem;flex-wrap:wrap;margin:.3rem 0 .5rem}
-.emo{width:32px;height:32px;border-radius:9px;border:1px solid var(--b);background:rgba(255,255,255,.05);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .18s;position:relative}
-.emo:hover{background:rgba(255,255,255,.12);transform:scale(1.2);border-color:rgba(255,255,255,.2);z-index:2}
-.emo:active{transform:scale(.95)}
-.emo-used{border-color:rgba(245,200,66,.4);background:rgba(245,200,66,.08)}
-/* STICKER TABS */
+:root{
+  --deep:#0f0c1d;--card:rgba(255,255,255,0.07);--gold:#f5c842;
+  --rose:#ff6b9d;--mint:#00e5cc;--purple:#a78bfa;--purple2:#7c3aed;
+  --text:#fff;--sub:rgba(255,255,255,0.55);--border:rgba(255,255,255,0.12);
+  --green:#22c55e;--red:#ef4444;
+}
+html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:'Kanit',sans-serif;overflow-x:hidden}
 
+/* ── BG ── */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.3;animation:drift 14s ease-in-out infinite alternate}
+.bb1{width:500px;height:500px;background:radial-gradient(#6c3fa0,transparent);top:-120px;left:-100px}
+.bb2{width:400px;height:400px;background:radial-gradient(#1a4a6e,transparent);bottom:-60px;right:-80px;animation-delay:-6s}
+.bb3{width:280px;height:280px;background:radial-gradient(#6e1a3a,transparent);top:45%;left:45%;animation-delay:-10s}
+@keyframes drift{to{transform:translate(40px,30px) scale(1.12)}}
 
-.sticker-tab{flex-shrink:0;padding:.22rem .6rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s;white-space:nowrap}
-.sticker-tab.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
-/* CHAR COUNTER */
-.char-counter{font-size:.62rem;color:var(--mute);text-align:right;margin-top:.18rem;transition:color .2s}
-.char-counter.warn{color:var(--rose)}
-/* MOOD SELECTOR */
-.mood-row{display:flex;gap:.3rem;margin-bottom:.5rem;overflow-x:auto;scrollbar-width:none}
-.mood-row::-webkit-scrollbar{display:none}
-.mood-btn{flex-shrink:0;padding:.28rem .75rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.72rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.25rem;white-space:nowrap}
-.mood-btn:hover{border-color:var(--b2);color:var(--sub)}
-.mood-btn.active{font-weight:500}
-.mood-warm.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
-.mood-cute.active{background:rgba(255,107,157,.1);border-color:var(--rose);color:var(--rose)}
-.mood-cool.active{background:rgba(0,229,204,.08);border-color:var(--mint);color:var(--mint)}
-.mood-funny.active{background:rgba(167,139,250,.1);border-color:var(--purple);color:var(--purple)}
-/* SEND BUTTON ANIM */
-.send-btn{width:100%;padding:.72rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:12px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.send-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .4s}
-.send-btn:hover::before{transform:translateX(100%)}
-.send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,200,66,.35)}
-.send-btn:active{transform:scale(.98)}
-.send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
-/* TEMPLATE SUGGESTIONS */
-.tmpl-row{display:flex;gap:.28rem;flex-wrap:wrap;margin-bottom:.45rem}
-/* CUSTOM STICKER EDITOR */
+/* ── LAYOUT ── */
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 0 60px}
 
+/* ── HEADER ── */
+.hero{
+  background:linear-gradient(135deg,#7c3aed,#db2777,#ea580c);
+  padding:32px 20px 24px;text-align:center;
+  border-radius:0 0 28px 28px;
+}
+.hero h1{font-family:'Dancing Script',cursive;font-size:2rem;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.hero p{font-size:.88rem;color:rgba(255,255,255,.8);margin-top:4px}
 
-.sticker-add-inp::placeholder{font-size:.65rem;color:var(--mute)}
+/* ── POINTS BADGE ── */
+.pts-bar{
+  margin:14px 16px 0;
+  background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(219,39,119,.25));
+  border:1px solid var(--border);border-radius:16px;
+  padding:14px 18px;display:flex;align-items:center;gap:12px;
+  display:none;
+}
+.pts-bar.show{display:flex}
+.pts-star{font-size:2rem}
+.pts-info .lbl{font-size:.75rem;color:var(--sub)}
+.pts-info .val{font-size:1.6rem;font-weight:700;color:var(--gold)}
+.pts-detail{margin-left:auto;font-size:.75rem;color:var(--sub);text-align:right;line-height:1.7}
 
-.sticker-add-btn:hover{background:rgba(245,200,66,.18);border-color:var(--gold)}
+/* ── NAME INPUT ── */
+.name-section{margin:14px 16px 0}
+.name-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px}
+.name-card label{font-size:.85rem;color:var(--sub);margin-bottom:6px;display:block}
+.name-row{display:flex;gap:8px}
+.name-row input{
+  flex:1;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--border);background:rgba(255,255,255,.06);
+  color:#fff;font-family:'Kanit',sans-serif;font-size:.95rem;outline:none;
+}
+.name-row input:focus{border-color:var(--purple)}
+.name-row input::placeholder{color:var(--sub)}
+.btn-confirm{
+  padding:10px 18px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,var(--purple2),#db2777);
+  color:#fff;font-family:'Kanit',sans-serif;font-weight:600;font-size:.9rem;cursor:pointer;
+  white-space:nowrap;
+}
 
-.sticker-clear-btn:hover{background:rgba(255,107,157,.1);color:var(--rose)}
+/* ── TABS ── */
+.tabs{display:flex;gap:6px;padding:16px 16px 0;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  padding:8px 16px;border-radius:99px;white-space:nowrap;
+  font-family:'Kanit',sans-serif;font-size:.83rem;font-weight:500;
+  border:1.5px solid var(--border);background:rgba(255,255,255,.04);
+  color:var(--sub);cursor:pointer;transition:all .2s;
+}
+.tab.active{background:var(--purple2);color:#fff;border-color:var(--purple2)}
 
-.tmpl-btn{flex-shrink:0;padding:.25rem .65rem;border-radius:20px;border:1px dashed rgba(255,255,255,.15);background:rgba(255,255,255,.03);color:rgba(255,255,255,.5);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s;line-height:1.3}
-.tmpl-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.25);color:#fff}
-.send-btn{width:100%;padding:.68rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:11px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;transition:opacity .2s}
-.send-btn:hover{opacity:.9}
-.send-btn:disabled{opacity:.45;cursor:not-allowed}
-.success-msg{display:none;text-align:center;color:var(--mint);font-size:.8rem;margin-top:.5rem}
-.success-msg.show{display:block}
-/* VOTE */
-.vote-sec{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
-.vote-card{display:flex;align-items:center;gap:.5rem;padding:.42rem .6rem;border-radius:10px;border:1px solid var(--b);background:var(--c2);margin-bottom:.3rem;cursor:pointer;transition:border-color .15s}
-.vote-card:hover{border-color:var(--b2)}
-.vote-card.voted{border-color:var(--rose)}
-.vote-medal{font-size:.88rem;flex-shrink:0;width:18px}
-.vote-msg{flex:1;min-width:0;font-size:.73rem;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vote-bar-wrap{width:60px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;flex-shrink:0}
-.vote-bar{height:100%;background:var(--rose);border-radius:2px;transition:width .4s}
-.vote-cnt{font-size:.62rem;color:var(--rose);min-width:22px;text-align:right;flex-shrink:0}
-.vote-empty{font-size:.75rem;color:var(--mute);padding:.3rem 0}
-/* WISH WALL */
-.wish-wall{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
-.wall-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
-.wall-refresh{background:none;border:1px solid var(--b);border-radius:7px;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.68rem;padding:.25rem .55rem;cursor:pointer;transition:all .2s}
-.wall-refresh:hover{border-color:var(--gold);color:var(--gold)}
-.wish-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
-.wish-card{background:var(--c2);border-radius:12px;padding:.75rem;position:relative;overflow:hidden;animation:cardIn .3s ease both;border-left:2.5px solid transparent}
-.wc-0{border-color:var(--gold)}.wc-1{border-color:var(--rose)}.wc-2{border-color:var(--mint)}.wc-3{border-color:var(--purple)}.wc-4{border-color:#34d399}.wc-5{border-color:#f472b6}
-@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.wish-hidden{opacity:.25;filter:grayscale(1)}
-.wish-emoji{font-size:1.3rem;margin-bottom:.25rem}
-.wish-msg{font-size:.73rem;color:rgba(255,255,255,.8);line-height:1.55;margin-bottom:.42rem;word-break:break-word}
-.wish-from{font-size:.62rem;color:var(--mute)}
-.wish-from-name{color:var(--gold);font-weight:500}
-.wish-ts{font-size:.58rem;opacity:.4;display:block;margin-top:.1rem}
-.wish-actions{display:none;position:absolute;top:.38rem;right:.38rem;gap:.22rem}
-.admin-mode .wish-card .wish-actions{display:flex}
-.wact{width:22px;height:22px;border-radius:6px;border:none;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center}
-.wact-hide{background:rgba(245,200,66,.1);color:var(--gold)}
-.wact-del{background:rgba(255,107,157,.1);color:var(--rose)}
-.wish-empty{grid-column:1/-1;text-align:center;padding:1.8rem 1rem;color:var(--mute)}
-.wish-empty-icon{font-size:2rem;margin-bottom:.4rem}
-/* PARTICIPANTS */
-.part-sec{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
-.part-chips{display:flex;flex-wrap:wrap;gap:.28rem}
-.part-chip{display:flex;align-items:center;gap:.22rem;padding:.2rem .6rem;border-radius:20px;background:var(--c2);border:1px solid var(--b);font-size:.68rem;color:var(--sub)}
-.part-chip.winner{background:rgba(245,200,66,.1);border-color:var(--gold);color:var(--gold);font-weight:500}
-.part-empty{font-size:.72rem;color:var(--mute)}
-/* WHEEL */
-.wheel-sec{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
-.wheel-wrap{display:flex;flex-direction:column;align-items:center;gap:.65rem;padding-top:.25rem}
-.wheel-frame{position:relative;width:240px;height:240px}
-canvas#wheelCanvas{border-radius:50%}
-.wheel-ptr{position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:20px solid var(--gold)}
-.wheel-result-txt{font-size:.92rem;font-weight:500;color:var(--gold);min-height:1.3rem;text-align:center}
-.wheel-admin-btns{display:none;flex-direction:column;align-items:center;gap:.38rem;width:100%}
-.wheel-spin-btn{padding:.6rem 1.8rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:30px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .2s}
-.wheel-spin-btn:disabled{opacity:.42;cursor:not-allowed}
-.wheel-export-btn{padding:.35rem 1rem;background:transparent;border:1px solid rgba(245,200,66,.2);border-radius:20px;color:rgba(245,200,66,.65);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
-.wheel-export-btn:hover{background:rgba(245,200,66,.08);color:var(--gold)}
-.wheel-pub-hint{font-size:.68rem;color:var(--mute);text-align:center}
-/* LEADERBOARD */
-.lb-sec{margin:.4rem 1rem .4rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
-.lb-tabs{display:flex;gap:.28rem;margin-bottom:.7rem}
-.lb-tab{padding:.22rem .72rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
-.lb-tab.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
-.lb-row{display:flex;align-items:center;gap:.5rem;padding:.38rem .6rem;border-radius:9px;background:var(--c2);margin-bottom:.28rem}
-.lb-rank{font-size:.9rem;width:20px;text-align:center;flex-shrink:0}
-.lb-ava{width:24px;height:24px;border-radius:50%;background:rgba(245,200,66,.14);display:flex;align-items:center;justify-content:center;font-size:.58rem;color:var(--gold);flex-shrink:0;font-weight:600}
-.lb-name{flex:1;font-size:.78rem;color:#fff}
-.lb-score{font-size:.68rem;color:var(--gold);flex-shrink:0}
-.lb-empty{font-size:.72rem;color:var(--mute);padding:.3rem 0}
-/* SPACER */
-.spacer-bottom{height:1.5rem}
-/* NOTIFICATIONS */
-.offline-banner{display:none;position:sticky;top:53px;z-index:49;background:linear-gradient(90deg,#92400e,#78350f);padding:.38rem 1rem;text-align:center;font-size:.72rem}
-.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(70px);background:rgba(0,229,204,.12);border:1px solid var(--mint);border-radius:30px;padding:.44rem 1.1rem;font-size:.78rem;color:var(--mint);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;z-index:100;opacity:0;pointer-events:none;white-space:nowrap}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.like-notif{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(70px);background:rgba(255,107,157,.12);border:1px solid var(--rose);border-radius:30px;padding:.44rem 1.1rem;font-size:.78rem;color:var(--rose);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;z-index:99;opacity:0;pointer-events:none;white-space:nowrap}
-.like-notif.show{transform:translateX(-50%) translateY(0);opacity:1}
-.like-heart-fly{position:fixed;pointer-events:none;z-index:98;font-size:1.4rem;animation:heartFly 1.2s ease forwards}
-@keyframes heartFly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-100px) scale(1.5)}}
-.confetti-piece{position:fixed;pointer-events:none;z-index:97;width:7px;height:7px;border-radius:2px;animation:cfFall 2.5s ease forwards}
-@keyframes cfFall{0%{opacity:1;transform:translate(0,0) rotate(0deg)}100%{opacity:0;transform:translate(var(--dx),90vh) rotate(720deg)}}
-/* SYNC STATUS */
-#syncStatus{font-size:.62rem;color:var(--mute);text-align:center;padding:.18rem 1rem;min-height:1rem}
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
-.modal-box{background:#1a1230;border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:1.35rem;width:100%;max-width:340px;display:flex;flex-direction:column;gap:.75rem}
-.modal-title{font-size:.92rem;font-weight:500;color:#fff;display:flex;align-items:center;gap:.3rem}
-.modal-input{background:rgba(255,255,255,.07);border:1px solid var(--b2);border-radius:10px;padding:.5rem .78rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.86rem;width:100%;outline:none;transition:border-color .2s}
-.modal-input:focus{border-color:rgba(245,200,66,.42)}
-.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
-.modal-btn-primary{padding:.6rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer}
-.modal-btn-ghost{padding:.6rem;background:transparent;border:1px solid var(--b2);border-radius:10px;color:var(--sub);font-family:'Kanit',sans-serif;font-size:.86rem;cursor:pointer}
-.modal-sep{height:1px;background:var(--b)}
-.modal-label{font-size:.65rem;color:var(--mute);letter-spacing:.04em}
-.modal-danger{color:var(--rose);font-size:.76rem;background:rgba(255,107,157,.05);border:1px solid rgba(255,107,157,.16);border-radius:10px;padding:.52rem .78rem;cursor:pointer;font-family:'Kanit',sans-serif;width:100%;text-align:left}
-.modal-danger:hover{background:rgba(255,107,157,.11)}
-.modal-success-msg{font-size:.72rem;color:var(--mint);text-align:center;display:none}
+/* ── CONTENT ── */
+.pane{display:none;padding:14px 16px 0}
+.pane.active{display:block}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px}
+.sec-title{font-size:.95rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+/* ── FORM ── */
+input[type=text],textarea,select{
+  width:100%;padding:10px 14px;border-radius:10px;
+  border:1.5px solid var(--border);background:rgba(255,255,255,.06);
+  color:#fff;font-family:'Kanit',sans-serif;font-size:.92rem;outline:none;margin-bottom:10px;
+}
+input:focus,textarea:focus{border-color:var(--purple)}
+textarea{resize:vertical;min-height:80px}
+input::placeholder,textarea::placeholder{color:var(--sub)}
+.field-lbl{font-size:.8rem;color:var(--sub);margin-bottom:4px}
+
+/* ── MOOD ── */
+.moods{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.mood-btn{
+  padding:6px 14px;border-radius:99px;border:1.5px solid var(--border);
+  background:rgba(255,255,255,.04);color:var(--sub);cursor:pointer;
+  font-family:'Kanit',sans-serif;font-size:.82rem;transition:all .2s;
+}
+.mood-btn.sel{background:rgba(124,58,237,.35);border-color:var(--purple);color:#fff}
+
+/* ── EMOJI GRID ── */
+.emoji-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.emoji-btn{font-size:1.4rem;background:none;border:none;cursor:pointer;padding:2px;border-radius:6px;transition:transform .15s}
+.emoji-btn:hover{transform:scale(1.25)}
+
+/* ── BUTTONS ── */
+.btn{
+  width:100%;padding:13px;border:none;border-radius:12px;
+  font-family:'Kanit',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:transform .15s,opacity .15s;
+}
+.btn:active{transform:scale(.97)}
+.btn-rose{background:linear-gradient(135deg,var(--rose),#c026d3);color:#fff}
+.btn-purple{background:linear-gradient(135deg,var(--purple2),#6366f1);color:#fff}
+.btn-gold{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
+.btn-sm{padding:8px 16px;width:auto;font-size:.85rem;border-radius:10px}
+.btn-outline{background:transparent;border:1.5px solid var(--purple);color:var(--purple)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.mt8{margin-top:8px}
+
+/* ── WISH WALL ── */
+.wish-item{
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:14px;padding:14px;margin-bottom:10px;
+}
+.wish-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.wish-photo{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--purple)}
+.wish-name{font-weight:600;font-size:.9rem}
+.wish-mood{font-size:.72rem;color:var(--sub);margin-top:1px}
+.wish-msg{font-size:.88rem;line-height:1.6;color:rgba(255,255,255,.88)}
+.wish-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.wish-time{font-size:.72rem;color:var(--sub)}
+.like-btn{
+  display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;
+  border:1px solid var(--border);background:rgba(255,255,255,.04);
+  color:var(--sub);cursor:pointer;font-family:'Kanit',sans-serif;font-size:.82rem;
+  transition:all .2s;
+}
+.like-btn.liked{background:rgba(255,107,157,.2);border-color:var(--rose);color:var(--rose)}
+
+/* ── QUIZ ── */
+.quiz-prog-bg{background:rgba(255,255,255,.1);border-radius:99px;height:6px;margin-bottom:14px}
+.quiz-prog{background:linear-gradient(90deg,var(--rose),var(--purple));height:6px;border-radius:99px;transition:width .4s}
+.quiz-q{font-size:1rem;font-weight:600;line-height:1.5;margin-bottom:14px}
+.quiz-opts{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{
+  padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);
+  background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;
+  font-family:'Kanit',sans-serif;font-size:.9rem;text-align:left;transition:all .2s;
+}
+.quiz-opt:hover:not(:disabled){border-color:var(--purple);background:rgba(124,58,237,.2)}
+.quiz-opt.correct{border-color:var(--green)!important;background:rgba(34,197,94,.18)!important;color:#4ade80}
+.quiz-opt.wrong{border-color:var(--red)!important;background:rgba(239,68,68,.18)!important;color:#f87171}
+.quiz-opt:disabled{cursor:default}
+
+/* ── RESULT BOX ── */
+.result-box{text-align:center;padding:24px 16px}
+.result-emoji{font-size:3.2rem}
+.result-title{font-size:1.2rem;font-weight:700;margin-top:8px}
+.result-sub{font-size:.85rem;color:var(--sub);margin-top:4px}
+.pts-earned{
+  display:inline-block;margin-top:14px;
+  background:rgba(245,200,66,.15);border:1.5px solid var(--gold);
+  border-radius:12px;padding:8px 22px;font-size:1rem;font-weight:700;color:var(--gold);
+}
+
+/* ── LEADERBOARD ── */
+.lb-tabs{display:flex;gap:6px;margin-bottom:12px}
+.lb-tab{
+  padding:6px 14px;border-radius:99px;font-size:.82rem;font-family:'Kanit',sans-serif;
+  border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:var(--sub);cursor:pointer;
+}
+.lb-tab.active{background:var(--purple2);color:#fff;border-color:var(--purple2)}
+.lb-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.lb-row:last-child{border-bottom:none}
+.lb-rank{font-size:1.1rem;min-width:26px}
+.lb-name{flex:1;font-size:.9rem}
+.lb-pts{font-weight:700;color:var(--gold);font-size:.95rem}
+.lb-sub{font-size:.72rem;color:var(--sub)}
+
+/* ── MONTHLY STATS TABLE ── */
+.stats-section{padding:0 16px;margin-top:6px}
+.stats-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.stats-header .sec-title{margin-bottom:0}
+.refresh-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--sub);padding:5px 12px;border-radius:8px;font-family:'Kanit',sans-serif;font-size:.8rem;cursor:pointer}
+.refresh-btn:hover{color:#fff;border-color:var(--purple)}
+
+/* Summary cards */
+.summary-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.sum-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
+.sum-icon{font-size:1.4rem}
+.sum-val{font-size:1.3rem;font-weight:700;margin-top:4px}
+.sum-lbl{font-size:.7rem;color:var(--sub);margin-top:2px;line-height:1.3}
+.sum-card.wish .sum-val{color:#fb923c}
+.sum-card.quiz .sum-val{color:#60a5fa}
+.sum-card.total .sum-val{color:var(--green)}
+
+/* Stats table */
+.stats-table-wrap{overflow-x:auto}
+.stats-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.stats-table th{
+  background:rgba(124,58,237,.3);color:rgba(255,255,255,.8);
+  padding:9px 10px;text-align:center;font-weight:600;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+.stats-table td{
+  padding:9px 10px;text-align:center;border-bottom:1px solid rgba(255,255,255,.05);
+  vertical-align:middle;
+}
+.stats-table tr:last-child td{border-bottom:none}
+.stats-table tr:hover td{background:rgba(255,255,255,.03)}
+.rank-medal{font-size:1.1rem}
+.bar-wrap{display:flex;align-items:center;gap:6px;justify-content:center}
+.bar-bg{flex:1;max-width:60px;background:rgba(255,255,255,.1);border-radius:99px;height:5px}
+.bar-fill{height:5px;border-radius:99px}
+.bar-wish{background:linear-gradient(90deg,#fb923c,#f59e0b)}
+.bar-quiz{background:linear-gradient(90deg,#60a5fa,#818cf8)}
+.month-tag{
+  display:inline-block;padding:3px 10px;border-radius:99px;
+  background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.4);
+  font-size:.78rem;font-weight:600;
+}
+.no-data{text-align:center;padding:24px;color:var(--sub);font-size:.88rem}
+.skeleton{animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ── ADMIN ── */
+.admin-strip{display:none;background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(219,39,119,.2));border-bottom:1px solid var(--border);padding:10px 16px}
+.admin-mode .admin-strip{display:block}
+.admin-mode .admin-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.admin-badge{background:var(--purple2);color:#fff;font-size:.72rem;padding:3px 10px;border-radius:99px;font-weight:700}
+
+/* ── SPIN WHEEL ── */
+.wheel-wrap{text-align:center;padding:10px 0}
+canvas#wheel{border-radius:50%;box-shadow:0 0 30px rgba(124,58,237,.5)}
+.wheel-ptr{font-size:2rem;margin:6px 0}
+
+/* ── QR ── */
+.qr-box{text-align:center}
+#qrcode{display:inline-block;padding:12px;background:#fff;border-radius:12px;margin:10px 0}
+.qr-url{font-size:.72rem;color:var(--sub);word-break:break-all;margin-top:4px}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(20,10,40,.95);border:1px solid var(--purple);color:#fff;
+  padding:11px 22px;border-radius:99px;font-size:.88rem;font-weight:500;
+  opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:9999;
+}
+.toast.show{opacity:1}
+
+/* ── PHOTO UPLOAD ── */
+.photo-prev{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--purple);display:none}
+.upload-lbl{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:1.5px dashed var(--border);color:var(--sub);cursor:pointer;font-size:.82rem;margin-bottom:10px}
+.upload-lbl:hover{border-color:var(--purple);color:var(--purple)}
 </style>
 </head>
 <body>
-<div class="bg-deco"><div class="bb bb1"></div><div class="bb bb2"></div><div class="bb bb3"></div></div>
-<div class="offline-banner" id="offlineBanner">⚠️ ออฟไลน์</div>
+<div class="bg"><div class="bb bb1"></div><div class="bb bb2"></div><div class="bb bb3"></div></div>
 
-<div class="topbar">
-  <div class="tb-logo">🎂 SML Birthday</div>
-  <div id="syncStatus"></div>
-  <div class="tb-right">
-    <a class="tb-btn" href="admin.html" title="Admin" style="text-decoration:none">⚙️</a>
-  </div>
+<!-- ADMIN BAR -->
+<div class="admin-strip">
+  <span class="admin-badge">👑 ADMIN</span>
+  <button class="btn btn-sm btn-outline" onclick="openQRModal()">📲 QR Code</button>
+  <button class="btn btn-sm btn-outline" onclick="openWheelModal()">🎡 Spin Wheel</button>
+  <button class="btn btn-sm btn-outline" onclick="exportScores()">📊 Export</button>
+  <button class="btn btn-sm" style="background:rgba(239,68,68,.3);border:1px solid #ef4444;color:#f87171" onclick="logoutAdmin()">ออก</button>
 </div>
 
-<div class="month-row" id="monthTabs"></div>
-<div class="person-row" id="personChips"><div class="person-locked">เลือกเดือนด้านบน</div></div>
+<div class="wrap">
+  <!-- HERO -->
+  <div class="hero">
+    <h1>🎂 SML Birthday Wishes</h1>
+    <p id="heroSub">ร่วมอวยพร · ตอบคำถาม · สะสมแต้ม</p>
+  </div>
 
-<div class="hero" id="hero">
-  <div class="hero-photo-wrap">
-    <div style="display:flex;flex-direction:column;align-items:center">
-      <div class="hero-photo" id="empPhotoFrame" onclick="adminUploadPhoto()">
-        <span id="empPhotoEmoji" style="position:relative;z-index:1">🎂</span>
-        <img id="empPhoto" src="" style="display:none">
-        <div class="photo-badge-inner">🎉</div>
-      </div>
-      <div class="photo-hint" id="photoUploadHint">📷 คลิกอัปโหลดรูป</div>
-      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
+  <!-- POINTS BAR -->
+  <div class="pts-bar" id="ptsBar">
+    <div class="pts-star">⭐</div>
+    <div class="pts-info">
+      <div class="lbl">แต้มสะสมของคุณ</div>
+      <div class="val" id="ptsVal">0</div>
     </div>
-  </div>
-  <div class="hero-name" id="hero-name">เลือกพนักงาน</div>
-  <div class="hero-pos" id="hero-pos">—</div>
-  <div class="hero-pill" id="hero-date"><span>🎂</span><span>เกิดเดือน...</span></div>
-  <div class="stat-row">
-    <div class="stat-item"><div class="stat-n" id="wish-count">0</div><div class="stat-l">คำอวยพร</div></div>
-    <div class="stat-item"><div class="stat-n" id="like-total">0</div><div class="stat-l">❤️ ไลก์</div></div>
-    <div class="stat-item"><div class="stat-n" id="player-count">0</div><div class="stat-l">ผู้เล่น</div></div>
-  </div>
-</div>
-
-<!-- WISH FORM -->
-<div class="wish-form" id="wish-form">
-  <div class="sec-hdr">
-    <div class="sec-title">✍️ เขียนคำอวยพร</div>
-    <div class="sec-badge" id="wishFormBadge">กรอกชื่อก่อนนะ</div>
+    <div class="pts-detail" id="ptsDetail"></div>
   </div>
 
-  <!-- MOOD SELECTOR -->
-  <div class="mood-row" id="moodRow">
-    <div class="fl" style="flex-shrink:0;align-self:center">บรรยากาศ:</div>
-    <button class="mood-btn mood-warm active" data-mood="warm" onclick="setMood(this)">🌟 อบอุ่น</button>
-    <button class="mood-btn mood-cute" data-mood="cute" onclick="setMood(this)">🥰 น่ารัก</button>
-    <button class="mood-btn mood-cool" data-mood="cool" onclick="setMood(this)">😎 เท่ๆ</button>
-    <button class="mood-btn mood-funny" data-mood="funny" onclick="setMood(this)">😄 ฮา</button>
-  </div>
-
-  <!-- TEMPLATE SUGGESTIONS -->
-  <div class="tmpl-row" id="tmplRow"></div>
-
-  <div class="form-grid">
-    <div class="fi"><div class="fl">ชื่อของคุณ *</div><input class="finput" id="wf-name" placeholder="ชื่อเล่น / ชื่อ-สกุล" maxlength="50" oninput="onNameInput()"></div>
-    <div class="fi"><div class="fl">แผนก / ทีม</div><input class="finput" id="wf-dept" placeholder="PDI, HR, Yard..."></div>
-    <div class="fi fi-full">
-      <div class="fl" style="display:flex;justify-content:space-between">
-        <span>คำอวยพร *</span>
-        <span class="char-counter" id="charCounter">0/200</span>
+  <!-- NAME INPUT -->
+  <div class="name-section">
+    <div class="name-card">
+      <label>👤 ชื่อของคุณ (สำหรับบันทึกแต้ม)</label>
+      <div class="name-row">
+        <input type="text" id="myName" placeholder="พิมพ์ชื่อ-นามสกุล เช่น สมใจ ใจดี" maxlength="50"
+               onkeydown="if(event.key==='Enter') confirmName()">
+        <button class="btn-confirm" onclick="confirmName()">ยืนยัน ✓</button>
       </div>
-      <textarea class="finput ftextarea" id="wf-text" placeholder="เขียนคำอวยพรให้เพื่อนร่วมงาน..." maxlength="200" oninput="onTextInput()"></textarea>
+      <div style="font-size:.75rem;color:var(--sub);margin-top:2px">* ชื่อจะใช้สะสมแต้มและแสดงบน Leaderboard</div>
     </div>
   </div>
 
-  <!-- EMOJI GRID -->
-  <div class="fl" style="margin:.4rem 0 .25rem;font-size:.65rem;color:var(--mute)">กด Emoji เพื่อใส่ในข้อความ 👇</div>
-  <div class="emoji-bar" id="emojiBar">
-    <!-- inline fallback — will be overwritten by initStickerSystem() -->
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('wish',this)">💌 อวยพร</button>
+    <button class="tab" onclick="showTab('quiz',this)">🎯 Quiz</button>
+    <button class="tab" onclick="showTab('board',this)">🏆 Leaderboard</button>
+    <button class="tab" onclick="showTab('admin',this)" id="adminTab" style="display:none">🔐 Admin</button>
   </div>
 
-  <button class="send-btn" id="send-btn" onclick="submitWish()">🎊 ส่งคำอวยพร!</button>
-  <div class="success-msg" id="success-msg">🎉 ส่งคำอวยพรสำเร็จ! ขอบคุณนะ ❤️</div>
-</div>
-
-<!-- GAME BANNER -->
-<div class="game-banner" id="gameBanner" onclick="document.getElementById('quizInline').scrollIntoView({behavior:'smooth'})">
-  <div class="gb-icon">🎯</div>
-  <div class="gb-body">
-    <div class="gb-title" id="gameBannerTitle">คุณเป็นแฟนพันธุ์แท้ของเจ้าของวันเกิดหรือไม่?</div>
-    <div class="gb-sub">ตอบคำถาม · ลุ้นรับรางวัล 🎡 · ขึ้นกระดานคะแนน 🏆</div>
+  <!-- PANE: WISH -->
+  <div class="pane active" id="pane-wish">
+    <div class="card">
+      <div class="sec-title">💌 เขียนคำอวยพร</div>
+      <div id="wishFormWrap">
+        <div class="field-lbl">อารมณ์วันนี้</div>
+        <div class="moods" id="moodBtns"></div>
+        <div class="field-lbl">เลือก Emoji</div>
+        <div class="emoji-grid" id="emojiGrid"></div>
+        <div class="field-lbl">คำอวยพร</div>
+        <textarea id="wishMsg" placeholder="เขียนคำอวยพรให้เพื่อนร่วมงานที่เกิดไตรมาสนี้..." maxlength="200"></textarea>
+        <div style="text-align:right;font-size:.72rem;color:var(--sub);margin-top:-8px;margin-bottom:8px" id="msgCount">0/200</div>
+        <label class="upload-lbl">
+          📷 แนบรูปถ้ามี
+          <input type="file" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+        </label>
+        <img id="photoPrev" class="photo-prev">
+        <button class="btn btn-rose mt8" id="wishBtn" onclick="submitWish()">💌 ส่งคำอวยพร (+1 แต้ม)</button>
+      </div>
+      <div id="wishDoneBox" class="result-box" style="display:none">
+        <div class="result-emoji">💌</div>
+        <div class="result-title">ส่งคำอวยพรแล้ว!</div>
+        <div class="result-sub">แต้มถูกบันทึกเรียบร้อยค่ะ</div>
+        <div class="pts-earned">+1 ⭐ แต้ม</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec-title">💬 Wish Wall</div>
+      <div id="wishWall"><div class="no-data skeleton">กำลังโหลด...</div></div>
+    </div>
   </div>
-  <div class="gb-score" id="gameScore">0 แต้ม</div>
-</div>
 
-<!-- QUIZ INLINE -->
-<div class="quiz-inline" id="quizInline">
-  <div class="qi-score-bar">
-    <span class="qi-score-txt" id="gameTitleText">เลือกพนักงานเพื่อเริ่มเกม</span>
-    <button onclick="startGame()" style="background:none;border:1px solid var(--b);border-radius:7px;color:var(--mute);font-size:.68rem;padding:.15rem .42rem;cursor:pointer">🔄</button>
+  <!-- PANE: QUIZ -->
+  <div class="pane" id="pane-quiz">
+    <div class="card" id="quizCard"></div>
   </div>
-  <div id="gameBody"><div style="text-align:center;color:var(--mute);font-size:.8rem;padding:.75rem">เลือกพนักงานก่อนเล่นเกม</div></div>
-  <div class="game-name-hint" id="gameNameHint" style="font-size:.65rem;color:rgba(245,200,66,.5);text-align:center;margin-top:.3rem;display:none">กรอกชื่อในช่องอวยพรด้านล่างเพื่อขึ้นกระดาน</div>
-</div>
 
-<!-- VOTE -->
-<div class="vote-sec" id="voteSection" style="display:none">
-  <div class="sec-hdr"><div class="sec-title">❤️ คำอวยพรยอดฮิต</div><div class="sec-badge">โหวตได้ 1 ครั้ง</div></div>
-  <div id="voteList"><div class="vote-empty">ยังไม่มีคำอวยพรให้โหวต</div></div>
-</div>
-
-<!-- WISH WALL -->
-<div class="wish-wall">
-  <div class="wall-hdr">
-    <div class="sec-title">💌 กำแพงคำอวยพร</div>
-    <button class="wall-refresh" onclick="loadWishes()">🔄 รีเฟรช</button>
+  <!-- PANE: LEADERBOARD -->
+  <div class="pane" id="pane-board">
+    <div class="card">
+      <div class="lb-tabs">
+        <button class="lb-tab active" onclick="showLbTab('pts',this)">⭐ แต้มสะสม</button>
+        <button class="lb-tab" onclick="showLbTab('quiz',this)">🎯 Quiz</button>
+        <button class="lb-tab" onclick="showLbTab('likes',this)">❤️ Likes</button>
+      </div>
+      <div id="lbContent"><div class="no-data skeleton">กำลังโหลด...</div></div>
+    </div>
   </div>
-  <div class="wish-grid" id="wish-grid">
-    <div class="wish-empty"><div class="wish-empty-icon">💭</div><div>ยังไม่มีคำอวยพร<br><span style="font-size:.7rem">เป็นคนแรกที่ส่งคำอวยพร!</span></div></div>
+
+  <!-- PANE: ADMIN -->
+  <div class="pane" id="pane-admin">
+    <div class="card" id="adminLoginCard">
+      <div class="sec-title">🔐 Admin Login</div>
+      <input type="password" id="adminPwd" placeholder="รหัสผ่าน Admin" onkeydown="if(event.key==='Enter') doAdminLogin()">
+      <button class="btn btn-purple" onclick="doAdminLogin()">เข้าสู่ระบบ</button>
+    </div>
+    <div id="adminPanel" style="display:none">
+      <div class="card">
+        <div class="sec-title">📲 QR Code แชร์ให้พนักงาน</div>
+        <div class="qr-box">
+          <div id="qrcode"></div>
+          <div class="qr-url" id="qrUrl"></div>
+        </div>
+        <button class="btn btn-outline mt8" onclick="downloadQR()">⬇️ บันทึก QR</button>
+      </div>
+      <div class="card">
+        <div class="sec-title">🎡 Spin Wheel (จับรางวัล)</div>
+        <div class="wheel-wrap">
+          <canvas id="wheel" width="260" height="260"></canvas>
+          <div class="wheel-ptr">⬇️</div>
+          <button class="btn btn-gold mt8" onclick="spinWheel()">หมุนจับรางวัล!</button>
+          <div id="wheelResult" style="margin-top:10px;font-size:1rem;font-weight:600;color:var(--gold)"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec-title">⚙️ จัดการ</div>
+        <button class="btn btn-purple mt8" onclick="exportScores()">📊 Export คะแนน Excel</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /wrap -->
+
+<!-- ── MONTHLY STATS (ด้านล่างสุด นอก wrap) ── -->
+<div class="stats-section" style="max-width:480px;margin:0 auto;padding-bottom:40px">
+  <div class="card">
+    <div class="stats-header">
+      <div class="sec-title">📊 สถิติผู้ร่วมกิจกรรมรายเดือน<br><small style="font-weight:400;font-size:.75rem;color:var(--sub)">มิ.ย. – ธ.ค. 2569</small></div>
+      <button class="refresh-btn" onclick="loadMonthlyStats()">🔄 รีเฟรช</button>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-cards">
+      <div class="sum-card wish">
+        <div class="sum-icon">💌</div>
+        <div class="sum-val" id="sumWish">—</div>
+        <div class="sum-lbl">รวมอวยพร<br>ทั้งหมด</div>
+      </div>
+      <div class="sum-card quiz">
+        <div class="sum-icon">🎯</div>
+        <div class="sum-val" id="sumQuiz">—</div>
+        <div class="sum-lbl">รวมตอบ Quiz<br>ทั้งหมด</div>
+      </div>
+      <div class="sum-card total">
+        <div class="sum-icon">👥</div>
+        <div class="sum-val" id="sumTotal">—</div>
+        <div class="sum-lbl">ผู้เข้าร่วม<br>(ไม่ซ้ำ)</div>
+      </div>
+    </div>
+
+    <!-- Top 10 Table -->
+    <div class="stats-table-wrap">
+      <table class="stats-table" id="statsTable">
+        <thead>
+          <tr>
+            <th>อันดับ</th>
+            <th>เดือน</th>
+            <th>💌 อวยพร</th>
+            <th>🎯 Quiz</th>
+            <th>👥 รวม</th>
+          </tr>
+        </thead>
+        <tbody id="statsTbody">
+          <tr><td colspan="5" class="no-data skeleton">กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- All months row -->
+    <div style="margin-top:12px">
+      <div class="sec-title" style="font-size:.85rem">📅 ยอดสะสมทุกเดือน (มิ.ย.–ธ.ค.)</div>
+      <div id="allMonthsRow" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>
+    </div>
   </div>
 </div>
 
-<!-- PARTICIPANTS -->
-<div class="part-sec" id="partSection">
-  <div class="sec-hdr"><div class="sec-title">👥 ผู้ร่วมตอบคำถาม</div><div class="sec-badge" id="partCount">0 คน</div></div>
-  <div class="part-chips" id="partGrid"><div class="part-empty">ยังไม่มีผู้เข้าร่วม</div></div>
-</div>
-
-<!-- WHEEL -->
-<div class="wheel-sec" id="wheelSection">
-  <div class="sec-hdr"><div class="sec-title">🎡 วงล้อสุ่มรางวัล</div><div class="sec-badge">Admin กดหมุน</div></div>
-  <div class="wheel-wrap">
-    <div class="wheel-frame"><canvas id="wheelCanvas" width="240" height="240"></canvas><div class="wheel-ptr"></div></div>
-    <div class="wheel-result-txt" id="wheelResult">รอ Admin กดหมุน 🎡</div>
-    <div class="wheel-pub-hint" id="wheelPublicHint">Admin เป็นผู้กดหมุนครับ</div>
-  </div>
-</div>
-
-<!-- WHEEL WINNER HISTORY -->
-<div class="wheel-sec" id="wheelHistorySection" style="display:none">
-  <div class="sec-hdr"><div class="sec-title">🏆 ผู้โชคดีที่ผ่านมา</div><div class="sec-badge">อันดับ 1 - 2</div></div>
-  <div id="wheelHistoryList"></div>
-</div>
-
-<!-- LEADERBOARD -->
-<div class="lb-sec" id="lbSection">
-  <div class="sec-hdr"><div class="sec-title">🏆 กระดานคะแนน</div></div>
-  <div class="lb-tabs">
-    <button class="lb-tab active" id="lbTabGame" onclick="switchLbTab('game')">🎯 เกม</button>
-    <button class="lb-tab" id="lbTabLike" onclick="switchLbTab('like')">❤️ ไลก์</button>
-  </div>
-  <div id="lbList"><div class="lb-empty">เล่นเกมเพื่อขึ้นกระดาน!</div></div>
-</div>
-
-<div class="spacer-bottom"></div>
-
-<!-- TOAST + LIKE -->
 <div class="toast" id="toast"></div>
-<div class="like-notif" id="likeNotif"></div>
 
-<script src="employees.js"></script>
-<script src="app.js"></script>
+<script>
+// ══════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════
+var API_URL   = 'YOUR_APPS_SCRIPT_URL'; // ← ใส่ URL Apps Script
+var QUARTER   = 'มิ.ย.-2569';           // ← อัปเดตทุกไตรมาส
+var ADMIN_PWD = 'sml2569';
+var PAGE_URL  = location.href.split('?')[0];
 
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+var myName    = '';
+var isAdmin   = false;
+var wishDone  = false;
+var quizDone  = false;
+var myPts     = {wish:0, quiz:0, total:0};
+var likedIds  = JSON.parse(localStorage.getItem('likedIds')||'{}');
+var photoB64  = '';
+var selMood   = '';
+var quizState = {q:0, correct:0, done:false};
+var quizData  = [];
+var wheelSpinning = false;
+var persons   = [];
+
+var MOODS = ['😊 สุขใจ','🎉 ตื่นเต้น','🥰 รู้สึกดี','😎 ชิลล์','🤩 ว้าว'];
+var EMOJIS = ['🎂','🎈','🎁','🎊','🎉','🌟','⭐','💖','💝','🥳',
+              '🌸','🌺','🌻','🍀','✨','🦋','🎀','🏆','👑','💎',
+              '🎵','🎶','🌈','☀️','🌙','💌','🤗','👏','🙌','💪',
+              '🍰','🧁','🍭','🎠','🎡','🎪','🎭','🎨','🎬','🎤'];
+
+var QUIZ_BANK = [
+  {q:'🎂 สัตว์ที่เป็นสัญลักษณ์ของ SML คือ?',opts:['ช้าง','สิงโต','เสือ','หมี'],ans:0},
+  {q:'⭐ SML ก่อตั้งมากี่ปีแล้ว?',opts:['10 ปี','15 ปี','20 ปี','25 ปี'],ans:2},
+  {q:'🏢 สำนักงานใหญ่ SML อยู่จังหวัดใด?',opts:['กรุงเทพ','สมุทรปราการ','นนทบุรี','ปทุมธานี'],ans:1},
+  {q:'💼 ฝ่าย HR & GA มีหน้าที่หลักคือ?',opts:['ขายสินค้า','ดูแลพนักงาน','จัดซื้อ','บัญชี'],ans:1},
+  {q:'🎯 กิจกรรมวันเกิดนี้จัดทุก?',opts:['เดือน','ไตรมาส','ปี','สองปี'],ans:1}
+];
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+window.addEventListener('load', function() {
+  buildMoods();
+  buildEmojiGrid();
+  buildQRCode();
+  loadWishes();
+  loadMonthlyStats();
+  renderQuiz();
+  document.getElementById('wishMsg').addEventListener('input', function() {
+    document.getElementById('msgCount').textContent = this.value.length + '/200';
+  });
+});
+
+// ══════════════════════════════════════════════════
+// NAME CONFIRM
+// ══════════════════════════════════════════════════
+function confirmName() {
+  var n = document.getElementById('myName').value.trim();
+  if (!n) return toast('⚠️ กรุณาพิมพ์ชื่อก่อนนะคะ');
+  myName = n;
+  document.getElementById('heroSub').textContent = 'สวัสดีคุณ ' + n + ' 👋';
+  loadMyPoints();
+  toast('✅ ยืนยันชื่อแล้ว: ' + n);
+}
+
+function loadMyPoints() {
+  api('getPoints', {name: myName, quarter: QUARTER}, function(r) {
+    if (r && r.found) {
+      myPts = {wish: r.wishPts||0, quiz: r.quizPts||0, total: r.totalPts||0};
+      wishDone = r.wishDone;
+      quizDone = r.quizDone;
+    }
+    updatePtsBar();
+    if (wishDone) markWishDone(false);
+    if (quizDone) renderQuizDone();
+  });
+}
+
+function updatePtsBar() {
+  var bar = document.getElementById('ptsBar');
+  bar.classList.add('show');
+  document.getElementById('ptsVal').textContent = myPts.total + ' แต้ม';
+  var parts = [];
+  if (myPts.wish > 0) parts.push('💌 อวยพร +' + myPts.wish);
+  if (myPts.quiz > 0) parts.push('🎯 Quiz +'  + myPts.quiz);
+  document.getElementById('ptsDetail').innerHTML = parts.join('<br>') || 'ยังไม่ได้ทำกิจกรรม';
+}
+
+// ══════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════
+function showTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('active')});
+  btn.classList.add('active');
+  document.getElementById('pane-'+name).classList.add('active');
+  if (name === 'board') loadLeaderboard('pts');
+}
+
+// ══════════════════════════════════════════════════
+// WISH WALL
+// ══════════════════════════════════════════════════
+function buildMoods() {
+  var el = document.getElementById('moodBtns');
+  MOODS.forEach(function(m) {
+    var b = document.createElement('button');
+    b.className = 'mood-btn'; b.textContent = m;
+    b.onclick = function() {
+      document.querySelectorAll('.mood-btn').forEach(function(x){x.classList.remove('sel')});
+      b.classList.add('sel'); selMood = m;
+    };
+    el.appendChild(b);
+  });
+}
+
+function buildEmojiGrid() {
+  var el = document.getElementById('emojiGrid');
+  EMOJIS.forEach(function(e) {
+    var b = document.createElement('button');
+    b.className = 'emoji-btn'; b.textContent = e;
+    b.onclick = function() {
+      var ta = document.getElementById('wishMsg');
+      ta.value += e;
+      document.getElementById('msgCount').textContent = ta.value.length + '/200';
+    };
+    el.appendChild(b);
+  });
+}
+
+function previewPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    photoB64 = e.target.result;
+    var prev = document.getElementById('photoPrev');
+    prev.src = photoB64; prev.style.display = 'block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function submitWish() {
+  if (!myName) return toast('⚠️ กรุณายืนยันชื่อก่อนค่ะ');
+  if (wishDone) return toast('✅ คุณส่งคำอวยพรแล้ว');
+  var msg = document.getElementById('wishMsg').value.trim();
+  if (!msg) return toast('⚠️ กรุณาเขียนคำอวยพรก่อนนะคะ');
+
+  document.getElementById('wishBtn').disabled = true;
+  toast('⏳ กำลังบันทึก...');
+
+  api('addWish', {name:myName, message:msg, mood:selMood, photo:photoB64, month:QUARTER}, function(r) {
+    if (r && r.ok) {
+      // บันทึกแต้ม
+      api('addPoints', {type:'wish', name:myName, quarter:QUARTER}, function(pr) {
+        if (pr && pr.ok) { myPts.wish = pr.wishPts||1; myPts.total = pr.totalPts||1; }
+        else { myPts.wish++; myPts.total++; }
+        wishDone = true;
+        updatePtsBar();
+        markWishDone(true);
+        loadWishes();
+        toast('🎉 ส่งคำอวยพรแล้ว! +1 แต้ม');
+        confetti();
+      });
+    } else {
+      document.getElementById('wishBtn').disabled = false;
+      toast('❌ เกิดข้อผิดพลาด ลองใหม่นะคะ');
+    }
+  });
+}
+
+function markWishDone(animate) {
+  document.getElementById('wishFormWrap').style.display = 'none';
+  document.getElementById('wishDoneBox').style.display = 'block';
+  if (animate) confetti();
+}
+
+function loadWishes() {
+  api('getWishes', {}, function(r) {
+    var wall = document.getElementById('wishWall');
+    if (!r || !r.wishes || !r.wishes.length) {
+      wall.innerHTML = '<div class="no-data">ยังไม่มีคำอวยพร — เป็นคนแรกได้เลย! 💌</div>';
+      return;
+    }
+    wall.innerHTML = r.wishes.map(function(w) {
+      var liked = likedIds[w.id];
+      return '<div class="wish-item">' +
+        '<div class="wish-head">' +
+        (w.photo ? '<img class="wish-photo" src="'+w.photo+'">' : '<div class="wish-photo" style="background:linear-gradient(135deg,#7c3aed,#db2777);display:flex;align-items:center;justify-content:center;font-size:1rem">💜</div>') +
+        '<div><div class="wish-name">'+escHtml(w.name)+'</div><div class="wish-mood">'+escHtml(w.mood||'')+'</div></div>' +
+        '</div>' +
+        '<div class="wish-msg">'+escHtml(w.message)+'</div>' +
+        '<div class="wish-foot"><span class="wish-time">'+fmtTime(w.timestamp)+'</span>' +
+        '<button class="like-btn'+(liked?' liked':'') +'" onclick="likeWish(\''+w.id+'\',this)">'+
+        '❤️ <span>'+((w.likes||0) + (liked?0:0))+'</span></button>' +
+        '</div></div>';
+    }).join('');
+  });
+}
+
+function likeWish(id, btn) {
+  if (likedIds[id]) return;
+  likedIds[id] = true;
+  localStorage.setItem('likedIds', JSON.stringify(likedIds));
+  btn.classList.add('liked');
+  var sp = btn.querySelector('span');
+  sp.textContent = parseInt(sp.textContent||0) + 1;
+}
+
+// ══════════════════════════════════════════════════
+// QUIZ
+// ══════════════════════════════════════════════════
+function renderQuiz() {
+  var el = document.getElementById('quizCard');
+  if (quizDone) { renderQuizDone(); return; }
+  if (quizState.done) { finishQuiz(); return; }
+
+  quizData = QUIZ_BANK;
+  var q = quizData[quizState.q];
+  var pct = (quizState.q / quizData.length * 100).toFixed(0);
+
+  el.innerHTML =
+    '<div class="sec-title">🎯 Quiz วันเกิด</div>' +
+    '<div class="quiz-prog-bg"><div class="quiz-prog" style="width:'+pct+'%"></div></div>' +
+    '<div style="font-size:.75rem;color:var(--sub);margin-bottom:10px">ข้อ '+(quizState.q+1)+'/'+quizData.length+'</div>' +
+    '<div class="quiz-q">'+q.q+'</div>' +
+    '<div class="quiz-opts">'+
+    q.opts.map(function(o,i) {
+      return '<button class="quiz-opt" onclick="answerQuiz('+i+',this)">'+o+'</button>';
+    }).join('') +
+    '</div>';
+}
+
+function answerQuiz(idx, btn) {
+  var q = quizData[quizState.q];
+  document.querySelectorAll('.quiz-opt').forEach(function(b){b.disabled=true});
+  btn.classList.add(idx === q.ans ? 'correct' : 'wrong');
+  if (idx !== q.ans) document.querySelectorAll('.quiz-opt')[q.ans].classList.add('correct');
+  if (idx === q.ans) quizState.correct++;
+  setTimeout(function() {
+    quizState.q++;
+    if (quizState.q >= quizData.length) { quizState.done = true; finishQuiz(); }
+    else renderQuiz();
+  }, 900);
+}
+
+function finishQuiz() {
+  var allCorrect = quizState.correct === quizData.length;
+  var pts = allCorrect ? 2 : 1;
+  if (!myName) { renderQuizResult(allCorrect, pts, true); return; }
+
+  api('addPoints', {type:'quiz', name:myName, score:quizState.correct, total:quizData.length, quarter:QUARTER}, function(pr) {
+    if (pr && pr.ok) { myPts.quiz = pr.quizPts||pts; myPts.total = pr.totalPts||(myPts.wish+pts); }
+    else { myPts.quiz += pts; myPts.total += pts; }
+    quizDone = true;
+    updatePtsBar();
+    if (allCorrect) confetti();
+    renderQuizResult(allCorrect, pts, false);
+  });
+}
+
+function renderQuizResult(allCorrect, pts, noName) {
+  document.getElementById('quizCard').innerHTML =
+    '<div class="result-box">' +
+    '<div class="result-emoji">'+(allCorrect?'🎊':'🙂')+'</div>' +
+    '<div class="result-title">'+(allCorrect?'เยี่ยม! ถูกทุกข้อ!':'ถูก '+quizState.correct+'/'+quizData.length+' ข้อ')+'</div>' +
+    '<div class="result-sub">'+(allCorrect?'คุณรู้จักเพื่อนร่วมงานดีมาก!':'ไตรมาสหน้ามาลองใหม่นะคะ 💪')+'</div>' +
+    (noName ? '<div class="result-sub" style="color:var(--rose);margin-top:8px">⚠️ ยืนยันชื่อก่อนจึงจะบันทึกแต้มได้</div>' : '<div class="pts-earned">+'+pts+' ⭐ แต้ม</div>') +
+    '</div>';
+}
+
+function renderQuizDone() {
+  document.getElementById('quizCard').innerHTML =
+    '<div class="result-box"><div class="result-emoji">✅</div>' +
+    '<div class="result-title">คุณทำ Quiz แล้ว!</div>' +
+    '<div class="result-sub">ไตรมาสหน้ามาลุ้นอีกครั้งนะคะ 😊</div></div>';
+}
+
+// ══════════════════════════════════════════════════
+// LEADERBOARD
+// ══════════════════════════════════════════════════
+var curLbTab = 'pts';
+function showLbTab(type, btn) {
+  document.querySelectorAll('.lb-tab').forEach(function(t){t.classList.remove('active')});
+  btn.classList.add('active');
+  curLbTab = type;
+  loadLeaderboard(type);
+}
+
+function loadLeaderboard(type) {
+  var el = document.getElementById('lbContent');
+  el.innerHTML = '<div class="no-data skeleton">กำลังโหลด...</div>';
+
+  if (type === 'pts') {
+    api('getLeaderboard', {quarter: QUARTER, limit:'20'}, function(r) {
+      if (!r || !r.board || !r.board.length) { el.innerHTML = '<div class="no-data">ยังไม่มีข้อมูล</div>'; return; }
+      renderLbRows(el, r.board.map(function(x,i) {
+        return {rank:i+1, name:x.name, main:x.totalPts+' แต้ม', sub:'💌'+x.wishPts+' 🎯'+x.quizPts};
+      }));
+    });
+  } else if (type === 'quiz') {
+    api('getLeaderboard', {quarter: QUARTER, limit:'20'}, function(r) {
+      if (!r || !r.board || !r.board.length) { el.innerHTML = '<div class="no-data">ยังไม่มีข้อมูล</div>'; return; }
+      var sorted = r.board.slice().sort(function(a,b){return (b.quizPts||0)-(a.quizPts||0)});
+      renderLbRows(el, sorted.map(function(x,i) {
+        return {rank:i+1, name:x.name, main:x.quizPts+' คะแนน', sub:''};
+      }));
+    });
+  } else {
+    api('getWishes', {}, function(r) {
+      if (!r || !r.wishes || !r.wishes.length) { el.innerHTML = '<div class="no-data">ยังไม่มีข้อมูล</div>'; return; }
+      var cnt = {};
+      r.wishes.forEach(function(w) { cnt[w.name] = (cnt[w.name]||0) + (w.likes||0); });
+      var arr = Object.keys(cnt).map(function(k){return {name:k,likes:cnt[k]}}).sort(function(a,b){return b.likes-a.likes});
+      renderLbRows(el, arr.slice(0,20).map(function(x,i) {
+        return {rank:i+1, name:x.name, main:x.likes+' ❤️', sub:''};
+      }));
+    });
+  }
+}
+
+function renderLbRows(el, rows) {
+  var medals = ['🥇','🥈','🥉'];
+  el.innerHTML = rows.map(function(r) {
+    return '<div class="lb-row">' +
+      '<div class="lb-rank">'+(medals[r.rank-1]||r.rank+'.')+'</div>' +
+      '<div class="lb-name">'+escHtml(r.name)+(r.name===myName?' <span style="color:var(--purple);font-size:.72rem">← คุณ</span>':'')+'</div>' +
+      '<div><div class="lb-pts">'+r.main+'</div>'+(r.sub?'<div class="lb-sub">'+r.sub+'</div>':'')+'</div>' +
+      '</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+// MONTHLY STATS
+// ══════════════════════════════════════════════════
+function loadMonthlyStats() {
+  document.getElementById('statsTbody').innerHTML =
+    '<tr><td colspan="5" class="no-data skeleton">กำลังดึงข้อมูลจาก Google Sheets...</td></tr>';
+  document.getElementById('sumWish').textContent  = '...';
+  document.getElementById('sumQuiz').textContent  = '...';
+  document.getElementById('sumTotal').textContent = '...';
+
+  api('getMonthlyStats', {}, function(r) {
+    if (!r || r.error) {
+      document.getElementById('statsTbody').innerHTML =
+        '<tr><td colspan="5" class="no-data">ไม่สามารถโหลดข้อมูลได้ — ตรวจสอบ API URL</td></tr>';
+      return;
+    }
+
+    // Summary
+    var s = r.summary || {};
+    document.getElementById('sumWish').textContent  = s.totalWish  || 0;
+    document.getElementById('sumQuiz').textContent  = s.totalQuiz  || 0;
+    document.getElementById('sumTotal').textContent = s.totalUnique || 0;
+
+    // Top 10 table
+    var top10 = r.top10 || [];
+    var allStats = r.stats || [];
+    var maxPart = Math.max.apply(null, top10.map(function(x){return x.totalParticipants||0}).concat([1]));
+    var medals = ['🥇','🥈','🥉'];
+
+    document.getElementById('statsTbody').innerHTML = top10.length
+      ? top10.map(function(row, i) {
+          var wPct = maxPart ? Math.round((row.wishCount||0)/maxPart*100) : 0;
+          var qPct = maxPart ? Math.round((row.quizCount||0)/maxPart*100) : 0;
+          return '<tr>' +
+            '<td><span class="rank-medal">'+(medals[i]||('No.'+(i+1)))+'</span></td>' +
+            '<td><span class="month-tag">'+(row.monthShort||'')+'&nbsp;'+(row.year||'')+'</span></td>' +
+            '<td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill bar-wish" style="width:'+wPct+'%"></div></div>'+(row.wishCount||0)+'</div></td>' +
+            '<td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill bar-quiz" style="width:'+qPct+'%"></div></div>'+(row.quizCount||0)+'</div></td>' +
+            '<td style="font-weight:700;color:var(--green)">'+(row.totalParticipants||0)+'</td>' +
+            '</tr>';
+        }).join('')
+      : '<tr><td colspan="5" class="no-data">ยังไม่มีข้อมูล — รอพนักงานเข้าร่วมกิจกรรมค่ะ</td></tr>';
+
+    // All months chips
+    var chips = document.getElementById('allMonthsRow');
+    chips.innerHTML = allStats.map(function(m) {
+      var total = m.totalParticipants || 0;
+      var hasData = total > 0;
+      return '<div style="text-align:center;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:8px 10px;min-width:68px;">' +
+        '<div style="font-size:.75rem;color:var(--sub)">'+(m.monthShort||'')+'</div>' +
+        '<div style="font-size:1.1rem;font-weight:700;color:'+(hasData?'var(--green)':'var(--sub)')+'">'+total+'</div>' +
+        '<div style="font-size:.65rem;color:var(--sub)">คน</div>' +
+        '</div>';
+    }).join('');
+  });
+}
+
+// ══════════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════════
+function doAdminLogin() {
+  var pwd = document.getElementById('adminPwd').value;
+  if (pwd === ADMIN_PWD) {
+    isAdmin = true;
+    document.body.classList.add('admin-mode');
+    document.getElementById('adminLoginCard').style.display = 'none';
+    document.getElementById('adminPanel').style.display     = 'block';
+    document.getElementById('adminTab').style.display       = 'inline-block';
+    buildQRCode();
+    initWheel();
+    toast('👑 เข้าสู่ระบบ Admin แล้วค่ะ');
+  } else {
+    toast('❌ รหัสผ่านไม่ถูกต้อง');
+  }
+}
+
+function logoutAdmin() {
+  isAdmin = false;
+  document.body.classList.remove('admin-mode');
+  document.getElementById('adminTab').style.display = 'none';
+  document.getElementById('adminPwd').value = '';
+  document.getElementById('adminLoginCard').style.display = 'block';
+  document.getElementById('adminPanel').style.display     = 'none';
+}
+
+function openQRModal()   { showTab('admin', document.getElementById('adminTab')); }
+function openWheelModal(){ showTab('admin', document.getElementById('adminTab')); }
+
+// ── QR CODE ──
+function buildQRCode() {
+  var el = document.getElementById('qrcode');
+  if (!el || el.querySelector('canvas')) return;
+  new QRCode(el, {text:PAGE_URL, width:180, height:180, colorDark:'#7c3aed', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.M});
+  document.getElementById('qrUrl').textContent = PAGE_URL;
+}
+
+function downloadQR() {
+  var c = document.querySelector('#qrcode canvas');
+  if (!c) return toast('ไม่พบ QR Code');
+  var a = document.createElement('a');
+  a.download = 'SML_Birthday_QR.png'; a.href = c.toDataURL(); a.click();
+}
+
+// ── SPIN WHEEL ──
+var wheelSegments = ['🎁 ของรางวัล','🎫 คูปอง','☕ กาแฟ','🍰 เค้ก','💐 ดอกไม้','📌 ลองใหม่'];
+var wheelColors   = ['#7c3aed','#db2777','#ea580c','#0ea5e9','#22c55e','#a855f7'];
+var wheelAngle    = 0;
+
+function initWheel() {
+  var canvas = document.getElementById('wheel');
+  if (!canvas) return;
+  drawWheel(canvas, 0);
+}
+
+function drawWheel(canvas, rotate) {
+  var ctx = canvas.getContext('2d');
+  var cx = canvas.width/2, cy = canvas.height/2, r = cx - 8;
+  var seg = wheelSegments.length, arc = 2*Math.PI/seg;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  wheelSegments.forEach(function(label, i) {
+    var start = rotate + i*arc, end = start + arc;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,start,end); ctx.closePath();
+    ctx.fillStyle = wheelColors[i%wheelColors.length]; ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 11px Kanit'; ctx.textAlign = 'center';
+    ctx.save(); ctx.translate(cx,cy);
+    ctx.rotate(start + arc/2);
+    ctx.fillText(label, r*0.6, 4); ctx.restore();
+  });
+  ctx.beginPath(); ctx.arc(cx,cy,18,0,2*Math.PI);
+  ctx.fillStyle='#fff'; ctx.fill();
+}
+
+function spinWheel() {
+  if (wheelSpinning) return;
+  wheelSpinning = true;
+  document.getElementById('wheelResult').textContent = '';
+  var canvas = document.getElementById('wheel');
+  var extra   = Math.random()*360 + 1440;
+  var duration = 3500;
+  var start    = performance.now();
+  var startAngle = wheelAngle;
+
+  function step(now) {
+    var elapsed = now - start;
+    var progress = Math.min(elapsed/duration, 1);
+    var ease = 1 - Math.pow(1-progress, 4);
+    wheelAngle = startAngle + extra * ease * Math.PI/180;
+    drawWheel(canvas, wheelAngle);
+    if (progress < 1) { requestAnimationFrame(step); return; }
+
+    wheelSpinning = false;
+    var seg = wheelSegments.length;
+    var arc = 2*Math.PI/seg;
+    var norm = (((-wheelAngle) % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+    var idx  = Math.floor(norm/arc) % seg;
+    document.getElementById('wheelResult').textContent = '🎉 ' + wheelSegments[idx];
+    confetti();
+  }
+  requestAnimationFrame(step);
+}
+
+// ── EXPORT ──
+function exportScores() {
+  api('getLeaderboard', {quarter:QUARTER, limit:'99'}, function(r) {
+    if (!r || !r.board) return toast('ไม่มีข้อมูล');
+    var rows = [['ชื่อ','แต้มรวม','แต้มอวยพร','แต้ม Quiz']];
+    r.board.forEach(function(x) { rows.push([x.name, x.totalPts, x.wishPts||0, x.quizPts||0]); });
+    var csv = rows.map(function(r){return r.join(',')}).join('\n');
+    var a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+    a.download = 'SML_Points_'+QUARTER+'.csv'; a.click();
+    toast('✅ Export แล้วค่ะ');
+  });
+}
+
+// ══════════════════════════════════════════════════
+// API CALLER
+// ══════════════════════════════════════════════════
+function api(action, params, cb) {
+  params.action = action;
+  var qs = Object.keys(params).map(function(k) {
+    return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);
+  }).join('&');
+  var url = API_URL + '?' + qs;
+
+  fetch(url, {redirect:'follow'})
+    .then(function(r){return r.json()})
+    .then(cb)
+    .catch(function(err) {
+      console.warn('API error:', err);
+      cb && cb({error: err.toString()});
+    });
+}
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(function(){t.classList.remove('show')}, 2800);
+}
+
+function confetti() {
+  var colors = ['#ff6b9d','#ffd93d','#a78bfa','#22c55e','#60a5fa'];
+  for (var i = 0; i < 35; i++) {
+    var d = document.createElement('div');
+    d.style.cssText = 'position:fixed;width:8px;height:8px;border-radius:2px;' +
+      'background:'+colors[i%5]+';left:'+Math.random()*100+'vw;' +
+      'top:-12px;z-index:9999;pointer-events:none;' +
+      'animation:fall '+(1.2+Math.random()*1.5)+'s ease-in forwards;' +
+      'animation-delay:'+Math.random()*0.4+'s';
+    document.body.appendChild(d);
+    setTimeout(function(){d.remove()}, 3000);
+  }
+  if (!document.getElementById('fallStyle')) {
+    var s = document.createElement('style'); s.id='fallStyle';
+    s.textContent = '@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0}}';
+    document.head.appendChild(s);
+  }
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtTime(iso) {
+  if (!iso) return '';
+  try {
+    var d = new Date(iso);
+    return d.toLocaleDateString('th-TH',{day:'numeric',month:'short'}) + ' ' +
+           d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  } catch(e) { return ''; }
+}
+</script>
 </body>
 </html>
