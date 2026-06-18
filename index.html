@@ -7,15 +7,39 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Dancing+Script:wght@700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:linear-gradient(160deg,#ffe3b0 0%,#ffc7e6 38%,#bfe0ff 75%,#fff0a8 100%);--c1:#ffffff;--c2:#fff3f8;--gold:#ff9f43;--gold2:#ffc24b;--rose:#ff6b9d;--mint:#1fc8a9;--purple:#9b6dff;--text:#2f1d3d;--sub:rgba(47,29,61,.78);--mute:rgba(47,29,61,.5);--b:rgba(47,29,61,.14);--b2:rgba(47,29,61,.22)}
+:root{--bg:linear-gradient(160deg,#070b24 0%,#101a4a 35%,#1b2a6b 70%,#0a1230 100%);--c1:#ffffff;--c2:#fff3f8;--gold:#ff9f43;--gold2:#ffc24b;--rose:#ff6b9d;--mint:#1fc8a9;--purple:#9b6dff;--text:#2f1d3d;--sub:rgba(47,29,61,.78);--mute:rgba(47,29,61,.5);--b:rgba(47,29,61,.14);--b2:rgba(47,29,61,.22)}
 html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;color:var(--text);font-family:'Kanit',sans-serif;overflow-x:hidden}
 /* BG */
 .bg-deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.bb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35}
-.bb1{width:550px;height:550px;background:#ffd1e8;top:-150px;left:-120px;animation:drift 14s ease-in-out infinite alternate}
-.bb2{width:450px;height:450px;background:#cfe8ff;bottom:-80px;right:-80px;animation:drift 18s ease-in-out infinite alternate-reverse}
-.bb3{width:300px;height:300px;background:#fff0bf;top:45%;left:30%;animation:drift 11s ease-in-out infinite alternate}
+.bb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.32}
+.bb1{width:550px;height:550px;background:#ff8fc9;top:-150px;left:-120px;animation:drift 14s ease-in-out infinite alternate}
+.bb2{width:450px;height:450px;background:#5fa8ff;bottom:-80px;right:-80px;animation:drift 18s ease-in-out infinite alternate-reverse}
+.bb3{width:300px;height:300px;background:#ffe08a;top:45%;left:30%;animation:drift 11s ease-in-out infinite alternate}
 @keyframes drift{from{transform:translate(0,0)}to{transform:translate(28px,22px)}}
+.stars,.stars2{position:absolute;inset:0}
+.stars{background-image:
+  radial-gradient(1.4px 1.4px at 12% 18%,#fff,transparent),
+  radial-gradient(1.2px 1.2px at 78% 8%,#fff,transparent),
+  radial-gradient(1.6px 1.6px at 35% 42%,#fff,transparent),
+  radial-gradient(1.1px 1.1px at 60% 70%,#fff,transparent),
+  radial-gradient(1.4px 1.4px at 90% 55%,#fff,transparent),
+  radial-gradient(1.2px 1.2px at 6% 75%,#fff,transparent),
+  radial-gradient(1.6px 1.6px at 50% 12%,#fff,transparent),
+  radial-gradient(1.1px 1.1px at 22% 90%,#fff,transparent),
+  radial-gradient(1.4px 1.4px at 85% 85%,#fff,transparent),
+  radial-gradient(1.2px 1.2px at 95% 25%,#fff,transparent);
+  background-size:220px 220px;background-repeat:repeat;opacity:.75;
+  animation:twinkle 3.2s ease-in-out infinite alternate}
+.stars2{background-image:
+  radial-gradient(1px 1px at 15% 55%,#fff,transparent),
+  radial-gradient(1px 1px at 70% 30%,#fff,transparent),
+  radial-gradient(1px 1px at 40% 80%,#fff,transparent),
+  radial-gradient(1px 1px at 88% 65%,#fff,transparent),
+  radial-gradient(1px 1px at 25% 10%,#fff,transparent),
+  radial-gradient(1px 1px at 55% 50%,#fff,transparent);
+  background-size:300px 300px;background-repeat:repeat;opacity:.5;
+  animation:twinkle 4.5s ease-in-out infinite alternate-reverse}
+@keyframes twinkle{from{opacity:.25}to{opacity:.85}}
 /* TOPBAR */
 .topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--b);padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between}
 .tb-logo{font-family:'Mitr',sans-serif;font-size:.95rem;font-weight:700;color:var(--gold);letter-spacing:.05em}
@@ -296,7 +320,7 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 </style>
 </head>
 <body>
-<div class="bg-deco"><div class="bb bb1"></div><div class="bb bb2"></div><div class="bb bb3"></div></div>
+<div class="bg-deco"><div class="stars"></div><div class="stars2"></div><div class="bb bb1"></div><div class="bb bb2"></div><div class="bb bb3"></div></div>
 <div class="offline-banner" id="offlineBanner">⚠️ ออฟไลน์</div>
 
 <div class="topbar">
