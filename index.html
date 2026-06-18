@@ -369,6 +369,7 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
   <div class="top10-list" id="top10Chart"><div class="top10-empty">ยังไม่มีผู้เข้าร่วม</div></div>
   <div class="top10-admin-btns" id="top10AdminArea">
     <button class="top10-export-btn" onclick="exportScoresExcel()">📊 Export คะแนน Excel</button>
+    <button class="top10-export-btn" onclick="exportBirthdayCardsPDF()">🎂 Export การ์ดวันเกิด PDF</button>
   </div>
 </div>
 
@@ -574,6 +575,7 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 function toggleMonthCtrl(){const el=document.getElementById('adminMonthCtrl');if(el)el.classList.toggle('open');}
 // Render emoji bar as soon as DOM is ready (before async init)
@@ -701,9 +703,26 @@ async function apiPost(body){
     Object.entries(body).forEach(([k,v]) => params.append(k, v));
     const r = await fetch(url + '?' + params.toString());
     return await r.json();
-  }catch(e){ 
+  }catch(e){
     console.error('API error:', e);
-    return null; 
+    return null;
+  }
+}
+async function apiPostJson(body){
+  // POST จริง สำหรับข้อมูลขนาดใหญ่ เช่น รูปภาพ (base64) ที่ใส่ใน query string ไม่ได้
+  // ใช้ Content-Type: text/plain เพื่อเลี่ยง CORS preflight ของ Apps Script
+  const url = getApiUrl();
+  if(!url) return null;
+  try{
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body)
+    });
+    return await r.json();
+  }catch(e){
+    console.error('API POST error:', e);
+    return null;
   }
 }
 
@@ -752,6 +771,7 @@ function buildMonthTabs(){
 }
 function selectMonth(mi){
   selMonth=mi; buildMonthTabs();
+  renderBirthdayCalendar(mi);
   const chips=document.getElementById('personChips');
   const isAdmin=document.body.classList.contains('admin-mode');
   const allowed=getActiveMonths();
@@ -768,7 +788,6 @@ function selectMonth(mi){
     </div>`
   ).join('');
   if(!curEmp||curEmp.month!==mi) selectPerson(list[0].code);
-  renderBirthdayCalendar(mi);
 }
 function renderBirthdayCalendar(mi){
   const el=document.getElementById('calList');
@@ -1001,6 +1020,7 @@ async function loadPersonsFromSheet(){
         faction: String(p.faction||'').trim(),
         day:     parseInt(p.day)||1,
         month:   Math.max(0, parseInt(p.month||0, 10) - 1),
+        photo:   String(p.photo||'').trim(),
       }));
     if(parsed.length === 0) return false;
     calPersons = parsed;
@@ -1280,9 +1300,10 @@ async function reloadPersons(){
 // PHOTO FEATURE
 // ══════════════════════════════════════════════════
 function loadEmpPhoto(empKey) {
-  const saved = localStorage.getItem('photo_'+empKey);
   const img = document.getElementById('empPhoto');
   const emoji = document.getElementById('empPhotoEmoji');
+  const remote = curEmp && (curEmp.code===empKey||curEmp.name===empKey) ? curEmp.photo : '';
+  const saved = remote || localStorage.getItem('photo_'+empKey);
   if (saved) {
     img.src = saved; img.style.display='block'; emoji.style.display='none';
   } else {
@@ -1297,11 +1318,12 @@ function onPhotoSelected(evt) {
   const file = evt.target.files[0]; if(!file||!curEmp) return;
   const reader = new FileReader();
   reader.onload = function(e) {
-    const key = 'photo_'+(curEmp.code||curEmp.name);
+    const empKey = curEmp.code||curEmp.name;
+    const key = 'photo_'+empKey;
     // Resize to ~300px for storage efficiency
     const canvas = document.createElement('canvas');
     const tmpImg = new Image();
-    tmpImg.onload = function() {
+    tmpImg.onload = async function() {
       const size = 300;
       canvas.width = size; canvas.height = size;
       const ctx = canvas.getContext('2d');
@@ -1310,8 +1332,19 @@ function onPhotoSelected(evt) {
       ctx.drawImage(tmpImg, sx, sy, min, min, 0, 0, size, size);
       const data = canvas.toDataURL('image/jpeg', 0.82);
       localStorage.setItem(key, data);
-      loadEmpPhoto(curEmp.code||curEmp.name);
+      curEmp.photo = data;
+      loadEmpPhoto(empKey);
       showToast('อัปโหลดรูปสำเร็จ');
+      // อัปโหลดขึ้น Google Drive ให้ทุกคนเห็นรูปเดียวกัน
+      const res = await apiPostJson({action:'uploadPhoto', code: empKey, photo: data});
+      if (res && res.ok) {
+        curEmp.photo = res.photoUrl;
+        const p = calPersons.find(x=>x.code===curEmp.code);
+        if (p) p.photo = res.photoUrl;
+        showToast('บันทึกรูปขึ้น Google สำเร็จ ✅');
+      } else {
+        showToast('บันทึกรูปขึ้น Google ไม่สำเร็จ (เก็บไว้ในเครื่องนี้ก่อน)','warn');
+      }
     };
     tmpImg.src = e.target.result;
   };
@@ -1766,7 +1799,7 @@ function findPersonPhoto(name) {
   const person = calPersons.find(p=>norm(p.name)===norm(name)) ||
                  calPersons.find(p=>norm(p.name).split(' ')[0]===norm(name).split(' ')[0]);
   if (!person) return null;
-  return localStorage.getItem('photo_'+(person.code||person.name));
+  return person.photo || localStorage.getItem('photo_'+(person.code||person.name));
 }
 
 function renderTop10Chart() {
@@ -1840,6 +1873,91 @@ function exportScoresExcel() {
   const fname = 'SML_Game_Score_'+empName.replace(/\s+/g,'_')+'_'+new Date().toLocaleDateString('th-TH').replace(/\//g,'-')+'.xlsx';
   XLSX.writeFile(wb, fname);
   showToast('Export คะแนนสำเร็จ!');
+}
+
+// ══════════════════════════════════════════════════
+// EXPORT BIRTHDAY CARDS (A4 PDF, blue-gradient cute style)
+// ══════════════════════════════════════════════════
+async function exportBirthdayCardsPDF() {
+  if (!document.body.classList.contains('admin-mode')) {
+    showToast('เฉพาะ Admin เท่านั้นครับ','warn'); return;
+  }
+  if (!calPersons.length) { showToast('ไม่มีข้อมูลพนักงาน','warn'); return; }
+  if (typeof jspdf === 'undefined') {
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload=exportBirthdayCardsPDF; document.head.appendChild(s); return;
+  }
+  showToast('กำลังสร้าง PDF... รอสักครู่ 🎨');
+
+  const targets = (selMonth!=null) ? calPersons.filter(p=>p.month===selMonth) : calPersons;
+  if (!targets.length) { showToast('ไม่มีคนเกิดในเดือนนี้','warn'); return; }
+
+  const { jsPDF } = jspdf;
+  const pdf = new jsPDF('p','mm','a4');
+  const stage = document.createElement('div');
+  stage.style.position='fixed'; stage.style.left='-9999px'; stage.style.top='0';
+  stage.style.width='794px';
+  document.body.appendChild(stage);
+
+  for (let i=0; i<targets.length; i++) {
+    const person = targets[i];
+    const empKey = person.code || person.name;
+    let wishes = [], board = [];
+    try {
+      const w = await apiGet({action:'getWishes', empId: empKey});
+      wishes = Array.isArray(w) ? w : [];
+    } catch(e){}
+    try {
+      const g = await apiGet({action:'getGameLeaderboard', empId: empKey});
+      board = (g && Array.isArray(g.board)) ? g.board : [];
+    } catch(e){}
+
+    const photo = person.photo || localStorage.getItem('photo_'+empKey) || '';
+    const photoHtml = photo
+      ? `<img src="${photo}" style="width:160px;height:160px;border-radius:50%;object-fit:cover;border:6px solid #fff;box-shadow:0 8px 24px rgba(0,90,160,.25)">`
+      : `<div style="width:160px;height:160px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:64px;border:6px solid #fff">🎂</div>`;
+
+    const wishesHtml = wishes.length
+      ? wishes.map(w=>`<div style="background:rgba(255,255,255,.75);border-radius:12px;padding:8px 12px;margin-bottom:6px;font-size:13px;color:#1a3a5c"><b style="color:#0a78c2">${escHtml(w.senderName||w.name||'')}</b>: ${escHtml(w.msg||w.message||'')}</div>`).join('')
+      : `<div style="font-size:13px;color:#5a8ab0">ยังไม่มีคำอวยพร</div>`;
+
+    const boardHtml = board.length
+      ? `<div style="display:flex;flex-wrap:wrap;gap:6px">` + board.map(b=>
+          `<div style="background:#fff;border-radius:20px;padding:5px 12px;font-size:12px;color:#0a78c2;font-weight:600;border:1px solid #bfe6fa">${escHtml(b.playerName)} · ${b.bestScore} pt</div>`
+        ).join('') + `</div>`
+      : `<div style="font-size:13px;color:#5a8ab0">ยังไม่มีคนเล่นเกมตอบคำถาม</div>`;
+
+    stage.innerHTML = `
+      <div style="width:794px;height:1123px;box-sizing:border-box;padding:40px;font-family:'Kanit',sans-serif;
+        background:linear-gradient(160deg,#eaf7ff 0%,#cdeeff 35%,#a8defc 70%,#7bcdfa 100%);">
+        <div style="text-align:center;margin-bottom:18px">
+          <div style="font-size:30px;font-weight:700;color:#0a78c2">🎉 สุขสันต์วันเกิด 🎉</div>
+        </div>
+        <div style="text-align:center;margin-bottom:14px">${photoHtml}</div>
+        <div style="text-align:center;font-size:26px;font-weight:700;color:#0a3a5c;margin-bottom:2px">${escHtml(person.name)}</div>
+        <div style="text-align:center;font-size:14px;color:#0a78c2;margin-bottom:22px">${escHtml(person.pos||'')}${person.faction?' · '+escHtml(person.faction):''} · วันที่ ${person.day||'-'} ${MTH[person.month]}</div>
+
+        <div style="background:rgba(255,255,255,.45);border-radius:18px;padding:16px 18px;margin-bottom:16px">
+          <div style="font-size:16px;font-weight:700;color:#0a3a5c;margin-bottom:10px">💌 คำอวยพรที่ได้รับ (${wishes.length})</div>
+          <div style="max-height:430px;overflow:hidden">${wishesHtml}</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,.45);border-radius:18px;padding:16px 18px">
+          <div style="font-size:16px;font-weight:700;color:#0a3a5c;margin-bottom:10px">🎯 คนที่ตอบคำถามแฟนพันธุ์แท้ (${board.length})</div>
+          ${boardHtml}
+        </div>
+      </div>`;
+
+    const canvas = await html2canvas(stage.firstElementChild, {scale:2, useCORS:true});
+    const img = canvas.toDataURL('image/jpeg', 0.92);
+    if (i>0) pdf.addPage();
+    pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
+  }
+
+  document.body.removeChild(stage);
+  pdf.save('SML_Birthday_Cards_'+new Date().toLocaleDateString('th-TH').replace(/\//g,'-')+'.pdf');
+  showToast('Export การ์ด PDF สำเร็จ! 🎂');
 }
 
 
