@@ -9,6 +9,8 @@ var SHEET_PERSONS = 'Persons';
 var SHEET_POINTS  = 'Points';        // ใหม่
 var SHEET_STATS   = 'Monthly_Stats'; // ใหม่
 var SHEET_GAMESCORES = 'GameScores'; // ใหม่ — เก็บคะแนนเกมต่อพนักงาน/ผู้เล่น
+var SHEET_PHOTOS  = 'Photos';        // ใหม่ — รูปวันเกิดที่อัปโหลด (เก็บลิงก์ Drive)
+var PHOTOS_FOLDER_NAME = 'SML Birthday Photos';
 
 // เดือนที่กิจกรรมเปิด (admin กำหนด) — มิ.ย. = 6, ธ.ค. = 12
 var ACTIVITY_START_MONTH = 6;   // มิถุนายน 2569
@@ -103,12 +105,113 @@ function doGet(e) {
     else if (action === 'saveGameScore')  result = saveGameScore(p);
     else if (action === 'getGameLeaderboard') result = getGameLeaderboard(p);
     else if (action === 'ping')           result = {ok: true, time: new Date().toISOString()};
+    else if (action === 'uploadPhoto')    result = uploadPhoto(p);
     else result = {error: 'unknown action: ' + action};
 
     return jsonOut(result, cb);
   } catch(err) {
     return jsonOut({error: err.toString()}, cb);
   }
+}
+
+function doPost(e) {
+  var p = {};
+  try {
+    if (e.postData && e.postData.contents) {
+      p = JSON.parse(e.postData.contents);
+    }
+  } catch(err) {
+    return jsonOut({error: 'bad json: ' + err.toString()});
+  }
+  var action = p.action || '';
+  try {
+    var result;
+    if (action === 'uploadPhoto') result = uploadPhoto(p);
+    else result = {error: 'unknown action: ' + action};
+    return jsonOut(result);
+  } catch(err) {
+    return jsonOut({error: err.toString()});
+  }
+}
+
+// ============================================================
+// ── PHOTOS (เก็บรูปคนเกิดไว้ใน Google Drive ให้ทุกคนเห็นตรงกัน) ──
+// ============================================================
+function ensurePhotosSheet(ss) {
+  var ws = ss.getSheetByName(SHEET_PHOTOS);
+  if (!ws) {
+    ws = ss.insertSheet(SHEET_PHOTOS);
+    ws.appendRow(['Code', 'PhotoUrl', 'FileId', 'UpdatedAt']);
+    ws.setFrozenRows(1);
+    ws.getRange(1, 1, 1, 4).setBackground('#7BDFF2').setFontColor('#fff').setFontWeight('bold');
+  }
+  return ws;
+}
+
+function getOrCreatePhotosFolder() {
+  var folders = DriveApp.getFoldersByName(PHOTOS_FOLDER_NAME);
+  if (folders.hasNext()) return folders.next();
+  return DriveApp.createFolder(PHOTOS_FOLDER_NAME);
+}
+
+function uploadPhoto(p) {
+  var code  = String(p.code  || '').trim();
+  var photo = String(p.photo || '').trim();
+  if (!code || !photo) return {ok: false, error: 'code/photo required'};
+
+  var m = photo.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
+  if (!m) return {ok: false, error: 'invalid image data'};
+  var mime = m[1];
+  var base64 = m[2];
+  var bytes = Utilities.base64Decode(base64);
+  var ext = mime.indexOf('png') !== -1 ? 'png' : 'jpg';
+  var blob = Utilities.newBlob(bytes, mime, 'photo_' + code + '.' + ext);
+
+  var folder = getOrCreatePhotosFolder();
+
+  // ลบรูปเก่าของ code นี้ทิ้งก่อน (กันสะสมไฟล์ซ้ำ)
+  var oldFiles = folder.getFilesByName(blob.getName());
+  while (oldFiles.hasNext()) oldFiles.next().setTrashed(true);
+  // ลบไฟล์เก่าตามชื่อรูปแบบ photo_<code>.* ทุกนามสกุล
+  var iter = folder.getFiles();
+  while (iter.hasNext()) {
+    var f = iter.next();
+    if (f.getName().indexOf('photo_' + code + '.') === 0) f.setTrashed(true);
+  }
+
+  var file = folder.createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  var fileId = file.getId();
+  var photoUrl = 'https://drive.google.com/uc?export=view&id=' + fileId;
+
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensurePhotosSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  var rowIdx = -1;
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === code) { rowIdx = i + 1; break; }
+  }
+  var now = new Date();
+  if (rowIdx > 0) {
+    ws.getRange(rowIdx, 1, 1, 4).setValues([[code, photoUrl, fileId, now]]);
+  } else {
+    ws.appendRow([code, photoUrl, fileId, now]);
+  }
+
+  return {ok: true, photoUrl: photoUrl};
+}
+
+function getPhotosMap() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensurePhotosSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  var map = {};
+  for (var i = 1; i < rows.length; i++) {
+    var r = rows[i];
+    if (!r[0]) continue;
+    map[String(r[0])] = r[1] || '';
+  }
+  return map;
 }
 
 function jsonOut(data, cb) {
@@ -256,6 +359,7 @@ function getPersons() {
   var ws = ensurePersonsSheet(ss);
   var rows = ws.getDataRange().getValues();
   if (rows.length < 2) return [];
+  var photos = getPhotosMap();
   var persons = [];
   for (var i = 1; i < rows.length; i++) {
     var r = rows[i];
@@ -263,6 +367,7 @@ function getPersons() {
     var fname = r[1] || '';
     var lname = r[2] || '';
     var dept  = r[4] || '';
+    var code  = String(r[0]);
     persons.push({
       code:    r[0],
       name:    (String(fname) + ' ' + String(lname)).trim(),
@@ -271,7 +376,8 @@ function getPersons() {
       faction: dept,
       day:     r[5] || 1,
       month:   r[6] || 1,
-      active:  r[7] !== false && r[7] !== 'FALSE' && r[7] !== 'Inactive'
+      active:  r[7] !== false && r[7] !== 'FALSE' && r[7] !== 'Inactive',
+      photo:   photos[code] || ''
     });
   }
   return persons;
