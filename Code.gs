@@ -8,6 +8,7 @@ var SHEET_WISHES  = 'Wishes';
 var SHEET_PERSONS = 'Persons';
 var SHEET_POINTS  = 'Points';        // ใหม่
 var SHEET_STATS   = 'Monthly_Stats'; // ใหม่
+var SHEET_GAMESCORES = 'GameScores'; // ใหม่ — เก็บคะแนนเกมต่อพนักงาน/ผู้เล่น
 
 // เดือนที่กิจกรรมเปิด (admin กำหนด) — มิ.ย. = 6, ธ.ค. = 12
 var ACTIVITY_START_MONTH = 6;   // มิถุนายน 2569
@@ -29,55 +30,55 @@ var THAI_MONTHS_SHORT = [
 // month: 1-12 (เดือนเกิด)
 // ============================================================
 var PERSONS_SEED = [
-  {code:'90245',name:'ประจักษ์ แก้วหานาม',dept:'PDI Operation',month:1},
-  {code:'90308',name:'สกุล พรมมี',dept:'PDI Operation',month:1},
-  {code:'90576',name:'อานนท์ โสธรรมมงคล',dept:'Accessories Installetion',month:1},
-  {code:'90954',name:'วิรัตน์ สมศรี',dept:'Yard Operation',month:1},
-  {code:'91038',name:'เสรี คะรัมย์',dept:'Accessories Installetion',month:1},
-  {code:'91115',name:'ชาญวิทย์ ฤทธิ์สยาม',dept:'Accessories Installetion',month:1},
-  {code:'90239',name:'กิตติกา จันทร์สายทอง',dept:'Yard Operation',month:2},
-  {code:'90615',name:'ประธาน แช่มโชติ',dept:'Accessories Installetion',month:2},
-  {code:'90638',name:'รังสรรค์ แจ่มประเสริฐ',dept:'PDI Operation',month:2},
-  {code:'91021',name:'โชสิญา ดานเรือง',dept:'HR&GA',month:2},
-  {code:'90057',name:'ทวี กัณหา',dept:'Accessories Installetion',month:3},
-  {code:'90841',name:'สัมพันธ์ สำนวน',dept:'Accessories Installetion',month:3},
-  {code:'91100',name:'วิระพงษ์ กิระหัด',dept:'Accessories Installetion',month:3},
-  {code:'91112',name:'กุหลาบ กองทอง',dept:'PDI Operation',month:3},
-  {code:'90040',name:'ภูวดล ปาราลิตร์',dept:'HR&GA',month:4},
-  {code:'90258',name:'นาเรณ มูฮำหมัด',dept:'PDI Operation',month:4},
-  {code:'90566',name:'ยืนยง กันหา',dept:'Yard Operation',month:4},
-  {code:'90715',name:'ณธีพัฒน์ รัตนอธิพัฒน์',dept:'PDI Operation',month:4},
-  {code:'90835',name:'คำภา ปานิสัย',dept:'Accessories Installetion',month:4},
-  {code:'91059',name:'ปัทมา เห็มบุตร',dept:'บัญชีและการเงิน',month:4},
-  {code:'91079',name:'ณัฐวุฒิ เลิศวงษ์วรรณ',dept:'Yard Operation',month:4},
-  {code:'91116',name:'คณิน บุญอยู่',dept:'PDI Operation',month:4},
-  {code:'90354',name:'นำพล เล็กใจกล้า',dept:'HR&GA',month:5},
-  {code:'90439',name:'ปุณยนุช ม่วงศรี',dept:'บัญชีและการเงิน',month:5},
-  {code:'90713',name:'บุญเลี้ยง เหมภูมิ',dept:'Accessories Installetion',month:5},
-  {code:'90939',name:'สุรกิจ ตันกุล',dept:'PC&PDI Operation',month:5},
-  {code:'90459',name:'ดนุพล วังใจ',dept:'Accessories Installetion',month:6},
-  {code:'90495',name:'บุญช่วย เนียมมาก',dept:'PDI Operation',month:6},
-  {code:'90570',name:'ชาญณรงค์ ดวงสิน',dept:'Yard Operation',month:6},
-  {code:'91010',name:'โสภา สุดตาภักดี',dept:'บัญชีและการเงิน',month:6},
-  {code:'91146',name:'อลงกรณ์ สัตยาคุณ',dept:'Accessories Installetion',month:6},
-  {code:'90714',name:'วัชรินทร์ จันทำ',dept:'Accessories Installetion',month:7},
-  {code:'91155',name:'สุนิษา เกษพิจิตร',dept:'HR&GA',month:7},
-  {code:'91147',name:'ณัฐวิช เลิศวงษ์วรรณ',dept:'Yard Operation',month:8},
-  {code:'91152',name:'วิวัฒน์ ตันติวีรกุล',dept:'Accessories Installetion',month:8},
-  {code:'90352',name:'อาทิตย์ ภูแล่นคู่',dept:'PDI Operation',month:9},
-  {code:'90498',name:'อำนาจ ศุลญลา',dept:'PDI Operation',month:9},
-  {code:'90526',name:'ยศศักดิ์ ทัศนพงษ์',dept:'HR&GA',month:9},
-  {code:'91064',name:'วิภาวดี โตประดิษฐ์',dept:'Yard Operation',month:9},
-  {code:'91118',name:'อดิเรก บัวจันทร์',dept:'Accessories Installetion',month:9},
-  {code:'90368',name:'ฤทธิรงค์ อุปถัมภ์',dept:'Accessories Installetion',month:10},
-  {code:'90986',name:'พรรณเชษฐ์ นครรัตน์',dept:'Yard Operation',month:10},
-  {code:'90325',name:'ระวิ จันทโรทัย',dept:'PDI Operation',month:11},
-  {code:'90696',name:'ดลลดา ใจแก้ว',dept:'HR&GA',month:11},
-  {code:'90722',name:'ธนโชติ โพธิ์ใต้',dept:'PDI Operation',month:11},
-  {code:'91068',name:'วราภรณ์ ใสสม',dept:'Yard Operation',month:11},
-  {code:'90179',name:'ณุชัย หาญรักษ์',dept:'PDI Operation',month:12},
-  {code:'90934',name:'เชิดชัย มิกขุนทด',dept:'-',month:12},
-  {code:'91133',name:'กฤษณะ เหลืองมิวาย',dept:'Accessories Installetion',month:12}
+  {code:'90245',name:'ประจักษ์ แก้วหานาม',dept:'PDI Operation',month:1,pos:'พนักงานตรวจสอบรถใหม่',day:23},
+  {code:'90308',name:'สกุล พรมมี',dept:'PDI Operation',month:1,pos:'พนักงานปรับแต่ง',day:29},
+  {code:'90576',name:'อานนท์ โสธรรมมงคล',dept:'Accessories Installetion',month:1,pos:'พนักงานปรับแต่ง',day:24},
+  {code:'90954',name:'วิรัตน์ สมศรี',dept:'Yard Operation',month:1,pos:'พนักงาน Yard Control',day:5},
+  {code:'91038',name:'เสรี คะรัมย์',dept:'Accessories Installetion',month:1,pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',day:13},
+  {code:'91115',name:'ชาญวิทย์ ฤทธิ์สยาม',dept:'Accessories Installetion',month:1,pos:'พนักงานติดตั้งอุปกรณ์',day:21},
+  {code:'90239',name:'กิตติกา จันทร์สายทอง',dept:'Yard Operation',month:2,pos:'พนักงาน Yard Control',day:5},
+  {code:'90615',name:'ประธาน แช่มโชติ',dept:'Accessories Installetion',month:2,pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',day:19},
+  {code:'90638',name:'รังสรรค์ แจ่มประเสริฐ',dept:'PDI Operation',month:2,pos:'หัวหน้าหน่วยล้างรถใหม่',day:21},
+  {code:'91021',name:'โชสิญา ดานเรือง',dept:'HR&GA',month:2,pos:'ผู้ช่วย้จัดการส่วน HR&GA',day:2},
+  {code:'90057',name:'ทวี กัณหา',dept:'Accessories Installetion',month:3,pos:'เจ้าหน้าที่เคลม',day:8},
+  {code:'90841',name:'สัมพันธ์ สำนวน',dept:'Accessories Installetion',month:3,pos:'หัวหน้ากลุ่มงานติดตั้งอุปกรณ์รถใหม่',day:26},
+  {code:'91100',name:'วิระพงษ์ กิระหัด',dept:'Accessories Installetion',month:3,pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',day:27},
+  {code:'91112',name:'กุหลาบ กองทอง',dept:'PDI Operation',month:3,pos:'พนักงานปรับแต่ง',day:28},
+  {code:'90040',name:'ภูวดล ปาราลิตร์',dept:'HR&GA',month:4,pos:'พนักงานธุรการทั่วไป',day:2},
+  {code:'90258',name:'นาเรณ มูฮำหมัด',dept:'PDI Operation',month:4,pos:'พนักงานตรวจสอบรถใหม่',day:17},
+  {code:'90566',name:'ยืนยง กันหา',dept:'Yard Operation',month:4,pos:'พนักงาน Yard Control',day:24},
+  {code:'90715',name:'ณธีพัฒน์ รัตนอธิพัฒน์',dept:'PDI Operation',month:4,pos:'พนักงานตรวจสอบรถใหม่',day:5},
+  {code:'90835',name:'คำภา ปานิสัย',dept:'Accessories Installetion',month:4,pos:'เจ้าหน้าที่สโตร์',day:24},
+  {code:'91059',name:'ปัทมา เห็มบุตร',dept:'บัญชีและการเงิน',month:4,pos:'เจ้าหน้าที่บัญชี',day:16},
+  {code:'91079',name:'ณัฐวุฒิ เลิศวงษ์วรรณ',dept:'Yard Operation',month:4,pos:'ผู้ช่วยผู้จัดการส่วน Yrad Control',day:30},
+  {code:'91116',name:'คณิน บุญอยู่',dept:'PDI Operation',month:4,pos:'พนักงานปรับแต่ง',day:5},
+  {code:'90354',name:'นำพล เล็กใจกล้า',dept:'HR&GA',month:5,pos:'เจ้าหน้าที่จัดซื้อ',day:31},
+  {code:'90439',name:'ปุณยนุช ม่วงศรี',dept:'บัญชีและการเงิน',month:5,pos:'ผู้ช่วยผู้จัดการส่วนบัญชีและการเงิน',day:19},
+  {code:'90713',name:'บุญเลี้ยง เหมภูมิ',dept:'Accessories Installetion',month:5,pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',day:3},
+  {code:'90939',name:'สุรกิจ ตันกุล',dept:'PC&PDI Operation',month:5,pos:'ผู้จัดกรส่วนอาวุโส',day:21},
+  {code:'90459',name:'ดนุพล วังใจ',dept:'Accessories Installetion',month:6,pos:'หัวหน้าหน่วยติดตั้งอุปกรณ์รถใหม่',day:15},
+  {code:'90495',name:'บุญช่วย เนียมมาก',dept:'PDI Operation',month:6,pos:'พนักงานอาวุโสเทียบเท่าหัวหน้างาน(Final Judgement)',day:24},
+  {code:'90570',name:'ชาญณรงค์ ดวงสิน',dept:'Yard Operation',month:6,pos:'พนักงาน Yard Control',day:3},
+  {code:'91010',name:'โสภา สุดตาภักดี',dept:'บัญชีและการเงิน',month:6,pos:'เจ้าหน้าที่บัญชีทรัพย์สิน',day:18},
+  {code:'91146',name:'อลงกรณ์ สัตยาคุณ',dept:'Accessories Installetion',month:6,pos:'เจ้าหน้าที่เคลม',day:9},
+  {code:'90714',name:'วัชรินทร์ จันทำ',dept:'Accessories Installetion',month:7,pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',day:24},
+  {code:'91155',name:'สุนิษา เกษพิจิตร',dept:'HR&GA',month:7,pos:'จป.วิชาชีพ',day:5},
+  {code:'91147',name:'ณัฐวิช เลิศวงษ์วรรณ',dept:'Yard Operation',month:8,pos:'พนักงาน Yard Control',day:3},
+  {code:'91152',name:'วิวัฒน์ ตันติวีรกุล',dept:'Accessories Installetion',month:8,pos:'ผู้จัดการส่วน Accessories Installetion',day:15},
+  {code:'90352',name:'อาทิตย์ ภูแล่นคู่',dept:'PDI Operation',month:9,pos:'หัวหน้าหน่วยตรวจสอบรถใหม่',day:15},
+  {code:'90498',name:'อำนาจ ศุลญลา',dept:'PDI Operation',month:9,pos:'พนักงานตรวจสอบรถใหม่',day:23},
+  {code:'90526',name:'ยศศักดิ์ ทัศนพงษ์',dept:'HR&GA',month:9,pos:'เจ้าหน้าที่ IT',day:24},
+  {code:'91064',name:'วิภาวดี โตประดิษฐ์',dept:'Yard Operation',month:9,pos:'หัวหน้าแผนก Yard Operation',day:30},
+  {code:'91118',name:'อดิเรก บัวจันทร์',dept:'Accessories Installetion',month:9,pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',day:18},
+  {code:'90368',name:'ฤทธิรงค์ อุปถัมภ์',dept:'Accessories Installetion',month:10,pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',day:26},
+  {code:'90986',name:'พรรณเชษฐ์ นครรัตน์',dept:'Yard Operation',month:10,pos:'พนักงาน Yard Control',day:26},
+  {code:'90325',name:'ระวิ จันทโรทัย',dept:'PDI Operation',month:11,pos:'หัวหน้าแผนก PDI Operation',day:7},
+  {code:'90696',name:'ดลลดา ใจแก้ว',dept:'HR&GA',month:11,pos:'เจ้าหน้าที่สรรหา',day:6},
+  {code:'90722',name:'ธนโชติ โพธิ์ใต้',dept:'PDI Operation',month:11,pos:'พนักงานปรับแต่ง',day:23},
+  {code:'91068',name:'วราภรณ์ ใสสม',dept:'Yard Operation',month:11,pos:'หัวหน้าหน่วย Yard Control',day:3},
+  {code:'90179',name:'ณุชัย หาญรักษ์',dept:'PDI Operation',month:12,pos:'หัวหน้าหน่วยปรับแต่ง',day:28},
+  {code:'90934',name:'เชิดชัย มิกขุนทด',dept:'-',month:12,pos:'ผู้ช่วยกรมการผู้จัดการ',day:17},
+  {code:'91133',name:'กฤษณะ เหลืองมิวาย',dept:'Accessories Installetion',month:12,pos:'เจ้าหน้าที่สโตร์(Accessories)',day:24}
 ];
 
 // ============================================================
@@ -92,12 +93,15 @@ function doGet(e) {
     var result;
     if (action === 'getWishes')           result = getWishes(p);
     else if (action === 'addWish')        result = addWish(p);
+    else if (action === 'deleteWish')     result = deleteWish(p);
     else if (action === 'getPersons')     result = getPersons();
     else if (action === 'getPoints')      result = getPoints(p);
     else if (action === 'addPoints')      result = addPoints(p);
     else if (action === 'getLeaderboard') result = getLeaderboard(p);
     else if (action === 'getMonthlyStats')result = getMonthlyStats();
     else if (action === 'seedPersons')    result = seedPersons();
+    else if (action === 'saveGameScore')  result = saveGameScore(p);
+    else if (action === 'getGameLeaderboard') result = getGameLeaderboard(p);
     else if (action === 'ping')           result = {ok: true, time: new Date().toISOString()};
     else result = {error: 'unknown action: ' + action};
 
@@ -116,74 +120,158 @@ function jsonOut(data, cb) {
 }
 
 // ============================================================
-// ── WISHES (เดิม ไม่เปลี่ยน) ──────────────────────────────
+// ── WISHES ────────────────────────────────────────────────
+// Sheet columns: ID, Name, Message, Mood, Photo, Likes, Timestamp,
+//                Month, EmpId, EmpName, SenderDept, Emoji, Ts
+// New uploaded UI sends: action=addWish, empId, empName, senderName,
+//                        senderDept, msg, emoji, ts
+// getWishes returns a RAW ARRAY (not wrapped) — that's what the
+// client's loadWishes()/deleteWish() expect (Array.isArray check).
+// Each item carries BOTH new field names (empId/empName/senderName/
+// senderDept/msg/emoji/ts) AND legacy field names (name/message/
+// mood/photo/timestamp/month) for backward compatibility with the
+// old index.html.
 // ============================================================
-function getWishes(p) {
-  var ss = SpreadsheetApp.openById(SHEET_ID);
+function ensureWishesSheet(ss) {
   var ws = ss.getSheetByName(SHEET_WISHES);
-  if (!ws) return {wishes: []};
+  if (!ws) {
+    ws = ss.insertSheet(SHEET_WISHES);
+    ws.appendRow(['ID','Name','Message','Mood','Photo','Likes','Timestamp','Month','EmpId','EmpName','SenderDept','Emoji','Ts']);
+    ws.setFrozenRows(1);
+    ws.getRange(1, 1, 1, 13).setBackground('#FF6B9D').setFontColor('#fff').setFontWeight('bold');
+  }
+  // Backward-compat: add any missing columns to old sheets
+  var headers = ws.getRange(1, 1, 1, Math.max(ws.getLastColumn(), 1)).getValues()[0];
+  var want = ['ID','Name','Message','Mood','Photo','Likes','Timestamp','Month','EmpId','EmpName','SenderDept','Emoji','Ts'];
+  for (var i = 0; i < want.length; i++) {
+    if (headers.indexOf(want[i]) === -1) {
+      ws.getRange(1, ws.getLastColumn() + 1).setValue(want[i]);
+    }
+  }
+  return ws;
+}
+
+function getWishes(p) {
+  var empId = (p && p.empId) ? String(p.empId).trim() : '';
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureWishesSheet(ss);
   var rows = ws.getDataRange().getValues();
+  if (rows.length < 2) return [];
+  var headers = rows[0];
+  var IDX = makeIdx(headers);
   var wishes = [];
   for (var i = 1; i < rows.length; i++) {
     var r = rows[i];
     if (!r[0]) continue;
+    var rowEmpId = String(r[IDX['EmpId']] || '');
+    if (empId && rowEmpId !== empId) continue;
+    var tsRaw = r[IDX['Timestamp']];
+    var tsIso = tsRaw ? new Date(tsRaw).toISOString() : '';
     wishes.push({
-      id:        r[0],
-      name:      r[1],
-      message:   r[2],
-      mood:      r[3],
-      photo:     r[4] || '',
-      likes:     r[5] || 0,
-      timestamp: r[6] ? new Date(r[6]).toISOString() : '',
-      month:     r[7] || ''
+      // new field names (used by uploaded UI)
+      id:         r[0],
+      empId:      rowEmpId,
+      empName:    r[IDX['EmpName']]    || '',
+      senderName: r[IDX['Name']]       || r[IDX['SenderName']] || '',
+      senderDept: r[IDX['SenderDept']] || '',
+      msg:        r[IDX['Message']]    || '',
+      emoji:      r[IDX['Emoji']]      || r[IDX['Mood']] || '',
+      ts:         r[IDX['Ts']]         || tsIso,
+      // legacy field names (old index.html)
+      name:       r[IDX['Name']]       || '',
+      message:    r[IDX['Message']]    || '',
+      mood:       r[IDX['Mood']]       || '',
+      photo:      r[IDX['Photo']]      || '',
+      likes:      r[IDX['Likes']]      || 0,
+      timestamp:  tsIso,
+      month:      r[IDX['Month']]      || ''
     });
   }
-  return {wishes: wishes.reverse()};
+  return wishes.reverse();
 }
 
 function addWish(p) {
-  var name    = (p.name    || '').trim();
-  var message = (p.message || '').trim();
-  var mood    = p.mood    || '';
-  var photo   = p.photo   || '';
-  var month   = p.month   || '';
-  if (!name || !message) return {ok: false, error: 'name/message required'};
+  // Support both the new uploaded UI's field names and the legacy ones
+  var empId      = (p.empId      || '').trim();
+  var empName    = (p.empName    || '').trim();
+  var senderName = (p.senderName || p.name    || '').trim();
+  var senderDept = (p.senderDept || p.dept    || '').trim();
+  var msg        = (p.msg        || p.message || '').trim();
+  var emoji      = p.emoji  || p.mood  || '';
+  var photo      = p.photo  || '';
+  var month      = p.month  || '';
+  var ts         = p.ts     || '';
+  if (!senderName || !msg) return {ok: false, error: 'name/message required'};
 
-  var ss  = SpreadsheetApp.openById(SHEET_ID);
-  var ws  = ss.getSheetByName(SHEET_WISHES);
-  if (!ws) { ws = ss.insertSheet(SHEET_WISHES); ws.appendRow(['ID','Name','Message','Mood','Photo','Likes','Timestamp','Month']); }
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureWishesSheet(ss);
 
   var id  = 'W' + new Date().getTime();
   var now = new Date();
-  ws.appendRow([id, name, message, mood, photo, 0, now, month]);
+  ws.appendRow([id, senderName, msg, emoji, photo, 0, now, month, empId, empName, senderDept, emoji, ts || now.toLocaleString()]);
 
   // อัปเดต Monthly Stats
-  updateMonthlyStat(now, 'wish', name);
+  updateMonthlyStat(now, 'wish', senderName);
 
   return {ok: true, id: id};
 }
 
+// ลบคำอวยพร 1 แถวตาม wid (ts/timestamp/senderName ตัวใดตัวหนึ่งที่ตรงกับ
+// ค่าที่ client คำนวณไว้ — client ใช้ w.ts||w.timestamp||w.senderName เป็น id)
+function deleteWish(p) {
+  var wid = (p.wid || '').trim();
+  if (!wid) return {ok: false, error: 'wid required'};
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureWishesSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  if (rows.length < 2) return {ok: false, error: 'no wishes'};
+  var headers = rows[0];
+  var IDX = makeIdx(headers);
+  for (var i = 1; i < rows.length; i++) {
+    var r = rows[i];
+    var rowTs   = String(r[IDX['Ts']] || '');
+    var rowTime = r[IDX['Timestamp']] ? new Date(r[IDX['Timestamp']]).toISOString() : '';
+    var rowName = String(r[IDX['Name']] || '');
+    if (wid === rowTs || wid === rowTime || wid === rowName || wid === String(r[0])) {
+      ws.deleteRow(i + 1);
+      return {ok: true};
+    }
+  }
+  return {ok: false, error: 'not found'};
+}
+
 // ============================================================
-// ── PERSONS (เดิม ไม่เปลี่ยน) ─────────────────────────────
+// ── PERSONS ───────────────────────────────────────────────
+// Sheet columns: Code, Name, Month, Dept, Active, Pos, Day
+// getPersons returns a RAW ARRAY (matches loadPersonsFromSheet's
+// Array.isArray check in the uploaded UI). month returned is 1-12
+// (sheet convention); the client's loadPersonsFromSheet converts it
+// to 0-indexed itself.
 // ============================================================
 function getPersons() {
   var ss = SpreadsheetApp.openById(SHEET_ID);
-  var ws = ss.getSheetByName(SHEET_PERSONS);
-  if (!ws) return {persons: []};
+  var ws = ensurePersonsSheet(ss);
   var rows = ws.getDataRange().getValues();
+  if (rows.length < 2) return [];
+  var headers = rows[0];
+  var IDX = makeIdx(headers);
   var persons = [];
   for (var i = 1; i < rows.length; i++) {
     var r = rows[i];
     if (!r[0]) continue;
+    var dept = r[IDX['Dept']] || '';
     persons.push({
-      code:   r[0],
-      name:   r[1],
-      month:  r[2],
-      dept:   r[3] || '',
-      active: r[4] !== false && r[4] !== 'FALSE'
+      code:    r[0],
+      name:    r[IDX['Name']],
+      month:   r[IDX['Month']],
+      dept:    dept,
+      faction: dept,
+      pos:     r[IDX['Pos']] || '',
+      day:     r[IDX['Day']] || 1,
+      active:  r[IDX['Active']] !== false && r[IDX['Active']] !== 'FALSE'
     });
   }
-  return {persons: persons};
+  return persons;
 }
 
 // ============================================================
@@ -553,10 +641,15 @@ function ensurePersonsSheet(ss) {
   var ws = ss.getSheetByName(SHEET_PERSONS);
   if (!ws) {
     ws = ss.insertSheet(SHEET_PERSONS);
-    ws.appendRow(['Code','Name','Month','Dept','Active']);
+    ws.appendRow(['Code','Name','Month','Dept','Active','Pos','Day']);
     ws.setFrozenRows(1);
-    ws.getRange(1, 1, 1, 5).setBackground('#00E5CC').setFontColor('#000').setFontWeight('bold');
+    ws.getRange(1, 1, 1, 7).setBackground('#00E5CC').setFontColor('#000').setFontWeight('bold');
   }
+  // Backward-compat: add Pos/Day columns to older sheets that lack them
+  var headers = ws.getRange(1, 1, 1, Math.max(ws.getLastColumn(), 1)).getValues()[0];
+  if (headers.indexOf('Pos') === -1) ws.getRange(1, ws.getLastColumn() + 1).setValue('Pos');
+  headers = ws.getRange(1, 1, 1, Math.max(ws.getLastColumn(), 1)).getValues()[0];
+  if (headers.indexOf('Day') === -1) ws.getRange(1, ws.getLastColumn() + 1).setValue('Day');
   return ws;
 }
 
@@ -573,11 +666,95 @@ function seedPersons() {
   var added = 0;
   PERSONS_SEED.forEach(function(p) {
     if (existingCodes[p.code]) return;
-    ws.appendRow([p.code, p.name, p.month, p.dept, true]);
+    ws.appendRow([p.code, p.name, p.month, p.dept, true, p.pos || '', p.day || '']);
     added++;
   });
 
   return {ok: true, added: added, total: PERSONS_SEED.length};
+}
+
+// ============================================================
+// ── GAME SCORES ───────────────────────────────────────────
+// Sheet columns: EmpId, PlayerName, Score, Total, Plays, BestScore, LastTs
+// ============================================================
+function ensureGameScoresSheet(ss) {
+  var ws = ss.getSheetByName(SHEET_GAMESCORES);
+  if (!ws) {
+    ws = ss.insertSheet(SHEET_GAMESCORES);
+    ws.appendRow(['EmpId','PlayerName','Score','Total','Plays','BestScore','LastTs']);
+    ws.setFrozenRows(1);
+    ws.getRange(1, 1, 1, 7).setBackground('#34D399').setFontColor('#000').setFontWeight('bold');
+  }
+  return ws;
+}
+
+// GET: ?action=saveGameScore&empId=90245&playerName=สมใจ&score=2&total=3
+// Upserts a row keyed by (EmpId, PlayerName).
+function saveGameScore(p) {
+  var empId      = String(p.empId      || '').trim();
+  var playerName = String(p.playerName || '').trim();
+  var score      = parseInt(p.score || '0', 10) || 0;
+  var total      = parseInt(p.total || '0', 10) || 0;
+  if (!playerName) return {ok: false, error: 'playerName required'};
+
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureGameScoresSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  var headers = rows[0];
+  var IDX = makeIdx(headers);
+
+  var rowIdx = -1;
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][IDX['EmpId']]) === empId && normName(rows[i][IDX['PlayerName']]) === normName(playerName)) {
+      rowIdx = i + 1;
+      break;
+    }
+  }
+
+  var now = new Date().toLocaleString('th-TH');
+
+  if (rowIdx === -1) {
+    ws.appendRow([empId, playerName, score, total, 1, score, now]);
+    return {ok: true, bestScore: score, plays: 1};
+  }
+
+  var curRow    = ws.getRange(rowIdx, 1, 1, headers.length).getValues()[0];
+  var plays     = (parseInt(curRow[IDX['Plays']], 10) || 0) + 1;
+  var bestScore = Math.max(parseInt(curRow[IDX['BestScore']], 10) || 0, score);
+
+  ws.getRange(rowIdx, IDX['Score']     + 1).setValue(score);
+  ws.getRange(rowIdx, IDX['Total']     + 1).setValue(total);
+  ws.getRange(rowIdx, IDX['Plays']     + 1).setValue(plays);
+  ws.getRange(rowIdx, IDX['BestScore'] + 1).setValue(bestScore);
+  ws.getRange(rowIdx, IDX['LastTs']    + 1).setValue(now);
+
+  return {ok: true, bestScore: bestScore, plays: plays};
+}
+
+// GET: ?action=getGameLeaderboard&empId=90245
+function getGameLeaderboard(p) {
+  var empId = String(p.empId || '').trim();
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureGameScoresSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  if (rows.length < 2) return {board: []};
+  var headers = rows[0];
+  var IDX = makeIdx(headers);
+
+  var board = [];
+  for (var i = 1; i < rows.length; i++) {
+    var r = rows[i];
+    if (!r[IDX['PlayerName']]) continue;
+    if (empId && String(r[IDX['EmpId']]) !== empId) continue;
+    board.push({
+      playerName: r[IDX['PlayerName']],
+      bestScore:  parseInt(r[IDX['BestScore']], 10) || 0,
+      plays:      parseInt(r[IDX['Plays']], 10) || 0,
+      lastTs:     r[IDX['LastTs']] || ''
+    });
+  }
+  board.sort(function(a, b) { return b.bestScore - a.bestScore; });
+  return {board: board};
 }
 
 function ensurePointsSheet(ss) {
@@ -607,13 +784,15 @@ function ensureStatsSheet(ss) {
 // ============================================================
 function setup() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ensureWishesSheet(ss);
   ensurePersonsSheet(ss);
   ensurePointsSheet(ss);
+  ensureGameScoresSheet(ss);
   var statsWs = ensureStatsSheet(ss);
   initActivityMonths(ss, statsWs);
   var seedResult = seedPersons();
   SpreadsheetApp.getUi().alert(
-    '✅ Setup สำเร็จ!\n\nSheets ที่พร้อมแล้ว:\n- Wishes\n- Persons (นำเข้าพนักงานใหม่ ' + seedResult.added + ' คน)\n- Points (ใหม่)\n- Monthly_Stats มิ.ย.-ธ.ค. 2569 (ใหม่)'
+    '✅ Setup สำเร็จ!\n\nSheets ที่พร้อมแล้ว:\n- Wishes (เพิ่ม EmpId/SenderDept/Emoji/Ts)\n- Persons (นำเข้าพนักงานใหม่ ' + seedResult.added + ' คน, เพิ่ม Pos/Day)\n- Points (ใหม่)\n- Monthly_Stats มิ.ย.-ธ.ค. 2569 (ใหม่)\n- GameScores (ใหม่)'
   );
 }
 
