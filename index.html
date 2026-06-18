@@ -4,1100 +4,1975 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>SML Birthday Wishes 🎂</title>
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Dancing+Script:wght@700&family=Mitr:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --deep:#0f0c1d;--card:rgba(255,255,255,0.07);--gold:#f5c842;
-  --rose:#ff6b9d;--mint:#00e5cc;--purple:#a78bfa;--purple2:#7c3aed;
-  --text:#fff;--sub:rgba(255,255,255,0.55);--border:rgba(255,255,255,0.12);
-  --green:#22c55e;--red:#ef4444;
-}
-html,body{min-height:100vh;background:var(--deep);color:var(--text);font-family:'Kanit',sans-serif;overflow-x:hidden}
+:root{--bg:#0d0d1a;--c1:#16162a;--c2:#1e1e35;--gold:#f5c842;--gold2:#f7a621;--rose:#ff6b9d;--mint:#00e5cc;--purple:#a78bfa;--text:#fff;--sub:rgba(255,255,255,.55);--mute:rgba(255,255,255,.28);--b:rgba(255,255,255,.08);--b2:rgba(255,255,255,.14)}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Kanit',sans-serif;overflow-x:hidden}
+/* BG */
+.bg-deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.2}
+.bb1{width:550px;height:550px;background:#4a1070;top:-150px;left:-120px;animation:drift 14s ease-in-out infinite alternate}
+.bb2{width:450px;height:450px;background:#0e2560;bottom:-80px;right:-80px;animation:drift 18s ease-in-out infinite alternate-reverse}
+.bb3{width:300px;height:300px;background:#6e1a3a;top:45%;left:30%;animation:drift 11s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(28px,22px)}}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,13,26,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--b);padding:.65rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.tb-logo{font-family:'Mitr',sans-serif;font-size:.88rem;font-weight:500;color:var(--gold);letter-spacing:.05em}
+.tb-right{display:flex;align-items:center;gap:.35rem}
+.tb-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--b2);background:transparent;color:var(--sub);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.tb-btn:hover,.tb-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,.1)}
+.admin-top-badge{font-size:.62rem;background:linear-gradient(135deg,rgba(245,200,66,.25),rgba(247,166,33,.2));border:1px solid rgba(245,200,66,.45);border-radius:20px;padding:.18rem .65rem;color:var(--gold);display:none;font-weight:600;letter-spacing:.05em;box-shadow:0 0 8px rgba(245,200,66,.2)}
+.admin-mode .admin-top-badge{display:inline-block}
+.admin-mode .tb-btn#adminLock{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,.15);box-shadow:0 0 10px rgba(245,200,66,.3)}
+/* ADMIN STRIP */
+.admin-strip{display:none;background:linear-gradient(135deg,rgba(30,15,60,.95),rgba(20,10,45,.98));border-bottom:2px solid rgba(245,200,66,.35);padding:.65rem 1rem;gap:.4rem;flex-wrap:wrap;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.admin-mode .admin-strip{display:flex}
+.as-lbl{font-size:.6rem;color:rgba(245,200,66,.5);letter-spacing:.08em;text-transform:uppercase;flex-shrink:0}
+.as-inp{flex:1;min-width:120px;background:rgba(255,255,255,.07);border:1px solid rgba(245,200,66,.25);border-radius:8px;padding:.32rem .65rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.7rem;outline:none;transition:border-color .2s}
+.as-inp:focus{border-color:rgba(245,200,66,.6)}
+.as-btn{padding:.3rem .65rem;border-radius:8px;border:1px solid rgba(245,200,66,.28);background:rgba(245,200,66,.06);color:rgba(245,200,66,.8);font-family:'Kanit',sans-serif;font-size:.67rem;cursor:pointer;white-space:nowrap;transition:all .15s;font-weight:500}
+.as-btn:hover{background:rgba(245,200,66,.18);color:var(--gold);border-color:var(--gold);transform:translateY(-1px)}
+.api-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
+.api-dot.ok{background:var(--mint);color:var(--mint)}.api-dot.err{background:var(--rose);color:var(--rose)}.api-dot.pending{background:var(--gold);color:var(--gold)}
+/* ADMIN MONTH PANEL */
+.admin-month-panel{display:none;background:linear-gradient(135deg,rgba(25,12,55,.97),rgba(18,8,40,.99));border-bottom:2px solid rgba(245,200,66,.25);padding:.75rem 1rem}
+.admin-mode .admin-month-panel.open{display:block}
+.amp-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem}
+.amp-lbl{font-size:.65rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:.35rem}
+.amp-lbl::before{content:'🗓';font-size:.85rem}
+.amp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.3rem}
+.amp-chip{padding:.32rem .2rem;border-radius:8px;font-family:'Kanit',sans-serif;font-size:.7rem;cursor:pointer;text-align:center;transition:all .18s;font-weight:500;border:1.5px solid}
+.amp-chip.on{background:rgba(245,200,66,.2);border-color:var(--gold);color:var(--gold);box-shadow:0 0 8px rgba(245,200,66,.25)}
+.amp-chip.off{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.35)}
+.amp-chip.off:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
+.amp-confirm{margin-top:.55rem;display:flex;align-items:center;gap:.5rem;background:rgba(0,229,204,.06);border:1px solid rgba(0,229,204,.18);border-radius:10px;padding:.45rem .75rem}
+.amp-confirm-icon{font-size:.95rem;flex-shrink:0}
+.amp-confirm-text{font-size:.7rem;color:rgba(0,229,204,.8);flex:1;line-height:1.45}
+.amp-confirm-text b{color:var(--mint)}
+/* MONTH SCROLL */
+.month-row{display:flex;gap:.3rem;overflow-x:auto;padding:.65rem 1rem .35rem;scrollbar-width:none}
+.month-row::-webkit-scrollbar{display:none}
+.mtab{flex-shrink:0;padding:.3rem .7rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.mtab:hover{border-color:var(--b2);color:var(--sub)}
+.mtab.active{background:rgba(245,200,66,.14);border-color:var(--gold);color:var(--gold);font-weight:500}
+.mtab.hidden-month{opacity:.28;text-decoration:line-through}
+/* PERSON ROW */
+.person-row{display:flex;gap:.3rem;overflow-x:auto;padding:.15rem 1rem .6rem;scrollbar-width:none}
+.person-row::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .78rem;border-radius:20px;border:1px solid var(--b);background:var(--c1);color:var(--sub);font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.pchip.active{background:rgba(255,107,157,.12);border-color:var(--rose);color:var(--rose);font-weight:500}
+.person-locked{font-size:.75rem;color:var(--mute);padding:.35rem 1rem}
+/* HERO */
+.hero{padding:.85rem 1rem 1rem;text-align:center;background:linear-gradient(180deg,rgba(74,16,112,.2) 0%,transparent 100%)}
+.hero-photo-wrap{display:flex;justify-content:center;margin-bottom:.75rem}
+.hero-photo{width:84px;height:84px;border-radius:50%;border:3px solid var(--gold);background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:2.4rem;position:relative;overflow:hidden;cursor:default;transition:transform .2s}
+.admin-mode .hero-photo{cursor:pointer}
+.admin-mode .hero-photo:hover{transform:scale(1.04)}
+.hero-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo-badge-inner{position:absolute;bottom:1px;right:1px;width:22px;height:22px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:.7rem;border:2px solid var(--bg)}
+.photo-hint{font-size:.6rem;color:var(--mute);margin-top:.25rem;display:none;text-align:center}
+.admin-mode .photo-hint{display:block}
+.hero-name{font-family:'Dancing Script',cursive;font-size:1.9rem;font-weight:700;color:#fff;line-height:1.1;margin-bottom:.18rem}
+.hero-pos{font-size:.72rem;color:var(--sub);margin-bottom:.5rem}
+.hero-pill{display:inline-flex;align-items:center;gap:.3rem;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:.22rem .75rem;font-size:.72rem;color:var(--gold);margin-bottom:.65rem}
+.stat-row{display:flex;justify-content:center;gap:1.25rem}
+.stat-item{text-align:center}
+.stat-n{font-size:1.3rem;font-weight:600;color:var(--gold)}
+.stat-l{font-size:.62rem;color:var(--mute)}
+/* GAME BANNER */
+.game-banner{margin:.6rem 1rem .4rem;background:linear-gradient(135deg,#3d1a6e,#1a2560);border-radius:16px;padding:1rem 1.1rem;display:flex;align-items:center;gap:.75rem;border:1px solid rgba(167,139,250,.22);position:relative;overflow:hidden;cursor:pointer;transition:opacity .2s}
+.game-banner:hover{opacity:.92}
+.game-banner::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(167,139,250,.08);border-radius:50%}
+.gb-icon{font-size:1.8rem;flex-shrink:0;position:relative;z-index:1}
+.gb-body{flex:1;position:relative;z-index:1}
+.gb-title{font-size:.85rem;font-weight:500;color:#fff;margin-bottom:.18rem;line-height:1.3}
+.gb-sub{font-size:.68rem;color:rgba(255,255,255,.45)}
+.gb-score{font-size:.72rem;color:var(--gold);background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:.2rem .65rem;flex-shrink:0;position:relative;z-index:1}
+/* QUIZ INLINE */
+.quiz-inline{margin:0 1rem .4rem;background:var(--c1);border-radius:14px;padding:.9rem 1rem;border:1px solid var(--b)}
+.qi-q{font-size:.85rem;color:#fff;margin-bottom:.65rem;line-height:1.5}
+.qi-opts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.qopt{padding:.52rem .65rem;border-radius:10px;border:1px solid var(--b2);background:transparent;color:var(--sub);font-family:'Kanit',sans-serif;font-size:.78rem;cursor:pointer;text-align:left;transition:all .15s;line-height:1.3}
+.qopt:hover:not(:disabled){background:rgba(255,255,255,.07);color:#fff}
+.qopt.correct{background:rgba(0,229,204,.1);border-color:var(--mint);color:var(--mint)}
+.qopt.wrong{background:rgba(255,107,157,.1);border-color:var(--rose);color:var(--rose)}
+.qopt:disabled{cursor:default}
+.qi-next{margin-top:.6rem;width:100%;padding:.58rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer}
+.qi-score-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem}
+.qi-score-txt{font-size:.68rem;color:var(--mute)}
+.qi-score-val{font-size:.72rem;color:var(--gold);background:rgba(245,200,66,.1);border-radius:12px;padding:.18rem .6rem}
+.qi-result{text-align:center;padding:.5rem 0}
+.qi-name-inp{width:100%;background:rgba(255,255,255,.07);border:1px solid var(--b2);border-radius:9px;padding:.45rem .7rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.82rem;outline:none;margin:.5rem 0}
+.qi-name-inp:focus{border-color:rgba(245,200,66,.4)}
+/* ADMIN QUIZ EDITOR */
+.qe-panel{display:none;margin:0 1rem .4rem;background:rgba(245,200,66,.04);border-radius:14px;padding:.85rem 1rem;border:1px solid rgba(245,200,66,.12)}
+.admin-mode .qe-panel{display:block}
+.qe-lbl{font-size:.62rem;color:rgba(245,200,66,.6);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.4rem}
+.qe-list{display:flex;flex-direction:column;gap:.3rem;max-height:130px;overflow-y:auto;margin-bottom:.4rem}
+.qe-item{display:flex;align-items:center;gap:.3rem;background:var(--c2);border-radius:8px;padding:.28rem .55rem;font-size:.7rem;color:var(--sub)}
+.qe-item-q{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qe-del{background:none;border:none;color:rgba(255,107,157,.4);cursor:pointer;font-size:.78rem;flex-shrink:0}
+.qe-del:hover{color:var(--rose)}
+.qe-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.28rem;margin-bottom:.3rem}
+.qe-inp{background:rgba(255,255,255,.06);border:1px solid var(--b2);border-radius:8px;padding:.36rem .58rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.72rem;width:100%;outline:none}
+.qe-inp:focus{border-color:rgba(245,200,66,.38)}
+.qe-add{padding:.38rem;background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.17);border-radius:8px;color:var(--gold);font-family:'Kanit',sans-serif;font-size:.7rem;cursor:pointer;width:100%}
+.qe-add:hover{background:rgba(245,200,66,.14)}
+/* WISH FORM */
+.wish-form{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.sec-title{font-size:.88rem;font-weight:500;color:#fff}
+.sec-badge{font-size:.62rem;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:.15rem .55rem;color:var(--gold)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.45rem}
+.fi{display:flex;flex-direction:column;gap:.2rem}
+.fi-full{grid-column:1/-1}
+.fl{font-size:.62rem;color:var(--mute);letter-spacing:.03em}
+.finput{background:rgba(255,255,255,.06);border:1px solid var(--b2);border-radius:9px;padding:.48rem .72rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.83rem;width:100%;outline:none;transition:border-color .2s}
+.finput:focus{border-color:rgba(245,200,66,.42)}
+.ftextarea{height:76px;resize:none;line-height:1.55}
+.emoji-bar{display:flex;gap:.22rem;flex-wrap:wrap;margin:.3rem 0 .5rem}
+.emo{width:32px;height:32px;border-radius:9px;border:1px solid var(--b);background:rgba(255,255,255,.05);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .18s;position:relative}
+.emo:hover{background:rgba(255,255,255,.12);transform:scale(1.2);border-color:rgba(255,255,255,.2);z-index:2}
+.emo:active{transform:scale(.95)}
+.emo-used{border-color:rgba(245,200,66,.4);background:rgba(245,200,66,.08)}
+/* STICKER TABS */
 
-/* ── BG ── */
-.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.bb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.3;animation:drift 14s ease-in-out infinite alternate}
-.bb1{width:500px;height:500px;background:radial-gradient(#6c3fa0,transparent);top:-120px;left:-100px}
-.bb2{width:400px;height:400px;background:radial-gradient(#1a4a6e,transparent);bottom:-60px;right:-80px;animation-delay:-6s}
-.bb3{width:280px;height:280px;background:radial-gradient(#6e1a3a,transparent);top:45%;left:45%;animation-delay:-10s}
-@keyframes drift{to{transform:translate(40px,30px) scale(1.12)}}
 
-/* ── LAYOUT ── */
-.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 0 60px}
+.sticker-tab{flex-shrink:0;padding:.22rem .6rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.sticker-tab.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
+/* CHAR COUNTER */
+.char-counter{font-size:.62rem;color:var(--mute);text-align:right;margin-top:.18rem;transition:color .2s}
+.char-counter.warn{color:var(--rose)}
+/* MOOD SELECTOR */
+.mood-row{display:flex;gap:.3rem;margin-bottom:.5rem;overflow-x:auto;scrollbar-width:none}
+.mood-row::-webkit-scrollbar{display:none}
+.mood-btn{flex-shrink:0;padding:.28rem .75rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.72rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.25rem;white-space:nowrap}
+.mood-btn:hover{border-color:var(--b2);color:var(--sub)}
+.mood-btn.active{font-weight:500}
+.mood-warm.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
+.mood-cute.active{background:rgba(255,107,157,.1);border-color:var(--rose);color:var(--rose)}
+.mood-cool.active{background:rgba(0,229,204,.08);border-color:var(--mint);color:var(--mint)}
+.mood-funny.active{background:rgba(167,139,250,.1);border-color:var(--purple);color:var(--purple)}
+/* SEND BUTTON ANIM */
+.send-btn{width:100%;padding:.72rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:12px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.send-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .4s}
+.send-btn:hover::before{transform:translateX(100%)}
+.send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,200,66,.35)}
+.send-btn:active{transform:scale(.98)}
+.send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+/* TEMPLATE SUGGESTIONS */
+.tmpl-row{display:flex;gap:.28rem;flex-wrap:wrap;margin-bottom:.45rem}
+/* CUSTOM STICKER EDITOR */
 
-/* ── HEADER ── */
-.hero{
-  background:linear-gradient(135deg,#7c3aed,#db2777,#ea580c);
-  padding:32px 20px 24px;text-align:center;
-  border-radius:0 0 28px 28px;
-}
-.hero h1{font-family:'Dancing Script',cursive;font-size:2rem;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3)}
-.hero p{font-size:.88rem;color:rgba(255,255,255,.8);margin-top:4px}
 
-/* ── POINTS BADGE ── */
-.pts-bar{
-  margin:14px 16px 0;
-  background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(219,39,119,.25));
-  border:1px solid var(--border);border-radius:16px;
-  padding:14px 18px;display:flex;align-items:center;gap:12px;
-  display:none;
-}
-.pts-bar.show{display:flex}
-.pts-star{font-size:2rem}
-.pts-info .lbl{font-size:.75rem;color:var(--sub)}
-.pts-info .val{font-size:1.6rem;font-weight:700;color:var(--gold)}
-.pts-detail{margin-left:auto;font-size:.75rem;color:var(--sub);text-align:right;line-height:1.7}
+.sticker-add-inp::placeholder{font-size:.65rem;color:var(--mute)}
 
-/* ── NAME INPUT ── */
-.name-section{margin:14px 16px 0}
-.name-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px}
-.name-card label{font-size:.85rem;color:var(--sub);margin-bottom:6px;display:block}
-.name-row{display:flex;gap:8px}
-.name-row input{
-  flex:1;padding:10px 14px;border-radius:10px;
-  border:1.5px solid var(--border);background:rgba(255,255,255,.06);
-  color:#fff;font-family:'Kanit',sans-serif;font-size:.95rem;outline:none;
-}
-.name-row input:focus{border-color:var(--purple)}
-.name-row input::placeholder{color:var(--sub)}
-.btn-confirm{
-  padding:10px 18px;border-radius:10px;border:none;
-  background:linear-gradient(135deg,var(--purple2),#db2777);
-  color:#fff;font-family:'Kanit',sans-serif;font-weight:600;font-size:.9rem;cursor:pointer;
-  white-space:nowrap;
-}
+.sticker-add-btn:hover{background:rgba(245,200,66,.18);border-color:var(--gold)}
 
-/* ── TABS ── */
-.tabs{display:flex;gap:6px;padding:16px 16px 0;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{
-  padding:8px 16px;border-radius:99px;white-space:nowrap;
-  font-family:'Kanit',sans-serif;font-size:.83rem;font-weight:500;
-  border:1.5px solid var(--border);background:rgba(255,255,255,.04);
-  color:var(--sub);cursor:pointer;transition:all .2s;
-}
-.tab.active{background:var(--purple2);color:#fff;border-color:var(--purple2)}
+.sticker-clear-btn:hover{background:rgba(255,107,157,.1);color:var(--rose)}
 
-/* ── CONTENT ── */
-.pane{display:none;padding:14px 16px 0}
-.pane.active{display:block}
-
-/* ── CARD ── */
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px}
-.sec-title{font-size:.95rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-
-/* ── FORM ── */
-input[type=text],textarea,select{
-  width:100%;padding:10px 14px;border-radius:10px;
-  border:1.5px solid var(--border);background:rgba(255,255,255,.06);
-  color:#fff;font-family:'Kanit',sans-serif;font-size:.92rem;outline:none;margin-bottom:10px;
-}
-input:focus,textarea:focus{border-color:var(--purple)}
-textarea{resize:vertical;min-height:80px}
-input::placeholder,textarea::placeholder{color:var(--sub)}
-.field-lbl{font-size:.8rem;color:var(--sub);margin-bottom:4px}
-
-/* ── MOOD ── */
-.moods{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.mood-btn{
-  padding:6px 14px;border-radius:99px;border:1.5px solid var(--border);
-  background:rgba(255,255,255,.04);color:var(--sub);cursor:pointer;
-  font-family:'Kanit',sans-serif;font-size:.82rem;transition:all .2s;
-}
-.mood-btn.sel{background:rgba(124,58,237,.35);border-color:var(--purple);color:#fff}
-
-/* ── EMOJI GRID ── */
-.emoji-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.emoji-btn{font-size:1.4rem;background:none;border:none;cursor:pointer;padding:2px;border-radius:6px;transition:transform .15s}
-.emoji-btn:hover{transform:scale(1.25)}
-
-/* ── BUTTONS ── */
-.btn{
-  width:100%;padding:13px;border:none;border-radius:12px;
-  font-family:'Kanit',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:transform .15s,opacity .15s;
-}
-.btn:active{transform:scale(.97)}
-.btn-rose{background:linear-gradient(135deg,var(--rose),#c026d3);color:#fff}
-.btn-purple{background:linear-gradient(135deg,var(--purple2),#6366f1);color:#fff}
-.btn-gold{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
-.btn-sm{padding:8px 16px;width:auto;font-size:.85rem;border-radius:10px}
-.btn-outline{background:transparent;border:1.5px solid var(--purple);color:var(--purple)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.mt8{margin-top:8px}
-
-/* ── WISH WALL ── */
-.wish-item{
-  background:rgba(255,255,255,.05);border:1px solid var(--border);
-  border-radius:14px;padding:14px;margin-bottom:10px;
-}
-.wish-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.wish-photo{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--purple)}
-.wish-name{font-weight:600;font-size:.9rem}
-.wish-mood{font-size:.72rem;color:var(--sub);margin-top:1px}
-.wish-msg{font-size:.88rem;line-height:1.6;color:rgba(255,255,255,.88)}
-.wish-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
-.wish-time{font-size:.72rem;color:var(--sub)}
-.like-btn{
-  display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;
-  border:1px solid var(--border);background:rgba(255,255,255,.04);
-  color:var(--sub);cursor:pointer;font-family:'Kanit',sans-serif;font-size:.82rem;
-  transition:all .2s;
-}
-.like-btn.liked{background:rgba(255,107,157,.2);border-color:var(--rose);color:var(--rose)}
-
-/* ── QUIZ ── */
-.quiz-prog-bg{background:rgba(255,255,255,.1);border-radius:99px;height:6px;margin-bottom:14px}
-.quiz-prog{background:linear-gradient(90deg,var(--rose),var(--purple));height:6px;border-radius:99px;transition:width .4s}
-.quiz-q{font-size:1rem;font-weight:600;line-height:1.5;margin-bottom:14px}
-.quiz-opts{display:flex;flex-direction:column;gap:8px}
-.quiz-opt{
-  padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);
-  background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;
-  font-family:'Kanit',sans-serif;font-size:.9rem;text-align:left;transition:all .2s;
-}
-.quiz-opt:hover:not(:disabled){border-color:var(--purple);background:rgba(124,58,237,.2)}
-.quiz-opt.correct{border-color:var(--green)!important;background:rgba(34,197,94,.18)!important;color:#4ade80}
-.quiz-opt.wrong{border-color:var(--red)!important;background:rgba(239,68,68,.18)!important;color:#f87171}
-.quiz-opt:disabled{cursor:default}
-
-/* ── RESULT BOX ── */
-.result-box{text-align:center;padding:24px 16px}
-.result-emoji{font-size:3.2rem}
-.result-title{font-size:1.2rem;font-weight:700;margin-top:8px}
-.result-sub{font-size:.85rem;color:var(--sub);margin-top:4px}
-.pts-earned{
-  display:inline-block;margin-top:14px;
-  background:rgba(245,200,66,.15);border:1.5px solid var(--gold);
-  border-radius:12px;padding:8px 22px;font-size:1rem;font-weight:700;color:var(--gold);
-}
-
-/* ── LEADERBOARD ── */
-.lb-tabs{display:flex;gap:6px;margin-bottom:12px}
-.lb-tab{
-  padding:6px 14px;border-radius:99px;font-size:.82rem;font-family:'Kanit',sans-serif;
-  border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:var(--sub);cursor:pointer;
-}
-.lb-tab.active{background:var(--purple2);color:#fff;border-color:var(--purple2)}
-.lb-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-.lb-row:last-child{border-bottom:none}
-.lb-rank{font-size:1.1rem;min-width:26px}
-.lb-name{flex:1;font-size:.9rem}
-.lb-pts{font-weight:700;color:var(--gold);font-size:.95rem}
-.lb-sub{font-size:.72rem;color:var(--sub)}
-
-/* ── MONTHLY STATS TABLE ── */
-.stats-section{padding:0 16px;margin-top:6px}
-.stats-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.stats-header .sec-title{margin-bottom:0}
-.refresh-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--sub);padding:5px 12px;border-radius:8px;font-family:'Kanit',sans-serif;font-size:.8rem;cursor:pointer}
-.refresh-btn:hover{color:#fff;border-color:var(--purple)}
-
-/* Summary cards */
-.summary-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.sum-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
-.sum-icon{font-size:1.4rem}
-.sum-val{font-size:1.3rem;font-weight:700;margin-top:4px}
-.sum-lbl{font-size:.7rem;color:var(--sub);margin-top:2px;line-height:1.3}
-.sum-card.wish .sum-val{color:#fb923c}
-.sum-card.quiz .sum-val{color:#60a5fa}
-.sum-card.total .sum-val{color:var(--green)}
-
-/* Stats table */
-.stats-table-wrap{overflow-x:auto}
-.stats-table{width:100%;border-collapse:collapse;font-size:.82rem}
-.stats-table th{
-  background:rgba(124,58,237,.3);color:rgba(255,255,255,.8);
-  padding:9px 10px;text-align:center;font-weight:600;
-  border-bottom:1px solid var(--border);white-space:nowrap;
-}
-.stats-table td{
-  padding:9px 10px;text-align:center;border-bottom:1px solid rgba(255,255,255,.05);
-  vertical-align:middle;
-}
-.stats-table tr:last-child td{border-bottom:none}
-.stats-table tr:hover td{background:rgba(255,255,255,.03)}
-.rank-medal{font-size:1.1rem}
-.bar-wrap{display:flex;align-items:center;gap:6px;justify-content:center}
-.bar-bg{flex:1;max-width:60px;background:rgba(255,255,255,.1);border-radius:99px;height:5px}
-.bar-fill{height:5px;border-radius:99px}
-.bar-wish{background:linear-gradient(90deg,#fb923c,#f59e0b)}
-.bar-quiz{background:linear-gradient(90deg,#60a5fa,#818cf8)}
-.month-tag{
-  display:inline-block;padding:3px 10px;border-radius:99px;
-  background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.4);
-  font-size:.78rem;font-weight:600;
-}
-.no-data{text-align:center;padding:24px;color:var(--sub);font-size:.88rem}
-.skeleton{animation:pulse 1.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
-
-/* ── ADMIN ── */
-.admin-strip{display:none;background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(219,39,119,.2));border-bottom:1px solid var(--border);padding:10px 16px}
-.admin-mode .admin-strip{display:block}
-.admin-mode .admin-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.admin-badge{background:var(--purple2);color:#fff;font-size:.72rem;padding:3px 10px;border-radius:99px;font-weight:700}
-
-/* ── SPIN WHEEL ── */
-.wheel-wrap{text-align:center;padding:10px 0}
-canvas#wheel{border-radius:50%;box-shadow:0 0 30px rgba(124,58,237,.5)}
-.wheel-ptr{font-size:2rem;margin:6px 0}
-
-/* ── QR ── */
-.qr-box{text-align:center}
-#qrcode{display:inline-block;padding:12px;background:#fff;border-radius:12px;margin:10px 0}
-.qr-url{font-size:.72rem;color:var(--sub);word-break:break-all;margin-top:4px}
-
-/* ── TOAST ── */
-.toast{
-  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-  background:rgba(20,10,40,.95);border:1px solid var(--purple);color:#fff;
-  padding:11px 22px;border-radius:99px;font-size:.88rem;font-weight:500;
-  opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:9999;
-}
-.toast.show{opacity:1}
-
-/* ── PHOTO UPLOAD ── */
-.photo-prev{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--purple);display:none}
-.upload-lbl{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:1.5px dashed var(--border);color:var(--sub);cursor:pointer;font-size:.82rem;margin-bottom:10px}
-.upload-lbl:hover{border-color:var(--purple);color:var(--purple)}
+.tmpl-btn{flex-shrink:0;padding:.25rem .65rem;border-radius:20px;border:1px dashed rgba(255,255,255,.15);background:rgba(255,255,255,.03);color:rgba(255,255,255,.5);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s;line-height:1.3}
+.tmpl-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.25);color:#fff}
+.send-btn{width:100%;padding:.68rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:11px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.send-btn:hover{opacity:.9}
+.send-btn:disabled{opacity:.45;cursor:not-allowed}
+.success-msg{display:none;text-align:center;color:var(--mint);font-size:.8rem;margin-top:.5rem}
+.success-msg.show{display:block}
+/* VOTE */
+.vote-sec{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.vote-card{display:flex;align-items:center;gap:.5rem;padding:.42rem .6rem;border-radius:10px;border:1px solid var(--b);background:var(--c2);margin-bottom:.3rem;cursor:pointer;transition:border-color .15s}
+.vote-card:hover{border-color:var(--b2)}
+.vote-card.voted{border-color:var(--rose)}
+.vote-medal{font-size:.88rem;flex-shrink:0;width:18px}
+.vote-msg{flex:1;min-width:0;font-size:.73rem;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vote-bar-wrap{width:60px;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;flex-shrink:0}
+.vote-bar{height:100%;background:var(--rose);border-radius:2px;transition:width .4s}
+.vote-cnt{font-size:.62rem;color:var(--rose);min-width:22px;text-align:right;flex-shrink:0}
+.vote-empty{font-size:.75rem;color:var(--mute);padding:.3rem 0}
+/* WISH WALL */
+.wish-wall{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.wall-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
+.wall-refresh{background:none;border:1px solid var(--b);border-radius:7px;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.68rem;padding:.25rem .55rem;cursor:pointer;transition:all .2s}
+.wall-refresh:hover{border-color:var(--gold);color:var(--gold)}
+.wish-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.wish-card{background:var(--c2);border-radius:12px;padding:.75rem;position:relative;overflow:hidden;animation:cardIn .3s ease both;border-left:2.5px solid transparent}
+.wc-0{border-color:var(--gold)}.wc-1{border-color:var(--rose)}.wc-2{border-color:var(--mint)}.wc-3{border-color:var(--purple)}.wc-4{border-color:#34d399}.wc-5{border-color:#f472b6}
+@keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.wish-hidden{opacity:.25;filter:grayscale(1)}
+.wish-emoji{font-size:1.3rem;margin-bottom:.25rem}
+.wish-msg{font-size:.73rem;color:rgba(255,255,255,.8);line-height:1.55;margin-bottom:.42rem;word-break:break-word}
+.wish-from{font-size:.62rem;color:var(--mute)}
+.wish-from-name{color:var(--gold);font-weight:500}
+.wish-ts{font-size:.58rem;opacity:.4;display:block;margin-top:.1rem}
+.wish-actions{display:none;position:absolute;top:.38rem;right:.38rem;gap:.22rem}
+.admin-mode .wish-card .wish-actions{display:flex}
+.wact{width:22px;height:22px;border-radius:6px;border:none;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center}
+.wact-hide{background:rgba(245,200,66,.1);color:var(--gold)}
+.wact-del{background:rgba(255,107,157,.1);color:var(--rose)}
+.wish-empty{grid-column:1/-1;text-align:center;padding:1.8rem 1rem;color:var(--mute)}
+.wish-empty-icon{font-size:2rem;margin-bottom:.4rem}
+/* PARTICIPANTS */
+.part-sec{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.part-chips{display:flex;flex-wrap:wrap;gap:.28rem}
+.part-chip{display:flex;align-items:center;gap:.22rem;padding:.2rem .6rem;border-radius:20px;background:var(--c2);border:1px solid var(--b);font-size:.68rem;color:var(--sub)}
+.part-chip.winner{background:rgba(245,200,66,.1);border-color:var(--gold);color:var(--gold);font-weight:500}
+.part-empty{font-size:.72rem;color:var(--mute)}
+/* WHEEL */
+.wheel-sec{margin:.4rem 1rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.wheel-wrap{display:flex;flex-direction:column;align-items:center;gap:.65rem;padding-top:.25rem}
+.wheel-frame{position:relative;width:240px;height:240px}
+canvas#wheelCanvas{border-radius:50%}
+.wheel-ptr{position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:20px solid var(--gold)}
+.wheel-result-txt{font-size:.92rem;font-weight:500;color:var(--gold);min-height:1.3rem;text-align:center}
+.wheel-admin-btns{display:none;flex-direction:column;align-items:center;gap:.38rem;width:100%}
+.wheel-spin-btn{padding:.6rem 1.8rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:30px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.wheel-spin-btn:disabled{opacity:.42;cursor:not-allowed}
+.wheel-export-btn{padding:.35rem 1rem;background:transparent;border:1px solid rgba(245,200,66,.2);border-radius:20px;color:rgba(245,200,66,.65);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
+.wheel-export-btn:hover{background:rgba(245,200,66,.08);color:var(--gold)}
+.wheel-pub-hint{font-size:.68rem;color:var(--mute);text-align:center}
+/* LEADERBOARD */
+.lb-sec{margin:.4rem 1rem .4rem;background:var(--c1);border-radius:16px;padding:1rem;border:1px solid var(--b)}
+.lb-tabs{display:flex;gap:.28rem;margin-bottom:.7rem}
+.lb-tab{padding:.22rem .72rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
+.lb-tab.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
+.lb-row{display:flex;align-items:center;gap:.5rem;padding:.38rem .6rem;border-radius:9px;background:var(--c2);margin-bottom:.28rem}
+.lb-rank{font-size:.9rem;width:20px;text-align:center;flex-shrink:0}
+.lb-ava{width:24px;height:24px;border-radius:50%;background:rgba(245,200,66,.14);display:flex;align-items:center;justify-content:center;font-size:.58rem;color:var(--gold);flex-shrink:0;font-weight:600}
+.lb-name{flex:1;font-size:.78rem;color:#fff}
+.lb-score{font-size:.68rem;color:var(--gold);flex-shrink:0}
+.lb-empty{font-size:.72rem;color:var(--mute);padding:.3rem 0}
+/* SPACER */
+.spacer-bottom{height:1.5rem}
+/* NOTIFICATIONS */
+.offline-banner{display:none;position:sticky;top:53px;z-index:49;background:linear-gradient(90deg,#92400e,#78350f);padding:.38rem 1rem;text-align:center;font-size:.72rem}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(70px);background:rgba(0,229,204,.12);border:1px solid var(--mint);border-radius:30px;padding:.44rem 1.1rem;font-size:.78rem;color:var(--mint);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;z-index:100;opacity:0;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.like-notif{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(70px);background:rgba(255,107,157,.12);border:1px solid var(--rose);border-radius:30px;padding:.44rem 1.1rem;font-size:.78rem;color:var(--rose);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;z-index:99;opacity:0;pointer-events:none;white-space:nowrap}
+.like-notif.show{transform:translateX(-50%) translateY(0);opacity:1}
+.like-heart-fly{position:fixed;pointer-events:none;z-index:98;font-size:1.4rem;animation:heartFly 1.2s ease forwards}
+@keyframes heartFly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-100px) scale(1.5)}}
+.confetti-piece{position:fixed;pointer-events:none;z-index:97;width:7px;height:7px;border-radius:2px;animation:cfFall 2.5s ease forwards}
+@keyframes cfFall{0%{opacity:1;transform:translate(0,0) rotate(0deg)}100%{opacity:0;transform:translate(var(--dx),90vh) rotate(720deg)}}
+/* SYNC STATUS */
+#syncStatus{font-size:.62rem;color:var(--mute);text-align:center;padding:.18rem 1rem;min-height:1rem}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-box{background:#1a1230;border:1px solid rgba(245,200,66,.18);border-radius:20px;padding:1.35rem;width:100%;max-width:340px;display:flex;flex-direction:column;gap:.75rem}
+.modal-title{font-size:.92rem;font-weight:500;color:#fff;display:flex;align-items:center;gap:.3rem}
+.modal-input{background:rgba(255,255,255,.07);border:1px solid var(--b2);border-radius:10px;padding:.5rem .78rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.86rem;width:100%;outline:none;transition:border-color .2s}
+.modal-input:focus{border-color:rgba(245,200,66,.42)}
+.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.modal-btn-primary{padding:.6rem;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#1a0a00;font-family:'Kanit',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer}
+.modal-btn-ghost{padding:.6rem;background:transparent;border:1px solid var(--b2);border-radius:10px;color:var(--sub);font-family:'Kanit',sans-serif;font-size:.86rem;cursor:pointer}
+.modal-sep{height:1px;background:var(--b)}
+.modal-label{font-size:.65rem;color:var(--mute);letter-spacing:.04em}
+.modal-danger{color:var(--rose);font-size:.76rem;background:rgba(255,107,157,.05);border:1px solid rgba(255,107,157,.16);border-radius:10px;padding:.52rem .78rem;cursor:pointer;font-family:'Kanit',sans-serif;width:100%;text-align:left}
+.modal-danger:hover{background:rgba(255,107,157,.11)}
+.modal-success-msg{font-size:.72rem;color:var(--mint);text-align:center;display:none}
 </style>
 </head>
 <body>
-<div class="bg"><div class="bb bb1"></div><div class="bb bb2"></div><div class="bb bb3"></div></div>
+<div class="bg-deco"><div class="bb bb1"></div><div class="bb bb2"></div><div class="bb bb3"></div></div>
+<div class="offline-banner" id="offlineBanner">⚠️ ออฟไลน์</div>
 
-<!-- ADMIN BAR -->
-<div class="admin-strip">
-  <span class="admin-badge">👑 ADMIN</span>
-  <button class="btn btn-sm btn-outline" onclick="openQRModal()">📲 QR Code</button>
-  <button class="btn btn-sm btn-outline" onclick="openWheelModal()">🎡 Spin Wheel</button>
-  <button class="btn btn-sm btn-outline" onclick="exportScores()">📊 Export</button>
-  <button class="btn btn-sm" style="background:rgba(239,68,68,.3);border:1px solid #ef4444;color:#f87171" onclick="logoutAdmin()">ออก</button>
-</div>
-
-<div class="wrap">
-  <!-- HERO -->
-  <div class="hero">
-    <h1>🎂 SML Birthday Wishes</h1>
-    <p id="heroSub">ร่วมอวยพร · ตอบคำถาม · สะสมแต้ม</p>
-  </div>
-
-  <!-- POINTS BAR -->
-  <div class="pts-bar" id="ptsBar">
-    <div class="pts-star">⭐</div>
-    <div class="pts-info">
-      <div class="lbl">แต้มสะสมของคุณ</div>
-      <div class="val" id="ptsVal">0</div>
-    </div>
-    <div class="pts-detail" id="ptsDetail"></div>
-  </div>
-
-  <!-- NAME INPUT -->
-  <div class="name-section">
-    <div class="name-card">
-      <label>👤 ชื่อของคุณ (สำหรับบันทึกแต้ม)</label>
-      <div class="name-row">
-        <input type="text" id="myName" list="personList" placeholder="พิมพ์ชื่อ-นามสกุล เช่น สมใจ ใจดี" maxlength="50"
-               onkeydown="if(event.key==='Enter') confirmName()">
-        <datalist id="personList"></datalist>
-        <button class="btn-confirm" onclick="confirmName()">ยืนยัน ✓</button>
-      </div>
-      <div style="font-size:.75rem;color:var(--sub);margin-top:2px">* ชื่อจะใช้สะสมแต้มและแสดงบน Leaderboard</div>
-      <div id="myDeptTag" style="font-size:.78rem;color:var(--mint);margin-top:4px;display:none"></div>
-    </div>
-  </div>
-
-  <!-- TABS -->
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('wish',this)">💌 อวยพร</button>
-    <button class="tab" onclick="showTab('quiz',this)">🎯 Quiz</button>
-    <button class="tab" onclick="showTab('board',this)">🏆 Leaderboard</button>
-    <button class="tab" onclick="showTab('admin',this)" id="adminTab" style="display:none">🔐 Admin</button>
-  </div>
-
-  <!-- PANE: WISH -->
-  <div class="pane active" id="pane-wish">
-    <div class="card">
-      <div class="sec-title">💌 เขียนคำอวยพร</div>
-      <div id="wishFormWrap">
-        <div class="field-lbl">อารมณ์วันนี้</div>
-        <div class="moods" id="moodBtns"></div>
-        <div class="field-lbl">เลือก Emoji</div>
-        <div class="emoji-grid" id="emojiGrid"></div>
-        <div class="field-lbl">คำอวยพร</div>
-        <textarea id="wishMsg" placeholder="เขียนคำอวยพรให้เพื่อนร่วมงานที่เกิดไตรมาสนี้..." maxlength="200"></textarea>
-        <div style="text-align:right;font-size:.72rem;color:var(--sub);margin-top:-8px;margin-bottom:8px" id="msgCount">0/200</div>
-        <label class="upload-lbl">
-          📷 แนบรูปถ้ามี
-          <input type="file" accept="image/*" style="display:none" onchange="previewPhoto(this)">
-        </label>
-        <img id="photoPrev" class="photo-prev">
-        <button class="btn btn-rose mt8" id="wishBtn" onclick="submitWish()">💌 ส่งคำอวยพร (+1 แต้ม)</button>
-      </div>
-      <div id="wishDoneBox" class="result-box" style="display:none">
-        <div class="result-emoji">💌</div>
-        <div class="result-title">ส่งคำอวยพรแล้ว!</div>
-        <div class="result-sub">แต้มถูกบันทึกเรียบร้อยค่ะ</div>
-        <div class="pts-earned">+1 ⭐ แต้ม</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="sec-title">💬 Wish Wall</div>
-      <div id="wishWall"><div class="no-data skeleton">กำลังโหลด...</div></div>
-    </div>
-  </div>
-
-  <!-- PANE: QUIZ -->
-  <div class="pane" id="pane-quiz">
-    <div class="card" id="quizCard"></div>
-  </div>
-
-  <!-- PANE: LEADERBOARD -->
-  <div class="pane" id="pane-board">
-    <div class="card">
-      <div class="lb-tabs">
-        <button class="lb-tab active" onclick="showLbTab('pts',this)">⭐ แต้มสะสม</button>
-        <button class="lb-tab" onclick="showLbTab('quiz',this)">🎯 Quiz</button>
-        <button class="lb-tab" onclick="showLbTab('likes',this)">❤️ Likes</button>
-      </div>
-      <div id="lbContent"><div class="no-data skeleton">กำลังโหลด...</div></div>
-    </div>
-  </div>
-
-  <!-- PANE: ADMIN -->
-  <div class="pane" id="pane-admin">
-    <div class="card" id="adminLoginCard">
-      <div class="sec-title">🔐 Admin Login</div>
-      <input type="password" id="adminPwd" placeholder="รหัสผ่าน Admin" onkeydown="if(event.key==='Enter') doAdminLogin()">
-      <button class="btn btn-purple" onclick="doAdminLogin()">เข้าสู่ระบบ</button>
-    </div>
-    <div id="adminPanel" style="display:none">
-      <div class="card">
-        <div class="sec-title">📲 QR Code แชร์ให้พนักงาน</div>
-        <div class="qr-box">
-          <div id="qrcode"></div>
-          <div class="qr-url" id="qrUrl"></div>
-        </div>
-        <button class="btn btn-outline mt8" onclick="downloadQR()">⬇️ บันทึก QR</button>
-      </div>
-      <div class="card">
-        <div class="sec-title">🎡 Spin Wheel (จับรางวัล)</div>
-        <div class="wheel-wrap">
-          <canvas id="wheel" width="260" height="260"></canvas>
-          <div class="wheel-ptr">⬇️</div>
-          <button class="btn btn-gold mt8" onclick="spinWheel()">หมุนจับรางวัล!</button>
-          <div id="wheelResult" style="margin-top:10px;font-size:1rem;font-weight:600;color:var(--gold)"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="sec-title">⚙️ จัดการ</div>
-        <button class="btn btn-purple mt8" onclick="exportScores()">📊 Export คะแนน Excel</button>
-        <button class="btn btn-outline mt8" onclick="importPersonsAdmin()">👥 นำเข้าข้อมูลพนักงาน (Persons)</button>
-        <div style="font-size:.72rem;color:var(--sub);margin-top:6px">จำนวนพนักงานที่โหลดแล้ว: <b id="personsCount">0</b> คน</div>
-      </div>
-    </div>
-  </div>
-</div><!-- /wrap -->
-
-<!-- ── MONTHLY STATS (ด้านล่างสุด นอก wrap) ── -->
-<div class="stats-section" style="max-width:480px;margin:0 auto;padding-bottom:40px">
-  <div class="card">
-    <div class="stats-header">
-      <div class="sec-title">📊 สถิติผู้ร่วมกิจกรรมรายเดือน<br><small style="font-weight:400;font-size:.75rem;color:var(--sub)">มิ.ย. – ธ.ค. 2569</small></div>
-      <button class="refresh-btn" onclick="loadMonthlyStats()">🔄 รีเฟรช</button>
-    </div>
-
-    <!-- Summary cards -->
-    <div class="summary-cards">
-      <div class="sum-card wish">
-        <div class="sum-icon">💌</div>
-        <div class="sum-val" id="sumWish">—</div>
-        <div class="sum-lbl">รวมอวยพร<br>ทั้งหมด</div>
-      </div>
-      <div class="sum-card quiz">
-        <div class="sum-icon">🎯</div>
-        <div class="sum-val" id="sumQuiz">—</div>
-        <div class="sum-lbl">รวมตอบ Quiz<br>ทั้งหมด</div>
-      </div>
-      <div class="sum-card total">
-        <div class="sum-icon">👥</div>
-        <div class="sum-val" id="sumTotal">—</div>
-        <div class="sum-lbl">ผู้เข้าร่วม<br>(ไม่ซ้ำ)</div>
-      </div>
-    </div>
-
-    <!-- Top 10 Table -->
-    <div class="stats-table-wrap">
-      <table class="stats-table" id="statsTable">
-        <thead>
-          <tr>
-            <th>อันดับ</th>
-            <th>เดือน</th>
-            <th>💌 อวยพร</th>
-            <th>🎯 Quiz</th>
-            <th>👥 รวม</th>
-          </tr>
-        </thead>
-        <tbody id="statsTbody">
-          <tr><td colspan="5" class="no-data skeleton">กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <!-- All months row -->
-    <div style="margin-top:12px">
-      <div class="sec-title" style="font-size:.85rem">📅 ยอดสะสมทุกเดือน (มิ.ย.–ธ.ค.)</div>
-      <div id="allMonthsRow" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>
-    </div>
+<div class="topbar">
+  <div class="tb-logo">🎂 SML Birthday</div>
+  <div id="syncStatus"></div>
+  <div class="tb-right">
+    <span class="admin-top-badge">ADMIN</span>
+    <button class="tb-btn" id="adminLock" onclick="showAdminPrompt()" title="Admin">🔒</button>
   </div>
 </div>
 
+<div class="admin-strip" id="apiBar">
+  <span class="as-lbl">Script URL</span>
+  <input class="as-inp" id="apiUrl" type="text" placeholder="วาง Google Apps Script URL..." oninput="saveApiUrl()">
+  <div class="api-dot pending" id="apiDot"></div>
+  <button class="as-btn" onclick="testApi()">ทดสอบ</button>
+  <button class="as-btn" onclick="reloadPersons()">🔄 พนักงาน</button>
+  <button class="as-btn" onclick="toggleMonthCtrl()">🗓</button>
+  <button class="as-btn" onclick="showAdminSettings()">⚙️</button>
+</div>
+
+<div class="admin-month-panel" id="adminMonthCtrl">
+  <div class="amp-hdr">
+    <span class="amp-lbl">เดือนที่แสดงให้พนักงาน</span>
+    <button onclick="toggleAllMonths()" style="background:none;border:1px solid rgba(245,200,66,.22);border-radius:6px;color:rgba(245,200,66,.6);font-family:'Kanit',sans-serif;font-size:.6rem;padding:.1rem .42rem;cursor:pointer">เลือกทั้งหมด</button>
+  </div>
+  <div id="amcGrid" class="amp-grid"></div>
+  <div class="amp-confirm" id="ampConfirm" style="display:none">
+    <div class="amp-confirm-icon">✅</div>
+    <div class="amp-confirm-text" id="ampConfirmText">เปิดใช้งาน <b>0 เดือน</b> — พนักงานจะเห็นเฉพาะเดือนเหล่านี้</div>
+  </div>
+</div>
+
+<div class="month-row" id="monthTabs"></div>
+<div class="person-row" id="personChips"><div class="person-locked">เลือกเดือนด้านบน</div></div>
+
+<div class="hero" id="hero">
+  <div class="hero-photo-wrap">
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="hero-photo" id="empPhotoFrame" onclick="adminUploadPhoto()">
+        <span id="empPhotoEmoji" style="position:relative;z-index:1">🎂</span>
+        <img id="empPhoto" src="" style="display:none">
+        <div class="photo-badge-inner">🎉</div>
+      </div>
+      <div class="photo-hint" id="photoUploadHint">📷 คลิกอัปโหลดรูป</div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="onPhotoSelected(event)">
+    </div>
+  </div>
+  <div class="hero-name" id="hero-name">เลือกพนักงาน</div>
+  <div class="hero-pos" id="hero-pos">—</div>
+  <div class="hero-pill" id="hero-date"><span>🎂</span><span>เกิดเดือน...</span></div>
+  <div class="stat-row">
+    <div class="stat-item"><div class="stat-n" id="wish-count">0</div><div class="stat-l">คำอวยพร</div></div>
+    <div class="stat-item"><div class="stat-n" id="like-total">0</div><div class="stat-l">❤️ ไลก์</div></div>
+    <div class="stat-item"><div class="stat-n" id="player-count">0</div><div class="stat-l">ผู้เล่น</div></div>
+  </div>
+</div>
+
+<!-- WISH FORM -->
+<div class="wish-form" id="wish-form">
+  <div class="sec-hdr">
+    <div class="sec-title">✍️ เขียนคำอวยพร</div>
+    <div class="sec-badge" id="wishFormBadge">กรอกชื่อก่อนนะ</div>
+  </div>
+
+  <!-- MOOD SELECTOR -->
+  <div class="mood-row" id="moodRow">
+    <div class="fl" style="flex-shrink:0;align-self:center">บรรยากาศ:</div>
+    <button class="mood-btn mood-warm active" data-mood="warm" onclick="setMood(this)">🌟 อบอุ่น</button>
+    <button class="mood-btn mood-cute" data-mood="cute" onclick="setMood(this)">🥰 น่ารัก</button>
+    <button class="mood-btn mood-cool" data-mood="cool" onclick="setMood(this)">😎 เท่ๆ</button>
+    <button class="mood-btn mood-funny" data-mood="funny" onclick="setMood(this)">😄 ฮา</button>
+  </div>
+
+  <!-- TEMPLATE SUGGESTIONS -->
+  <div class="tmpl-row" id="tmplRow"></div>
+
+  <div class="form-grid">
+    <div class="fi"><div class="fl">ชื่อของคุณ *</div><input class="finput" id="wf-name" placeholder="ชื่อเล่น / ชื่อ-สกุล" maxlength="50" oninput="onNameInput()"></div>
+    <div class="fi"><div class="fl">แผนก / ทีม</div><input class="finput" id="wf-dept" placeholder="PDI, HR, Yard..."></div>
+    <div class="fi fi-full">
+      <div class="fl" style="display:flex;justify-content:space-between">
+        <span>คำอวยพร *</span>
+        <span class="char-counter" id="charCounter">0/200</span>
+      </div>
+      <textarea class="finput ftextarea" id="wf-text" placeholder="เขียนคำอวยพรให้เพื่อนร่วมงาน..." maxlength="200" oninput="onTextInput()"></textarea>
+    </div>
+  </div>
+
+  <!-- EMOJI GRID -->
+  <div class="fl" style="margin:.4rem 0 .25rem;font-size:.65rem;color:var(--mute)">กด Emoji เพื่อใส่ในข้อความ 👇</div>
+  <div class="emoji-bar" id="emojiBar">
+    <!-- inline fallback — will be overwritten by initStickerSystem() -->
+  </div>
+
+  <button class="send-btn" id="send-btn" onclick="submitWish()">🎊 ส่งคำอวยพร!</button>
+  <div class="success-msg" id="success-msg">🎉 ส่งคำอวยพรสำเร็จ! ขอบคุณนะ ❤️</div>
+</div>
+
+<!-- GAME BANNER -->
+<div class="game-banner" id="gameBanner" onclick="document.getElementById('quizInline').scrollIntoView({behavior:'smooth'})">
+  <div class="gb-icon">🎯</div>
+  <div class="gb-body">
+    <div class="gb-title" id="gameBannerTitle">คุณเป็นแฟนพันธุ์แท้ของเจ้าของวันเกิดหรือไม่?</div>
+    <div class="gb-sub">ตอบคำถาม · ลุ้นรับรางวัล 🎡 · ขึ้นกระดานคะแนน 🏆</div>
+  </div>
+  <div class="gb-score" id="gameScore">0 แต้ม</div>
+</div>
+
+<!-- QUIZ INLINE -->
+<div class="quiz-inline" id="quizInline">
+  <div class="qi-score-bar">
+    <span class="qi-score-txt" id="gameTitleText">เลือกพนักงานเพื่อเริ่มเกม</span>
+    <button onclick="startGame()" style="background:none;border:1px solid var(--b);border-radius:7px;color:var(--mute);font-size:.68rem;padding:.15rem .42rem;cursor:pointer">🔄</button>
+  </div>
+  <div id="gameBody"><div style="text-align:center;color:var(--mute);font-size:.8rem;padding:.75rem">เลือกพนักงานก่อนเล่นเกม</div></div>
+  <div class="game-name-hint" id="gameNameHint" style="font-size:.65rem;color:rgba(245,200,66,.5);text-align:center;margin-top:.3rem;display:none">กรอกชื่อในช่องอวยพรด้านล่างเพื่อขึ้นกระดาน</div>
+</div>
+
+<!-- ADMIN QUIZ EDITOR -->
+<div class="qe-panel" id="quizEditor">
+  <div class="qe-lbl">✏️ Admin — เพิ่มคำถามเอง</div>
+  <div class="qe-list" id="customQList"></div>
+  <input class="qe-inp" id="qeQuestion" placeholder="คำถาม เช่น คุณ... ชอบอาหารอะไร?" style="width:100%;margin-bottom:.28rem">
+  <div class="qe-form-grid">
+    <input class="qe-inp" id="qeOpt1" placeholder="ตัวเลือก 1 (ถูก)">
+    <input class="qe-inp" id="qeOpt2" placeholder="ตัวเลือก 2">
+    <input class="qe-inp" id="qeOpt3" placeholder="ตัวเลือก 3">
+    <input class="qe-inp" id="qeOpt4" placeholder="ตัวเลือก 4">
+  </div>
+  <button class="qe-add" onclick="addCustomQuestion()" style="margin-top:.28rem">+ เพิ่มคำถาม (ตัวเลือก 1 = ถูก)</button>
+</div>
+
+<!-- VOTE -->
+<div class="vote-sec" id="voteSection" style="display:none">
+  <div class="sec-hdr"><div class="sec-title">❤️ คำอวยพรยอดฮิต</div><div class="sec-badge">โหวตได้ 1 ครั้ง</div></div>
+  <div id="voteList"><div class="vote-empty">ยังไม่มีคำอวยพรให้โหวต</div></div>
+</div>
+
+<!-- WISH WALL -->
+<div class="wish-wall">
+  <div class="wall-hdr">
+    <div class="sec-title">💌 กำแพงคำอวยพร</div>
+    <button class="wall-refresh" onclick="loadWishes()">🔄 รีเฟรช</button>
+  </div>
+  <div class="wish-grid" id="wish-grid">
+    <div class="wish-empty"><div class="wish-empty-icon">💭</div><div>ยังไม่มีคำอวยพร<br><span style="font-size:.7rem">เป็นคนแรกที่ส่งคำอวยพร!</span></div></div>
+  </div>
+</div>
+
+<!-- PARTICIPANTS -->
+<div class="part-sec" id="partSection">
+  <div class="sec-hdr"><div class="sec-title">👥 ผู้ร่วมตอบคำถาม</div><div class="sec-badge" id="partCount">0 คน</div></div>
+  <div class="part-chips" id="partGrid"><div class="part-empty">ยังไม่มีผู้เข้าร่วม</div></div>
+</div>
+
+<!-- WHEEL -->
+<div class="wheel-sec" id="wheelSection">
+  <div class="sec-hdr"><div class="sec-title">🎡 วงล้อสุ่มรางวัล</div><div class="sec-badge">Admin กดหมุน</div></div>
+  <div class="wheel-wrap">
+    <div class="wheel-frame"><canvas id="wheelCanvas" width="240" height="240"></canvas><div class="wheel-ptr"></div></div>
+    <div class="wheel-result-txt" id="wheelResult">รอ Admin กดหมุน 🎡</div>
+    <div class="wheel-admin-btns" id="wheelAdminArea">
+      <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">🎡 หมุน!</button>
+      <button class="wheel-export-btn" onclick="exportScoresExcel()">📊 Export คะแนน Excel</button>
+    </div>
+    <div class="wheel-pub-hint" id="wheelPublicHint">Admin เป็นผู้กดหมุนครับ</div>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="lb-sec" id="lbSection">
+  <div class="sec-hdr"><div class="sec-title">🏆 กระดานคะแนน</div></div>
+  <div class="lb-tabs">
+    <button class="lb-tab active" id="lbTabGame" onclick="switchLbTab('game')">🎯 เกม</button>
+    <button class="lb-tab" id="lbTabLike" onclick="switchLbTab('like')">❤️ ไลก์</button>
+  </div>
+  <div id="lbList"><div class="lb-empty">เล่นเกมเพื่อขึ้นกระดาน!</div></div>
+</div>
+
+<div class="spacer-bottom"></div>
+
+<!-- TOAST + LIKE -->
 <div class="toast" id="toast"></div>
+<div class="like-notif" id="likeNotif"></div>
 
+<!-- MODALS -->
+<div class="modal-overlay" id="loginModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">🔐 เข้าสู่ระบบ Admin</div>
+    <div><div class="modal-label" style="margin-bottom:.25rem">รหัสผ่าน</div>
+    <input class="modal-input" id="loginPassInput" type="password" placeholder="ใส่รหัส Admin..." onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="modal-row">
+      <button class="modal-btn-ghost" onclick="document.getElementById('loginModal').style.display='none'">ยกเลิก</button>
+      <button class="modal-btn-primary" onclick="doLogin()">เข้าสู่ระบบ</button>
+    </div>
+    <div class="modal-sep"></div>
+    <button class="modal-danger" onclick="showForgotPass()">🔑 ลืมรหัสผ่าน / รีเซ็ต</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">⚙️ ตั้งค่า Admin</div>
+    <div><div class="modal-label" style="margin-bottom:.25rem">เปลี่ยนรหัสผ่าน</div>
+    <input class="modal-input" id="settOldPass" type="password" placeholder="รหัสเดิม" style="margin-bottom:.32rem">
+    <input class="modal-input" id="settNewPass" type="password" placeholder="รหัสใหม่ (อย่างน้อย 4 ตัว)" style="margin-bottom:.32rem">
+    <input class="modal-input" id="settConfPass" type="password" placeholder="ยืนยันรหัสใหม่"></div>
+    <button class="modal-btn-primary" onclick="changePassword()">💾 บันทึกรหัสใหม่</button>
+    <div class="modal-success-msg" id="settSuccessMsg">✅ เปลี่ยนรหัสสำเร็จ!</div>
+    <div class="modal-sep"></div>
+    <div class="modal-label" style="margin-bottom:.25rem">Master Key (รหัสสำรอง)</div>
+    <div style="font-size:.68rem;color:var(--mute);line-height:1.6;margin-bottom:.38rem">ใช้เข้าได้เสมอแม้ลืมรหัสหลัก<br><span style="color:var(--gold);font-weight:500;letter-spacing:.06em" id="masterKeyDisplay">••••••••</span></div>
+    <button class="modal-btn-ghost" onclick="showMasterKey()" style="font-size:.74rem">👁 แสดง Master Key</button>
+    <div class="modal-sep"></div>
+    <button class="modal-btn-ghost" onclick="document.getElementById('settingsModal').style.display='none'">ปิด</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="forgotModal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="modal-title">🔑 รีเซ็ตรหัสผ่าน</div>
+    <div style="font-size:.76rem;color:var(--sub);line-height:1.6">ใส่ <b style="color:var(--gold)">Master Key</b> เพื่อตั้งรหัสใหม่</div>
+    <input class="modal-input" id="forgotMasterKey" type="password" placeholder="Master Key">
+    <input class="modal-input" id="forgotNewPass" type="password" placeholder="รหัสผ่านใหม่">
+    <div class="modal-row">
+      <button class="modal-btn-ghost" onclick="document.getElementById('forgotModal').style.display='none'">ยกเลิก</button>
+      <button class="modal-btn-primary" onclick="resetWithMasterKey()">รีเซ็ต</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-// ══════════════════════════════════════════════════
-// CONFIG
-// ══════════════════════════════════════════════════
-var API_URL   = 'YOUR_APPS_SCRIPT_URL'; // ← ใส่ URL Apps Script
-var QUARTER   = 'มิ.ย.-2569';           // ← อัปเดตทุกไตรมาส
-var ADMIN_PWD = 'sml2569';
-var PAGE_URL  = location.href.split('?')[0];
+function toggleMonthCtrl(){const el=document.getElementById('adminMonthCtrl');if(el)el.classList.toggle('open');}
+// Render emoji bar as soon as DOM is ready (before async init)
+document.addEventListener('DOMContentLoaded',function(){
+  if(typeof initStickerSystem==='function') initStickerSystem();
+  if(typeof renderTemplates==='function') renderTemplates();
+});
+function updateStatRow(){
+  const empKey=curEmp?(curEmp.code||curEmp.name):'';
+  const wishes=localWishes[empKey]||[];
+  const board=JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  const votes=JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
+  const totalLikes=Object.values(votes).reduce((a,b)=>a+b,0);
+  const wc=document.getElementById('wish-count');const lt=document.getElementById('like-total');const pc=document.getElementById('player-count');
+  if(wc)wc.textContent=wishes.length;
+  if(lt)lt.textContent='❤️ '+totalLikes;
+  if(pc)pc.textContent=board.length;
+}
+function setApiStatus(type,text){
+  const el=document.getElementById('apiStatus');if(el){el.className='api-status api-'+type;el.textContent=text;}
+  const dot=document.getElementById('apiDot');if(dot)dot.className='api-dot '+type;
+}
+</script>
+<script>
 
-// ══════════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════════
-var myName    = '';
-var isAdmin   = false;
-var wishDone  = false;
-var quizDone  = false;
-var myPts     = {wish:0, quiz:0, total:0};
-var likedIds  = JSON.parse(localStorage.getItem('likedIds')||'{}');
-var photoB64  = '';
-var selMood   = '';
-var quizState = {q:0, correct:0, done:false};
-var quizData  = [];
-var wheelSpinning = false;
-var persons   = [];
-
-var MOODS = ['😊 สุขใจ','🎉 ตื่นเต้น','🥰 รู้สึกดี','😎 ชิลล์','🤩 ว้าว'];
-var EMOJIS = ['🎂','🎈','🎁','🎊','🎉','🌟','⭐','💖','💝','🥳',
-              '🌸','🌺','🌻','🍀','✨','🦋','🎀','🏆','👑','💎',
-              '🎵','🎶','🌈','☀️','🌙','💌','🤗','👏','🙌','💪',
-              '🍰','🧁','🍭','🎠','🎡','🎪','🎭','🎨','🎬','🎤'];
-
-var QUIZ_BANK = [
-  {q:'🎂 สัตว์ที่เป็นสัญลักษณ์ของ SML คือ?',opts:['ช้าง','สิงโต','เสือ','หมี'],ans:0},
-  {q:'⭐ SML ก่อตั้งมากี่ปีแล้ว?',opts:['10 ปี','15 ปี','20 ปี','25 ปี'],ans:2},
-  {q:'🏢 สำนักงานใหญ่ SML อยู่จังหวัดใด?',opts:['กรุงเทพ','สมุทรปราการ','นนทบุรี','ปทุมธานี'],ans:1},
-  {q:'💼 ฝ่าย HR & GA มีหน้าที่หลักคือ?',opts:['ขายสินค้า','ดูแลพนักงาน','จัดซื้อ','บัญชี'],ans:1},
-  {q:'🎯 กิจกรรมวันเกิดนี้จัดทุก?',opts:['เดือน','ไตรมาส','ปี','สองปี'],ans:1}
+const MTH=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const EMOJIS=['🎉','🌟','💖','🎂','🥳','🌈','✨','🎁','🍀','🏆','🌺','💐','🦋','⭐'];
+let calPersons = [
+  {code:'90245',name:'ประจักษ์ แก้วหานาม',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:23,month:0},
+  {code:'90308',name:'สกุล พรมมี',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:29,month:0},
+  {code:'90576',name:'อานนท์ โสธรรมมงคล',pos:'พนักงานปรับแต่ง',faction:'Accessories Installetion',day:24,month:0},
+  {code:'90954',name:'วิรัตน์ สมศรี',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:5,month:0},
+  {code:'91038',name:'เสรี คะรัมย์',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:13,month:0},
+  {code:'91115',name:'ชาญวิทย์ ฤทธิ์สยาม',pos:'พนักงานติดตั้งอุปกรณ์',faction:'Accessories Installetion',day:21,month:0},
+  {code:'90239',name:'กิตติกา จันทร์สายทอง',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:5,month:1},
+  {code:'90615',name:'ประธาน แช่มโชติ',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:19,month:1},
+  {code:'90638',name:'รังสรรค์ แจ่มประเสริฐ',pos:'หัวหน้าหน่วยล้างรถใหม่',faction:'PDI Operation',day:21,month:1},
+  {code:'91021',name:'โชสิญา ดานเรือง',pos:'ผู้ช่วย้จัดการส่วน HR&GA',faction:'HR&GA',day:2,month:1},
+  {code:'90057',name:'ทวี กัณหา',pos:'เจ้าหน้าที่เคลม',faction:'Accessories Installetion',day:8,month:2},
+  {code:'90841',name:'สัมพันธ์ สำนวน',pos:'หัวหน้ากลุ่มงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:26,month:2},
+  {code:'91100',name:'วิระพงษ์ กิระหัด',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:27,month:2},
+  {code:'91112',name:'กุหลาบ กองทอง',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:28,month:2},
+  {code:'90040',name:'ภูวดล ปาราลิตร์',pos:'พนักงานธุรการทั่วไป',faction:'HR&GA',day:2,month:3},
+  {code:'90258',name:'นาเรณ มูฮำหมัด',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:17,month:3},
+  {code:'90566',name:'ยืนยง กันหา',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:24,month:3},
+  {code:'90715',name:'ณธีพัฒน์ รัตนอธิพัฒน์',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:5,month:3},
+  {code:'90835',name:'คำภา ปานิสัย',pos:'เจ้าหน้าที่สโตร์',faction:'Accessories Installetion',day:24,month:3},
+  {code:'91059',name:'ปัทมา เห็มบุตร',pos:'เจ้าหน้าที่บัญชี',faction:'บัญชีและการเงิน',day:16,month:3},
+  {code:'91079',name:'ณัฐวุฒิ เลิศวงษ์วรรณ',pos:'ผู้ช่วยผู้จัดการส่วน Yrad Control',faction:'Yard Operation',day:30,month:3},
+  {code:'91116',name:'คณิน บุญอยู่',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:5,month:3},
+  {code:'90354',name:'นำพล เล็กใจกล้า',pos:'เจ้าหน้าที่จัดซื้อ',faction:'HR&GA',day:31,month:4},
+  {code:'90439',name:'ปุณยนุช ม่วงศรี',pos:'ผู้ช่วยผู้จัดการส่วนบัญชีและการเงิน',faction:'บัญชีและการเงิน',day:19,month:4},
+  {code:'90713',name:'บุญเลี้ยง เหมภูมิ',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:3,month:4},
+  {code:'90939',name:'สุรกิจ ตันกุล',pos:'ผู้จัดกรส่วนอาวุโส',faction:'PC&PDI Operation',day:21,month:4},
+  {code:'90459',name:'ดนุพล วังใจ',pos:'หัวหน้าหน่วยติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:15,month:5},
+  {code:'90495',name:'บุญช่วย เนียมมาก',pos:'พนักงานอาวุโสเทียบเท่าหัวหน้างาน(Final Judgement)',faction:'PDI Operation',day:24,month:5},
+  {code:'90570',name:'ชาญณรงค์ ดวงสิน',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:3,month:5},
+  {code:'91010',name:'โสภา สุดตาภักดี',pos:'เจ้าหน้าที่บัญชีทรัพย์สิน',faction:'บัญชีและการเงิน',day:18,month:5},
+  {code:'91146',name:'อลงกรณ์ สัตยาคุณ',pos:'เจ้าหน้าที่เคลม',faction:'Accessories Installetion',day:9,month:5},
+  {code:'90714',name:'วัชรินทร์ จันทำ',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:24,month:6},
+  {code:'91155',name:'สุนิษา เกษพิจิตร',pos:'จป.วิชาชีพ',faction:'HR&GA',day:5,month:6},
+  {code:'91147',name:'ณัฐวิช เลิศวงษ์วรรณ',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:3,month:7},
+  {code:'91152',name:'วิวัฒน์ ตันติวีรกุล',pos:'ผู้จัดการส่วน Accessories Installetion',faction:'Accessories Installetion',day:15,month:7},
+  {code:'90352',name:'อาทิตย์ ภูแล่นคู่',pos:'หัวหน้าหน่วยตรวจสอบรถใหม่',faction:'PDI Operation',day:15,month:8},
+  {code:'90498',name:'อำนาจ ศุลญลา',pos:'พนักงานตรวจสอบรถใหม่',faction:'PDI Operation',day:23,month:8},
+  {code:'90526',name:'ยศศักดิ์ ทัศนพงษ์',pos:'เจ้าหน้าที่ IT',faction:'HR&GA',day:24,month:8},
+  {code:'91064',name:'วิภาวดี โตประดิษฐ์',pos:'หัวหน้าแผนก Yard Operation',faction:'Yard Operation',day:30,month:8},
+  {code:'91118',name:'อดิเรก บัวจันทร์',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:18,month:8},
+  {code:'90368',name:'ฤทธิรงค์ อุปถัมภ์',pos:'พนักงานติดตั้งอุปกรณ์รถใหม่',faction:'Accessories Installetion',day:26,month:9},
+  {code:'90986',name:'พรรณเชษฐ์ นครรัตน์',pos:'พนักงาน Yard Control',faction:'Yard Operation',day:26,month:9},
+  {code:'90325',name:'ระวิ จันทโรทัย',pos:'หัวหน้าแผนก PDI Operation',faction:'PDI Operation',day:7,month:10},
+  {code:'90696',name:'ดลลดา ใจแก้ว',pos:'เจ้าหน้าที่สรรหา',faction:'HR&GA',day:6,month:10},
+  {code:'90722',name:'ธนโชติ โพธิ์ใต้',pos:'พนักงานปรับแต่ง',faction:'PDI Operation',day:23,month:10},
+  {code:'91068',name:'วราภรณ์ ใสสม',pos:'หัวหน้าหน่วย Yard Control',faction:'Yard Operation',day:3,month:10},
+  {code:'90179',name:'ณุชัย หาญรักษ์',pos:'หัวหน้าหน่วยปรับแต่ง',faction:'PDI Operation',day:28,month:11},
+  {code:'90934',name:'เชิดชัย มิกขุนทด',pos:'ผู้ช่วยกรมการผู้จัดการ',faction:'-',day:17,month:11},
+  {code:'91133',name:'กฤษณะ เหลืองมิวาย',pos:'เจ้าหน้าที่สโตร์(Accessories)',faction:'Accessories Installetion',day:24,month:11},
 ];
 
-// ══════════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════════
-window.addEventListener('load', function() {
-  buildMoods();
-  buildEmojiGrid();
-  buildQRCode();
+let curEmp = null;
+let selMonth = -1;
+let localWishes = JSON.parse(localStorage.getItem('sml_wishes') || '{}');
+let pendingQueue = JSON.parse(localStorage.getItem('sml_pending') || '[]');
+
+// ─── API ───────────────────────────────────────────────────
+function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim(); }
+function saveApiUrl(){
+  const url = document.getElementById('apiUrl').value.trim();
+  localStorage.setItem('sml_api_url', url);
+  setApiStatus('pending','ยังไม่ได้ทดสอบ');
+}
+function setApiStatus(type, text){
+  const el = document.getElementById('apiStatus');
+  el.className = 'api-status api-'+type;
+  el.textContent = text;
+}
+async function testApi(){
+  const url = getApiUrl();
+  if(!url){setApiStatus('err','ยังไม่ได้ใส่ URL');return;}
+  setApiStatus('pending','กำลังทดสอบ...');
+  try{
+    const r = await fetch(url+'?action=ping');
+    const d = await r.json();
+    if(d.ok) setApiStatus('ok','✅ เชื่อมต่อแล้ว');
+    else setApiStatus('err','ตอบกลับผิดปกติ');
+  }catch(e){setApiStatus('err','❌ เชื่อมต่อไม่ได้');}
+}
+async function apiGet(params){
+  const url = getApiUrl();
+  if(!url) return null;
+  const qs = Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+  try{ 
+    const r = await fetch(url+'?'+qs);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json(); 
+  }
+  catch(e){ console.error('apiGet error:', e); return null; }
+}
+async function apiPost(body){
+  const url = getApiUrl();
+  if(!url) return null;
+  try{
+    // ใช้ GET แทน POST เพื่อหลีกเลี่ยงปัญหา CORS ของ Google Apps Script
+    const params = new URLSearchParams();
+    Object.entries(body).forEach(([k,v]) => params.append(k, v));
+    const r = await fetch(url + '?' + params.toString());
+    return await r.json();
+  }catch(e){ 
+    console.error('API error:', e);
+    return null; 
+  }
+}
+
+// ─── PARTICLES ───────────────────────────────────────────
+// particles removed
+
+// ─── EMOJI ROW ───────────────────────────────────────────
+// ── EMOJI GRID ────────────────────────────────────
+function initStickerSystem(){
+  const bar=document.getElementById('emojiBar');
+  if(!bar){ setTimeout(initStickerSystem,200); return; }
+  const emojis=['🎉','🎂','🎊','🎁','🥳','🎈','🎀','🧁','🍰','🥂',
+    '❤️','💖','💝','🥰','😍','🤩','✨','🌟','⭐','🏆',
+    '👑','💪','🙏','😊','🤗','🌸','🌺','🦋','🌈','🍀',
+    '😄','🤣','😜','😎','🚀','💎','🎯','💡','🌙','☀️'];
+  bar.innerHTML=emojis.map(e=>
+    `<button class="emo" onclick="insertEmoji('${e}')">${e}</button>`
+  ).join('');
+}
+// Auto-call when script loads
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', initStickerSystem);
+} else {
+  initStickerSystem();
+}
+function insertEmoji(e){
+  const ta=document.getElementById('wf-text');
+  if(!ta) return;
+  const s=ta.selectionStart||ta.value.length;
+  const en=ta.selectionEnd||ta.value.length;
+  ta.value=ta.value.slice(0,s)+e+ta.value.slice(en);
+  ta.focus(); ta.selectionStart=ta.selectionEnd=s+e.length;
+  onTextInput();
+}
+
+// ─── MONTH TABS ──────────────────────────────────────────
+function buildMonthTabs(){
+  const isAdmin=document.body.classList.contains('admin-mode');
+  const allowed=getActiveMonths();
+  document.getElementById('monthTabs').innerHTML=MTH.map((m,i)=>{
+    const hasEmp=calPersons.some(p=>p.month===i);
+    const isAllowed=allowed.includes(i);
+    const cls=['mtab', i===selMonth?'active':'', !isAdmin&&!isAllowed?'hidden-month':''].filter(Boolean).join(' ');
+    return `<button class="${cls}" onclick="selectMonth(${i})">${m.substring(0,3)}</button>`;
+  }).join('');
+}
+function selectMonth(mi){
+  selMonth=mi; buildMonthTabs();
+  const chips=document.getElementById('personChips');
+  const isAdmin=document.body.classList.contains('admin-mode');
+  const allowed=getActiveMonths();
+  // Non-admin: block hidden months
+  if(!isAdmin && !allowed.includes(mi)){
+    chips.innerHTML='<div class="person-locked">🔒 ยังไม่เปิดให้ดูเดือนนี้</div>';
+    return;
+  }
+  const list=calPersons.filter(p=>p.month===mi);
+  if(!list.length){chips.innerHTML='<div style="font-size:.78rem;color:rgba(255,255,255,.3)">ไม่มีพนักงานเกิดเดือนนี้</div>';return;}
+  chips.innerHTML=list.map((p,i)=>
+    `<div class="pchip${curEmp&&curEmp.code===p.code?' active':''}" onclick="selectPerson('${p.code}')">
+      <span class="pchip-dot"></span>คุณ${p.name.split(' ')[0]}
+    </div>`
+  ).join('');
+  if(!curEmp||curEmp.month!==mi) selectPerson(list[0].code);
+}
+function selectPerson(code){
+  curEmp=calPersons.find(p=>p.code===code)||null;
+  if(!curEmp)return;
+  // Update chips
+  document.querySelectorAll('.pchip').forEach(c=>{
+    c.classList.toggle('active', c.textContent.includes(curEmp.name.split(' ')[0]));
+  });
+  // Update hero
+  document.getElementById('hero-name').textContent='คุณ'+curEmp.name;
+  document.getElementById('hero-pos').textContent=(curEmp.pos||'')+(curEmp.faction?' | '+curEmp.faction:'')+(curEmp.code?' | รหัส '+curEmp.code:'');
+  document.getElementById('hero-date').innerHTML=`<span>🎂</span><span>เกิดเดือน${MTH[curEmp.month]}</span>`;
+  // Load saved photo for this employee
+  loadEmpPhoto(curEmp.code||curEmp.name);
+  // Update game title
+  const gtt = document.getElementById('gameTitleText');
+  if(gtt) gtt.textContent = '🎯 คุณเป็นแฟนพันธุ์แท้ของคุณ'+curEmp.name.split(' ')[0]+' หรือไม่?';
+  // Show game section
+  const gs=document.getElementById('gameSection');
+  if(gs) gs.style.display='block';
+  // Always show wheel + participants sections when person is selected
+  const ws=document.getElementById('wheelSection');
+  if(ws) ws.style.display='block';
+  const ps=document.getElementById('partSection');
+  if(ps) ps.style.display='block';
+  startGame();
+  renderCustomQList();
+  renderParticipants();
+  renderLeaderboard();
+  setTimeout(drawWheel, 100);
   loadWishes();
-  loadMonthlyStats();
-  loadPersons();
-  renderQuiz();
-  document.getElementById('wishMsg').addEventListener('input', function() {
-    document.getElementById('msgCount').textContent = this.value.length + '/200';
-  });
-});
-
-// ══════════════════════════════════════════════════
-// PERSONS (ข้อมูลพนักงาน — ใช้ autocomplete + ออกคำถามวันเกิด)
-// ══════════════════════════════════════════════════
-function loadPersons() {
-  api('getPersons', {}, function(r) {
-    persons = (r && r.persons) ? r.persons.filter(function(p){return p.active}) : [];
-    var dl = document.getElementById('personList');
-    if (dl) dl.innerHTML = persons.map(function(p) { return '<option value="'+escHtml(p.name)+'">'; }).join('');
-    var pc = document.getElementById('personsCount');
-    if (pc) pc.textContent = persons.length;
-    buildBirthdayQuizQuestion();
-    if (quizState.q === 0 && !quizState.done && !quizDone) renderQuiz();
+  // Pull server-side game scores (if API configured) and refresh views once loaded
+  const empKeyForLb = curEmp.code||curEmp.name;
+  loadGameLeaderboard(empKeyForLb).then(merged=>{
+    if(merged){ renderLeaderboard(); renderParticipants(); drawWheel(); }
   });
 }
 
-function findPerson(name) {
-  var n = normName2(name);
-  for (var i = 0; i < persons.length; i++) {
-    if (normName2(persons[i].name) === n) return persons[i];
-  }
-  return null;
-}
-
-function normName2(s) { return String(s||'').replace(/\s+/g,' ').trim().toLowerCase(); }
-
-// เพิ่มคำถาม "เดือนนี้เป็นวันเกิดของใคร" จากข้อมูลพนักงานจริง
-function buildBirthdayQuizQuestion() {
-  if (!persons.length) return;
-  var curMonth = new Date().getMonth() + 1;
-  var bdayThisMonth = persons.filter(function(p) { return Number(p.month) === curMonth; });
-  if (!bdayThisMonth.length) return;
-
-  var correct = bdayThisMonth[Math.floor(Math.random() * bdayThisMonth.length)];
-  var others = persons.filter(function(p) { return p.code !== correct.code; });
-  if (others.length < 3) return;
-
-  // สุ่ม distractor 3 คน
-  var shuffled = others.slice().sort(function(){ return Math.random()-0.5; });
-  var distractors = shuffled.slice(0, 3);
-  var opts = distractors.concat([correct]).map(function(p){ return p.name; });
-  opts.sort(function(){ return Math.random()-0.5; });
-  var ansIdx = opts.indexOf(correct.name);
-
-  var MONTH_TH = ['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-  // กันไม่ให้ซ้ำหากโหลดข้อมูลพนักงานเสร็จหลังเริ่ม quiz แล้ว
-  QUIZ_BANK = QUIZ_BANK.filter(function(q){ return !q._birthdayQ; });
-  QUIZ_BANK.push({
-    q: '🎂 เดือน' + MONTH_TH[curMonth] + ' เป็นวันเกิดของใคร?',
-    opts: opts,
-    ans: ansIdx,
-    _birthdayQ: true
-  });
-}
-
-// ══════════════════════════════════════════════════
-// NAME CONFIRM
-// ══════════════════════════════════════════════════
-function confirmName() {
-  var n = document.getElementById('myName').value.trim();
-  if (!n) return toast('⚠️ กรุณาพิมพ์ชื่อก่อนนะคะ');
-  myName = n;
-  document.getElementById('heroSub').textContent = 'สวัสดีคุณ ' + n + ' 👋';
-
-  var deptTag = document.getElementById('myDeptTag');
-  var matched = findPerson(n);
-  if (matched) {
-    deptTag.style.display = 'block';
-    deptTag.textContent = '✓ พบในรายชื่อพนักงาน — แผนก ' + (matched.dept || '-');
+// ─── WISHES ──────────────────────────────────────────────
+async function loadWishes(){
+  if(!curEmp)return;
+  const empId=curEmp.code||curEmp.name;
+  // Try API first
+  const remote=await apiGet({action:'getWishes',empId});
+  let wishes;
+  if(remote&&Array.isArray(remote)){
+    wishes=remote;
+    // merge local pending
+    localWishes[empId]=wishes;
+    localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
   } else {
-    deptTag.style.display = 'block';
-    deptTag.textContent = '⚠️ ไม่พบชื่อนี้ในรายชื่อพนักงาน กรุณาตรวจสอบการสะกดชื่อ';
+    wishes=localWishes[empId]||[];
+  }
+  renderWishes(wishes);
+  document.getElementById('wish-count').textContent=wishes.length;
+}
+function renderWishes(wishes){
+  const grid=document.getElementById('wish-grid');
+  const isAdmin=document.body.classList.contains('admin-mode');
+  const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
+  const visible=isAdmin ? wishes : wishes.filter(w=>!hidden.includes(String(w.ts||w.timestamp||w.senderName)));
+
+  if(!visible.length){
+    grid.innerHTML='<div class="wish-empty"><div class="wish-empty-icon">💭</div><div>ยังไม่มีคำอวยพร<br><span style="font-size:.75rem">เป็นคนแรกที่ส่งคำอวยพร!</span></div></div>';
+    document.getElementById('voteSection').style.display='none';
+    return;
   }
 
-  loadMyPoints();
-  toast('✅ ยืนยันชื่อแล้ว: ' + n);
-}
+  grid.innerHTML=wishes.map((w,i)=>{
+    const wid=String(w.ts||w.timestamp||w.senderName||i);
+    const isHidden=hidden.includes(wid);
+    if(!isAdmin && isHidden) return '';
+    return `<div class="wish-card wc-${i%6}${isHidden?' wish-hidden':''}" style="animation-delay:${i*0.05}s;position:relative">
+      <div class="wish-actions">
+        <button class="wish-act-btn wish-act-hide" onclick="toggleHideWish('${wid.replace(/'/g,"\'")}',this)" title="${isHidden?'แสดง':'ซ่อน'}">${isHidden?'👁':'🙈'}</button>
+        <button class="wish-act-btn wish-act-del" onclick="deleteWish('${wid.replace(/'/g,"\'")}',this)" title="ลบ">🗑</button>
+      </div>
+      <div class="wish-emoji">${w.emoji||'🎉'}</div>
+      <div class="wish-msg">${escHtml(w.msg||w.message||'')}</div>
+      <div class="wish-from">
+        <span class="wish-from-name">${escHtml(w.senderName||w.name||'ไม่ระบุชื่อ')}</span>
+        <span>· ${escHtml(w.senderDept||w.dept||'ทีมงาน')}</span>
+        <span class="wish-ts">${w.ts||w.timestamp||''}</span>
+      </div>
+    </div>`;
+  }).join('');
 
-function loadMyPoints() {
-  api('getPoints', {name: myName, quarter: QUARTER}, function(r) {
-    if (r && r.found) {
-      myPts = {wish: r.wishPts||0, quiz: r.quizPts||0, total: r.totalPts||0};
-      wishDone = r.wishDone;
-      quizDone = r.quizDone;
-    }
-    updatePtsBar();
-    if (wishDone) markWishDone(false);
-    if (quizDone) renderQuizDone();
-  });
+  // Update vote list with visible wishes
+  renderVoteList(visible.slice(0,10));
 }
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-function updatePtsBar() {
-  var bar = document.getElementById('ptsBar');
-  bar.classList.add('show');
-  document.getElementById('ptsVal').textContent = myPts.total + ' แต้ม';
-  var parts = [];
-  if (myPts.wish > 0) parts.push('💌 อวยพร +' + myPts.wish);
-  if (myPts.quiz > 0) parts.push('🎯 Quiz +'  + myPts.quiz);
-  document.getElementById('ptsDetail').innerHTML = parts.join('<br>') || 'ยังไม่ได้ทำกิจกรรม';
-}
+// ─── SUBMIT ──────────────────────────────────────────────
+async function submitWish(){
+  if(!curEmp){showToast('กรุณาเลือกพนักงานก่อนครับ');return;}
+  const name=document.getElementById('wf-name').value.trim();
+  const dept=document.getElementById('wf-dept').value.trim();
+  const text=document.getElementById('wf-text').value.trim();
+  if(!name){shake('wf-name');return;}
+  if(!text){shake('wf-text');return;}
 
-// ══════════════════════════════════════════════════
-// TABS
-// ══════════════════════════════════════════════════
-function showTab(name, btn) {
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
-  document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('active')});
-  btn.classList.add('active');
-  document.getElementById('pane-'+name).classList.add('active');
-  if (name === 'board') loadLeaderboard('pts');
-}
-
-// ══════════════════════════════════════════════════
-// WISH WALL
-// ══════════════════════════════════════════════════
-function buildMoods() {
-  var el = document.getElementById('moodBtns');
-  MOODS.forEach(function(m) {
-    var b = document.createElement('button');
-    b.className = 'mood-btn'; b.textContent = m;
-    b.onclick = function() {
-      document.querySelectorAll('.mood-btn').forEach(function(x){x.classList.remove('sel')});
-      b.classList.add('sel'); selMood = m;
-    };
-    el.appendChild(b);
-  });
-}
-
-function buildEmojiGrid() {
-  var el = document.getElementById('emojiGrid');
-  EMOJIS.forEach(function(e) {
-    var b = document.createElement('button');
-    b.className = 'emoji-btn'; b.textContent = e;
-    b.onclick = function() {
-      var ta = document.getElementById('wishMsg');
-      ta.value += e;
-      document.getElementById('msgCount').textContent = ta.value.length + '/200';
-    };
-    el.appendChild(b);
-  });
-}
-
-function previewPhoto(input) {
-  if (!input.files || !input.files[0]) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    photoB64 = e.target.result;
-    var prev = document.getElementById('photoPrev');
-    prev.src = photoB64; prev.style.display = 'block';
+  const empId=curEmp.code||curEmp.name;
+  const wish={
+    action:'addWish', empId, empName:curEmp.name,
+    senderName:name, senderDept:dept||'ทีมงาน', msg:text,
+    emoji:EMOJIS[~~(Math.random()*EMOJIS.length)],
+    ts:new Date().toLocaleString('th-TH')
   };
-  reader.readAsDataURL(input.files[0]);
-}
 
-function submitWish() {
-  if (!myName) return toast('⚠️ กรุณายืนยันชื่อก่อนค่ะ');
-  if (wishDone) return toast('✅ คุณส่งคำอวยพรแล้ว');
-  var msg = document.getElementById('wishMsg').value.trim();
-  if (!msg) return toast('⚠️ กรุณาเขียนคำอวยพรก่อนนะคะ');
+  const btn=document.getElementById('send-btn');
+  btn.disabled=true;btn.textContent='⏳ กำลังส่ง...';
 
-  document.getElementById('wishBtn').disabled = true;
-  toast('⏳ กำลังบันทึก...');
+  // Save locally first
+  if(!localWishes[empId])localWishes[empId]=[];
+  const localWish={...wish};
+  localWishes[empId].unshift(localWish);
+  localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
 
-  api('addWish', {name:myName, message:msg, mood:selMood, photo:photoB64, month:QUARTER}, function(r) {
-    if (r && r.ok) {
-      // บันทึกแต้ม
-      api('addPoints', {type:'wish', name:myName, quarter:QUARTER}, function(pr) {
-        if (pr && pr.ok) { myPts.wish = pr.wishPts||1; myPts.total = pr.totalPts||1; }
-        else { myPts.wish++; myPts.total++; }
-        wishDone = true;
-        updatePtsBar();
-        markWishDone(true);
-        loadWishes();
-        toast('🎉 ส่งคำอวยพรแล้ว! +1 แต้ม');
-        confetti();
-      });
-    } else {
-      document.getElementById('wishBtn').disabled = false;
-      toast('❌ เกิดข้อผิดพลาด ลองใหม่นะคะ');
+  // Try API
+  const result=await apiPost(wish);
+  if(!result||result.error){
+    // Queue for later
+    pendingQueue.push(wish);
+    localStorage.setItem('sml_pending',JSON.stringify(pendingQueue));
+    showToast('💾 บันทึกในเครื่องแล้ว (จะส่งเมื่อออนไลน์)','warn');
+  } else {
+    showToast('🎉 ส่งคำอวยพรสำเร็จ!');
+    fireConfetti();
+  }
+
+  // Auto-save game score with this name if not saved yet
+  if (name) {
+    localStorage.setItem('playerName', name);
+    const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+    const alreadySaved = board.find(r=>r.name===name);
+    if (!alreadySaved) {
+      // Mark as participant even without playing game
+      saveGameScore(name, 0, 0);
     }
+  }
+  // UI
+  document.getElementById('wf-name').value='';
+  document.getElementById('wf-dept').value='';
+  document.getElementById('wf-text').value='';
+  const succ=document.getElementById('success-msg');
+  succ.classList.add('show');
+  setTimeout(()=>{succ.classList.remove('show');btn.disabled=false;btn.textContent='🎊 ส่งคำอวยพร!';},3500);
+  loadWishes();
+}
+
+function shake(id){
+  const el=document.getElementById(id);
+  el.style.animation='';el.style.borderColor='var(--rose)';
+  el.style.animation='shake .4s';
+  const style=document.getElementById('shakeStyle')||document.createElement('style');
+  style.id='shakeStyle';style.textContent='@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}';
+  document.head.appendChild(style);
+  setTimeout(()=>{el.style.borderColor='';el.style.animation='';},500);
+}
+
+// ─── CONFETTI ────────────────────────────────────────────
+function fireConfetti(){
+  const colors=['#f5c842','#ff6b9d','#00e5cc','#a78bfa','#f97316','#34d399'];
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');p.className='confetti-piece';
+    p.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[~~(Math.random()*colors.length)]};transform:rotate(${Math.random()*360}deg);--dx:${(Math.random()-0.5)*300}px;animation-delay:${Math.random()*.5}s;animation-duration:${Math.random()*1+1.5}s`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),3000);
+  }
+}
+
+// ─── TOAST ───────────────────────────────────────────────
+let toastTimer;
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show';
+  if(type==='warn')t.style.borderColor='var(--gold)';
+  else t.style.borderColor='var(--mint)';
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ─── SYNC PENDING ─────────────────────────────────────────
+async function syncPending(){
+  if(!pendingQueue.length)return;
+  const url=getApiUrl();if(!url)return;
+  const remaining=[];
+  for(const wish of pendingQueue){
+    try{const r=await apiPost(wish);if(!r||r.error)remaining.push(wish);}
+    catch{remaining.push(wish);}
+  }
+  pendingQueue=remaining;
+  localStorage.setItem('sml_pending',JSON.stringify(pendingQueue));
+}
+
+// ─── OFFLINE ─────────────────────────────────────────────
+window.addEventListener('online',()=>{document.getElementById('offline-banner').style.display='none';syncPending();});
+window.addEventListener('offline',()=>{document.getElementById('offline-banner').style.display='block';});
+
+// ─── INIT ─────────────────────────────────────────────────
+// ── LOAD PERSONS FROM GOOGLE SHEET ───────────────────────────────────
+async function loadPersonsFromSheet(){
+  const url = getApiUrl();
+  if(!url) return false;
+  const statusEl = document.getElementById('syncStatus');
+  if(statusEl) statusEl.textContent = 'กำลังโหลดข้อมูลพนักงาน...';
+  try{
+    const data = await apiGet({action:'getPersons'});
+    if(!data || !Array.isArray(data) || data.length === 0) return false;
+    // Convert sheet format → calPersons format
+    // Sheet: {code, name(fname+lname), pos, faction, day, month(0-based)}
+    const parsed = data
+      .filter(p => p.name && String(p.name).trim())
+      .map(p => ({
+        code:    String(p.code||'').trim(),
+        name:    String(p.name||'').trim().replace(/\s+/,' '),
+        pos:     String(p.pos||'').trim(),
+        faction: String(p.faction||'').trim(),
+        day:     parseInt(p.day)||1,
+        month:   typeof p.month==='number' ? p.month : Math.max(0,parseInt(p.month||0)-1),
+      }));
+    if(parsed.length === 0) return false;
+    calPersons = parsed;
+    if(statusEl) statusEl.textContent = 'โหลดข้อมูลพนักงานแล้ว ' + parsed.length + ' คน';
+    setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 3000);
+    return true;
+  } catch(e){
+    console.error('loadPersons error:', e);
+    return false;
+  }
+}
+
+
+// ── MOOD & TEMPLATE SYSTEM ─────────────────────────────────
+const MOOD_TEMPLATES = {
+  warm: [
+    'ขอให้วันเกิดนี้เต็มไปด้วยความสุขและรอยยิ้มนะ ❤️',
+    'ขอบคุณที่เป็นเพื่อนร่วมงานที่ดีเสมอมา สุขสันต์วันเกิดครับ/ค่ะ 🎂',
+    'ขอให้สุขภาพแข็งแรง มีแต่เรื่องดีๆ เข้ามาในชีวิตตลอดปีนะ 🌟',
+    'ขอให้ทุกความฝันเป็นจริง ประสบความสำเร็จในทุกด้าน 🏆',
+  ],
+  cute: [
+    'แก่แต่กาย ใจยังสาวเสมอนะจ๊ะ 🥰 สุขสันต์วันเกิดค้าบ!',
+    'เกิดมาดีมากเลยนะ ขอให้ปีนี้ดีกว่าเดิมอีก 100 เท่า 💖',
+    'ขอให้น่ารักและเก่งแบบนี้ไปตลอด ไม่มีวันแก่เลย! 🌸',
+    'วันเกิดแล้ว! ขอให้ได้ของขวัญที่อยากได้ทุกอย่างเลยนะ 🎁',
+  ],
+  cool: [
+    'Happy Birthday! Stay awesome เหมือนเดิมนะ 😎✨',
+    'ปีใหม่ชีวิตใหม่ ไปให้ถึงเป้าหมายที่ตั้งไว้ได้เลย 🚀',
+    'Level up! อีกหนึ่งปีที่แกร่งขึ้น เก่งขึ้น เจ๋งขึ้น 💪',
+    'ขอให้ความสำเร็จตามมาหาเอง ไม่ต้องวิ่งหาเลย 🏆',
+  ],
+  funny: [
+    'ยินดีด้วยที่แก่ขึ้นอีกปี! แต่ยังดูเด็กกว่าอายุจริงมากนะ 😄',
+    'อายุเพิ่ม แต่หล่อ/สวยเพิ่มด้วย ไม่ยุติธรรมกับคนอื่นเลย 🤣',
+    'สุขสันต์วันเกิด! ปีนี้ขอให้ได้นอนพักผ่อนเยอะๆ นะ 😴💤',
+    'ขอให้วันเกิดปีนี้ไม่ต้องทำงานล่วงเวลานะ 🙏😂',
+  ],
+};
+let curMood='warm';
+
+function setMood(btn){
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  curMood=btn.dataset.mood;
+  renderTemplates();
+  const ta=document.getElementById('wf-text');
+  const ph={warm:'ส่งความปรารถนาดีจากใจ...',cute:'เขียนอะไรน่ารักๆ ให้เจ้าของวันเกิด...',cool:'Cool message goes here...',funny:'ฮาๆ หน่อยก็ได้นะ! 😄'};
+  if(ta) ta.placeholder=ph[curMood]||'เขียนคำอวยพรให้เพื่อนร่วมงาน...';
+}
+
+function renderTemplates(){
+  const row=document.getElementById('tmplRow');
+  if(!row) return;
+  const tmpls=MOOD_TEMPLATES[curMood]||[];
+  row.innerHTML='<span style="font-size:.62rem;color:var(--mute);align-self:center;flex-shrink:0">เลือก:</span>'+
+    tmpls.map(t=>`<button class="tmpl-btn" onclick="useTmpl(this)" title="${t}">${t.substring(0,18)}…</button>`).join('');
+}
+
+function useTmpl(btn){
+  const ta=document.getElementById('wf-text');
+  if(!ta) return;
+  ta.value=btn.title; ta.focus(); onTextInput();
+  ta.style.borderColor='rgba(245,200,66,.6)';
+  setTimeout(()=>ta.style.borderColor='',800);
+}
+
+function onNameInput(){
+  const name=(document.getElementById('wf-name')||{value:''}).value.trim();
+  const badge=document.getElementById('wishFormBadge');
+  if(badge){
+    if(name){badge.textContent='พร้อมส่ง! 🎊';badge.style.color='var(--mint)';badge.style.borderColor='rgba(0,229,204,.3)';}
+    else{badge.textContent='กรอกชื่อก่อนนะ';badge.style.color='';badge.style.borderColor='';}
+  }
+}
+
+function onTextInput(){
+  const ta=document.getElementById('wf-text');
+  const counter=document.getElementById('charCounter');
+  if(!ta||!counter) return;
+  const len=ta.value.length, max=parseInt(ta.maxLength)||200;
+  counter.textContent=len+'/'+max;
+  counter.classList.toggle('warn',len>=max*0.85);
+}
+
+(async function(){
+  // Load saved API URL
+  const savedUrl=getApiUrl();
+  if(savedUrl){
+    document.getElementById('apiUrl').value=savedUrl;
+    testApi();
+    // Load persons from Sheet before building UI
+    await loadPersonsFromSheet();
+  }
+  // Build UI
+  buildMonthTabs();
+  // Auto-select current month
+  const now=new Date();
+  selectMonth(now.getMonth());
+  // Sync pending
+  syncPending();
+  // Auto-refresh wishes every 30s
+  setInterval(loadWishes, 30000);
+  // Draw placeholder wheel on load
+  setTimeout(drawWheel, 300);
+  // Init emoji grid + templates
+  initStickerSystem();
+  renderTemplates();
+  // Auto-refresh persons every 5 minutes
+  setInterval(async()=>{
+    const ok = await loadPersonsFromSheet();
+    if(ok){ buildMonthTabs(); if(selMonth>=0) selectMonth(selMonth); }
+  }, 5*60*1000);
+})();
+
+
+// ── ADMIN MONTH CONTROL ─────────────────────────────────────────────
+function getActiveMonths(){
+  const saved=localStorage.getItem('sml_active_months');
+  if(saved) return JSON.parse(saved);
+  // Default: current month only
+  return [new Date().getMonth()];
+}
+
+function saveActiveMonths(arr){
+  localStorage.setItem('sml_active_months', JSON.stringify(arr));
+}
+
+function buildAmcGrid(){
+  const active=getActiveMonths();
+  const grid=document.getElementById('amcGrid');
+  if(!grid) return;
+  grid.innerHTML=MTH.map((m,i)=>
+    `<button class="amc-chip${active.includes(i)?' on':''}" onclick="toggleAdminMonth(${i})" id="amc-${i}">${m.substring(0,3)}</button>`
+  ).join('');
+}
+
+function toggleAdminMonth(mi){
+  const active=getActiveMonths();
+  const idx=active.indexOf(mi);
+  if(idx>=0) active.splice(idx,1);
+  else active.push(mi);
+  saveActiveMonths(active);
+  buildAmcGrid();
+  buildMonthTabs();
+  // If current selMonth is now hidden, clear person list
+  if(!active.includes(selMonth)){
+    document.getElementById('personChips').innerHTML='<div class="person-locked">🔒 ยังไม่เปิดให้ดูเดือนนี้</div>';
+  }
+}
+
+function toggleAllMonths(){
+  const active=getActiveMonths();
+  const newActive = active.length===12 ? [] : MTH.map((_,i)=>i);
+  saveActiveMonths(newActive);
+  buildAmcGrid();
+  buildMonthTabs();
+}
+
+// ── ADMIN MODE ──────────────────────────────────────────────────────
+// Password stored in localStorage — changeable without editing code
+function getAdminPass(){ return localStorage.getItem('adminPass') || 'sml2569'; }
+function setAdminPass(p){ localStorage.setItem('adminPass', p); }
+
+function showAdminPrompt(){
+  if(document.body.classList.contains('admin-mode')){
+    exitAdmin(); return;
+  }
+  showAdminLoginModal();
+}
+
+function enterAdmin(){
+  document.body.classList.add('admin-mode');
+  document.getElementById('apiBar').classList.add('show');
+  document.getElementById('adminLock').classList.add('active');
+  document.getElementById('adminLock').textContent='🔓';
+  document.getElementById('adminLock').title='ออกจาก Admin Mode';
+  // Photo hints
+  const ph = document.getElementById('photoUploadHint');
+  if(ph) ph.style.display='block';
+  const pf = document.getElementById('empPhotoFrame');
+  if(pf) pf.style.cursor='pointer';
+  // Load saved URL
+  const saved=getApiUrl();
+  if(saved){ document.getElementById('apiUrl').value=saved; testApi(); }
+  // Build admin month grid
+  buildAmcGrid();
+  // Render custom questions
+  renderCustomQList();
+  // Show admin-only wheel controls
+  const wa=document.getElementById('wheelAdminArea');
+  const wh=document.getElementById('wheelPublicHint');
+  if(wa) wa.style.display='flex';
+  if(wh) wh.style.display='none';
+  // Reload persons from sheet
+  loadPersonsFromSheet().then(ok=>{
+    buildMonthTabs();
+    showToast(ok?'เข้าสู่ Admin Mode — พนักงาน '+calPersons.length+' คน':'เข้าสู่ Admin Mode แล้ว');
   });
+  loadWishes();
 }
 
-function markWishDone(animate) {
-  document.getElementById('wishFormWrap').style.display = 'none';
-  document.getElementById('wishDoneBox').style.display = 'block';
-  if (animate) confetti();
+function exitAdmin(){
+  document.body.classList.remove('admin-mode');
+  document.getElementById('apiBar').classList.remove('show');
+  document.getElementById('adminLock').classList.remove('active');
+  document.getElementById('adminLock').textContent='🔒';
+  document.getElementById('adminLock').title='Admin Login';
+  // Photo hints
+  const ph = document.getElementById('photoUploadHint');
+  if(ph) ph.style.display='none';
+  const pf = document.getElementById('empPhotoFrame');
+  if(pf) pf.style.cursor='default';
+  // Hide admin-only wheel controls
+  const wa=document.getElementById('wheelAdminArea');
+  const wh=document.getElementById('wheelPublicHint');
+  if(wa) wa.style.display='none';
+  if(wh) wh.style.display='block';
+  showToast('ออกจาก Admin Mode แล้ว');
+  loadWishes();
 }
 
-function loadWishes() {
-  api('getWishes', {}, function(r) {
-    var wall = document.getElementById('wishWall');
-    if (!r || !r.wishes || !r.wishes.length) {
-      wall.innerHTML = '<div class="no-data">ยังไม่มีคำอวยพร — เป็นคนแรกได้เลย! 💌</div>';
-      return;
+// ── HIDE / SHOW WISH ─────────────────────────────────────────────────
+function toggleHideWish(wid, btn){
+  const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
+  const idx=hidden.indexOf(wid);
+  if(idx>=0){ hidden.splice(idx,1); }
+  else { hidden.push(wid); }
+  localStorage.setItem('sml_hidden',JSON.stringify(hidden));
+  loadWishes();
+  showToast(idx>=0?'แสดงคำอวยพรแล้ว':'ซ่อนคำอวยพรแล้ว');
+}
+
+// ── DELETE WISH ──────────────────────────────────────────────────────
+async function deleteWish(wid, btn){
+  if(!confirm('ลบคำอวยพรนี้? ไม่สามารถกู้คืนได้')) return;
+  // 1. Remove from local cache
+  if(curEmp){
+    const empId=curEmp.code||curEmp.name;
+    if(localWishes[empId]){
+      localWishes[empId]=localWishes[empId].filter(w=>String(w.ts||w.timestamp||w.senderName||w.msg)!==wid);
+      localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
     }
-    wall.innerHTML = r.wishes.map(function(w) {
-      var liked = likedIds[w.id];
-      return '<div class="wish-item">' +
-        '<div class="wish-head">' +
-        (w.photo ? '<img class="wish-photo" src="'+w.photo+'">' : '<div class="wish-photo" style="background:linear-gradient(135deg,#7c3aed,#db2777);display:flex;align-items:center;justify-content:center;font-size:1rem">💜</div>') +
-        '<div><div class="wish-name">'+escHtml(w.name)+'</div><div class="wish-mood">'+escHtml(w.mood||'')+'</div></div>' +
-        '</div>' +
-        '<div class="wish-msg">'+escHtml(w.message)+'</div>' +
-        '<div class="wish-foot"><span class="wish-time">'+fmtTime(w.timestamp)+'</span>' +
-        '<button class="like-btn'+(liked?' liked':'') +'" onclick="likeWish(\''+w.id+'\',this)">'+
-        '❤️ <span>'+((w.likes||0) + (liked?0:0))+'</span></button>' +
-        '</div></div>';
-    }).join('');
-  });
+  }
+  // 2. Remove from hidden list
+  const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
+  const hi=hidden.indexOf(wid);
+  if(hi>=0){ hidden.splice(hi,1); localStorage.setItem('sml_hidden',JSON.stringify(hidden)); }
+  // 3. Delete from Google Sheet via API
+  const result=await apiGet({action:'deleteWish', wid:encodeURIComponent(wid)});
+  if(result&&result.ok){
+    showToast('ลบออกจาก Google Sheet แล้ว');
+  } else {
+    showToast('ลบจากหน้าเว็บแล้ว (Sheet อาจต้องลบเอง)','warn');
+  }
+  // 4. Force reload from server
+  const empId=curEmp?curEmp.code||curEmp.name:'';
+  const fresh=await apiGet({action:'getWishes',empId});
+  if(fresh&&Array.isArray(fresh)){
+    localWishes[empId]=fresh;
+    localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
+  }
+  loadWishes();
 }
 
-function likeWish(id, btn) {
-  if (likedIds[id]) return;
-  likedIds[id] = true;
-  localStorage.setItem('likedIds', JSON.stringify(likedIds));
-  btn.classList.add('liked');
-  var sp = btn.querySelector('span');
-  sp.textContent = parseInt(sp.textContent||0) + 1;
+
+async function reloadPersons(){
+  const ok = await loadPersonsFromSheet();
+  if(ok){
+    buildMonthTabs();
+    if(selMonth>=0) selectMonth(selMonth);
+    showToast('โหลดข้อมูลพนักงานใหม่แล้ว ' + calPersons.length + ' คน');
+  } else {
+    showToast('โหลดไม่ได้ — ตรวจสอบ Script URL','warn');
+  }
+}
+
+
+// ══════════════════════════════════════════════════
+// PHOTO FEATURE
+// ══════════════════════════════════════════════════
+function loadEmpPhoto(empKey) {
+  const saved = localStorage.getItem('photo_'+empKey);
+  const img = document.getElementById('empPhoto');
+  const emoji = document.getElementById('empPhotoEmoji');
+  if (saved) {
+    img.src = saved; img.style.display='block'; emoji.style.display='none';
+  } else {
+    img.src=''; img.style.display='none'; emoji.style.display='block';
+  }
+}
+function adminUploadPhoto() {
+  if (!document.body.classList.contains('admin-mode')) return;
+  document.getElementById('photoInput').click();
+}
+function onPhotoSelected(evt) {
+  const file = evt.target.files[0]; if(!file||!curEmp) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const key = 'photo_'+(curEmp.code||curEmp.name);
+    // Resize to ~300px for storage efficiency
+    const canvas = document.createElement('canvas');
+    const tmpImg = new Image();
+    tmpImg.onload = function() {
+      const size = 300;
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const min = Math.min(tmpImg.width, tmpImg.height);
+      const sx = (tmpImg.width-min)/2, sy = (tmpImg.height-min)/2;
+      ctx.drawImage(tmpImg, sx, sy, min, min, 0, 0, size, size);
+      const data = canvas.toDataURL('image/jpeg', 0.82);
+      localStorage.setItem(key, data);
+      loadEmpPhoto(curEmp.code||curEmp.name);
+      showToast('อัปโหลดรูปสำเร็จ');
+    };
+    tmpImg.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  evt.target.value='';
+}
+// photo hints handled inside enterAdmin/exitAdmin directly
+
+// ══════════════════════════════════════════════════
+// GAME FEATURE
+// ══════════════════════════════════════════════════
+let gameState = {score:0, qIdx:0, questions:[], answered:false};
+
+function generateQuestions(emp) {
+  if (!emp) return [];
+  const qs = [];
+  const mthName = MTH[emp.month];
+  // Q1: เดือนเกิด
+  const wrongMonths = MTH.filter(m=>m!==mthName).sort(()=>Math.random()-.5).slice(0,3);
+  const opts1 = [mthName,...wrongMonths].sort(()=>Math.random()-.5);
+  qs.push({q:`คุณ${emp.name.split(' ')[0]} เกิดเดือนอะไร?`, opts:opts1, ans:mthName});
+  // Q2: แผนก
+  const allFactions=[...new Set(calPersons.map(p=>p.faction).filter(Boolean))];
+  const wrongF = allFactions.filter(f=>f!==emp.faction).sort(()=>Math.random()-.5).slice(0,3);
+  if(wrongF.length>=2) {
+    const opts2 = [emp.faction,...wrongF.slice(0,3)].sort(()=>Math.random()-.5);
+    qs.push({q:`คุณ${emp.name.split(' ')[0]} อยู่แผนกไหน?`, opts:opts2, ans:emp.faction});
+  }
+  // Q3: ทาย emoji ที่เหมาะกับ
+  const emojis = ['🎉','🌟','💖','🎂','🥳','🌈','✨','🎁'];
+  const ans3 = emojis[Math.floor(Math.random()*emojis.length)];
+  const opts3 = [ans3,...emojis.filter(e=>e!==ans3).sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
+  qs.push({q:`เลือก emoji ที่เหมาะกับคุณ${emp.name.split(' ')[0]} ที่สุด!`, opts:opts3, ans:ans3, fun:true});
+  return qs;
+}
+
+function startGame() {
+  if (!curEmp) return;
+  gameState = {score:0, qIdx:0, questions:generateQuestions(curEmp), answered:false};
+  renderGame();
+}
+
+function renderGame() {
+  const body = document.getElementById('gameBody');
+  const score = document.getElementById('gameScore');
+  if (!body) return;
+  score.textContent = gameState.score + ' คะแนน';
+  // Show hint if name not filled
+  const hint = document.getElementById('gameNameHint');
+  const wfName = (document.getElementById('wf-name')||{value:''}).value.trim();
+  const saved = localStorage.getItem('playerName');
+  if(hint) hint.style.display = (!wfName && !saved) ? 'block' : 'none';
+  const qs = gameState.questions;
+  if (!qs.length) { body.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.3);padding:1rem">ไม่มีคำถาม</div>'; return; }
+  if (gameState.qIdx >= qs.length) {
+    const total = qs.length;
+    const s = gameState.score;
+    const msg = s===total?'เก่งมาก! 🏆':s>total/2?'ดีมาก! 👍':'ลองใหม่นะ 😊';
+    // Auto-get name from wish form (no extra input needed)
+    const wishFormName = (document.getElementById('wf-name')||{value:''}).value.trim();
+    const savedName = wishFormName || localStorage.getItem('playerName') || '';
+    if (savedName) {
+      localStorage.setItem('playerName', savedName);
+      saveGameScore(savedName, s, total);
+    }
+    const hasName = !!savedName;
+    body.innerHTML = `<div class="quiz-result">
+      <div style="font-size:2rem;margin-bottom:.5rem">${s===total?'🏆':s>total/2?'🌟':'💪'}</div>
+      <div style="font-size:1rem;font-weight:500;margin-bottom:.3rem">${msg}</div>
+      <div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:.65rem">${s}/${total} ข้อถูก</div>
+      ${hasName
+        ? `<div style="font-size:.78rem;color:rgba(245,200,66,.8);margin-bottom:.5rem">✅ บันทึกคะแนนของ <b>${escHtml(savedName)}</b> แล้ว</div>`
+        : `<div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:.45rem">กรอกชื่อในช่องเขียนคำอวยพรก่อนนะ เพื่อขึ้นกระดานคะแนน</div>`
+      }
+      <button class="quiz-next" onclick="${!hasName?`autoSaveThenRestart();`:'startGame()'}">
+        ${!hasName?'⬇ เลื่อนลงกรอกชื่อ':'🔄 เล่นอีกครั้ง'}
+      </button>
+    </div>`;
+    return;
+  }
+  const q = qs[gameState.qIdx];
+  body.innerHTML = `
+    <div class="quiz-question">${q.q}${q.fun?' <span style="font-size:.72rem;color:var(--gold)">(ข้อสนุก!)</span>':''}</div>
+    <div class="quiz-options">
+      ${q.opts.map(o=>`<button class="quiz-opt" onclick="answerGame(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}','${q.fun?'fun':''}')">${o}</button>`).join('')}
+    </div>`;
+}
+
+function answerGame(btn, selected, ans, type) {
+  if (gameState.answered) return;
+  gameState.answered = true;
+  const opts = document.querySelectorAll('.quiz-opt');
+  const isCorrect = type==='fun' || selected===ans;
+  opts.forEach(o => {
+    o.disabled = true;
+    if (o.textContent.trim()===ans) o.classList.add('correct');
+    else if (o===btn && !isCorrect) o.classList.add('wrong');
+  });
+  if (isCorrect) {
+    gameState.score++;
+    fireConfetti();
+    showToast(type==='fun'?'สนุกมาก! +1 คะแนน':'ถูกต้อง! +1 คะแนน');
+  } else {
+    showToast('ไม่ถูกนะ คำตอบที่ถูกคือ '+ans,'warn');
+  }
+  document.getElementById('gameScore').textContent = gameState.score+' คะแนน';
+  // Auto next after 1.5s
+  setTimeout(()=>{
+    gameState.qIdx++;
+    gameState.answered = false;
+    renderGame();
+  }, 1500);
 }
 
 // ══════════════════════════════════════════════════
-// QUIZ
+// VOTE FEATURE
 // ══════════════════════════════════════════════════
-function renderQuiz() {
-  var el = document.getElementById('quizCard');
-  if (quizDone) { renderQuizDone(); return; }
-  if (quizState.done) { finishQuiz(); return; }
-
-  quizData = QUIZ_BANK;
-  var q = quizData[quizState.q];
-  var pct = (quizState.q / quizData.length * 100).toFixed(0);
-
-  el.innerHTML =
-    '<div class="sec-title">🎯 Quiz วันเกิด</div>' +
-    '<div class="quiz-prog-bg"><div class="quiz-prog" style="width:'+pct+'%"></div></div>' +
-    '<div style="font-size:.75rem;color:var(--sub);margin-bottom:10px">ข้อ '+(quizState.q+1)+'/'+quizData.length+'</div>' +
-    '<div class="quiz-q">'+q.q+'</div>' +
-    '<div class="quiz-opts">'+
-    q.opts.map(function(o,i) {
-      return '<button class="quiz-opt" onclick="answerQuiz('+i+',this)">'+o+'</button>';
-    }).join('') +
-    '</div>';
+function renderVoteList(wishes) {
+  const voteEl = document.getElementById('voteSection');
+  const listEl = document.getElementById('voteList');
+  if (!voteEl||!listEl) return;
+  if (!wishes||!wishes.length) {
+    voteEl.style.display='none'; return;
+  }
+  voteEl.style.display='block';
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
+  const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
+  // Sort by vote count desc
+  const wWithVotes = wishes
+    .filter(w=>(w.msg||w.message))
+    .map(w=>({...w, voteCount: votes[String(w.ts||w.timestamp||w.senderName||w.msg)]||0}))
+    .sort((a,b)=>b.voteCount-a.voteCount)
+    .slice(0,5);
+  const maxV = Math.max(...wWithVotes.map(w=>w.voteCount), 1);
+  const myVote = localStorage.getItem('myvote_'+empKey);
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  listEl.innerHTML = wWithVotes.map((w,i)=>{
+    const wid = String(w.ts||w.timestamp||w.senderName||w.msg||i);
+    const pct = Math.round(w.voteCount/maxV*100);
+    const isVoted = myVote===wid;
+    return `<div class="vote-card${isVoted?' voted':''}" onclick="voteWish('${wid.replace(/'/g,"\\'")}')">
+      <span class="vote-heart">${medals[i]||'⭐'}</span>
+      <div style="flex:1;min-width:0">
+        <div class="vote-msg">"${escHtml(w.msg||w.message||'')}"</div>
+        <div style="display:flex;align-items:center;gap:.4rem;margin-top:.25rem">
+          <div class="vote-bar-wrap"><div class="vote-bar" style="width:${pct}%"></div></div>
+          <span style="font-size:.62rem;color:rgba(255,255,255,.35)">❤️ ${w.voteCount}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function answerQuiz(idx, btn) {
-  var q = quizData[quizState.q];
-  document.querySelectorAll('.quiz-opt').forEach(function(b){b.disabled=true});
-  btn.classList.add(idx === q.ans ? 'correct' : 'wrong');
-  if (idx !== q.ans) document.querySelectorAll('.quiz-opt')[q.ans].classList.add('correct');
-  if (idx === q.ans) quizState.correct++;
-  setTimeout(function() {
-    quizState.q++;
-    if (quizState.q >= quizData.length) { quizState.done = true; finishQuiz(); }
-    else renderQuiz();
-  }, 900);
+function voteWish(wid) {
+  if (!curEmp) return;
+  const empKey = curEmp.code||curEmp.name;
+  const prev = localStorage.getItem('myvote_'+empKey);
+  const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
+  if (prev === wid) {
+    votes[wid] = Math.max(0,(votes[wid]||1)-1);
+    localStorage.removeItem('myvote_'+empKey);
+    showLikeNotif('💔 ยกเลิกไลก์แล้ว', false);
+  } else {
+    if (prev) votes[prev] = Math.max(0,(votes[prev]||1)-1);
+    votes[wid] = (votes[wid]||0)+1;
+    localStorage.setItem('myvote_'+empKey, wid);
+    showLikeNotif('❤️ ไลก์คำอวยพรนี้แล้ว!', true);
+    spawnHearts();
+  }
+  localStorage.setItem('votes_'+empKey, JSON.stringify(votes));
+  const empId = curEmp.code||curEmp.name;
+  const ws = localWishes[empId]||[];
+  renderVoteList(ws.slice(0,10));
 }
 
-function finishQuiz() {
-  var allCorrect = quizState.correct === quizData.length;
-  var pts = allCorrect ? 2 : 1;
-  if (!myName) { renderQuizResult(allCorrect, pts, true); return; }
+let likeTimer;
+function showLikeNotif(msg, isLike) {
+  const el = document.getElementById('likeNotif');
+  if (!el) return;
+  el.innerHTML = (isLike?'❤️ ':'💔 ') + msg;
+  el.style.borderColor = isLike ? '#ff6b9d' : '#888';
+  el.style.color = isLike ? '#ff6b9d' : 'rgba(255,255,255,.5)';
+  el.style.background = isLike ? 'rgba(255,107,157,.15)' : 'rgba(255,255,255,.05)';
+  el.classList.add('show');
+  clearTimeout(likeTimer);
+  likeTimer = setTimeout(()=>el.classList.remove('show'), 2200);
+}
 
-  api('addPoints', {type:'quiz', name:myName, score:quizState.correct, total:quizData.length, quarter:QUARTER}, function(pr) {
-    if (pr && pr.ok) { myPts.quiz = pr.quizPts||pts; myPts.total = pr.totalPts||(myPts.wish+pts); }
-    else { myPts.quiz += pts; myPts.total += pts; }
-    quizDone = true;
-    updatePtsBar();
-    if (allCorrect) confetti();
-    renderQuizResult(allCorrect, pts, false);
+function spawnHearts() {
+  const colors = ['❤️','💖','💝','💗','🌸'];
+  for (let i=0;i<6;i++) {
+    setTimeout(()=>{
+      const h = document.createElement('div');
+      h.className = 'like-heart-fly';
+      h.textContent = colors[~~(Math.random()*colors.length)];
+      h.style.left = (30+Math.random()*40)+'vw';
+      h.style.bottom = '80px';
+      h.style.animationDelay = Math.random()*0.3+'s';
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(), 1400);
+    }, i*80);
+  }
+}
+
+
+// ══════════════════════════════════════════════════
+// CUSTOM QUIZ QUESTIONS (ADMIN)
+// ══════════════════════════════════════════════════
+function getCustomQuestions(empKey) {
+  return JSON.parse(localStorage.getItem('customQ_'+(empKey||''))||'[]');
+}
+function saveCustomQuestions(empKey, qs) {
+  localStorage.setItem('customQ_'+(empKey||''), JSON.stringify(qs));
+}
+
+function renderCustomQList() {
+  const el = document.getElementById('customQList');
+  if (!el) return;
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
+  const qs = getCustomQuestions(empKey);
+  if (!qs.length) {
+    el.innerHTML = '<div style="font-size:.72rem;color:rgba(255,255,255,.25);padding:.25rem">ยังไม่มีคำถามของตัวเอง</div>';
+    return;
+  }
+  el.innerHTML = qs.map((q,i) => `
+    <div class="qe-item">
+      <span class="qe-item-q" title="${q.q}">${i+1}. ${q.q}</span>
+      <button class="qe-del" onclick="deleteCustomQ(${i})" title="ลบ">✕</button>
+    </div>`).join('');
+}
+
+function addCustomQuestion() {
+  const q  = document.getElementById('qeQuestion').value.trim();
+  const o1 = document.getElementById('qeOpt1').value.trim();
+  const o2 = document.getElementById('qeOpt2').value.trim();
+  const o3 = document.getElementById('qeOpt3').value.trim();
+  const o4 = document.getElementById('qeOpt4').value.trim();
+  if (!q || !o1 || !o2) { showToast('กรอกคำถาม + ตัวเลือก 1-2 ก่อนนะ','warn'); return; }
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
+  const opts = [o1, o2, o3, o4].filter(Boolean);
+  const qs = getCustomQuestions(empKey);
+  qs.push({ q, opts, ans: o1 });
+  saveCustomQuestions(empKey, qs);
+  // Clear inputs
+  ['qeQuestion','qeOpt1','qeOpt2','qeOpt3','qeOpt4'].forEach(id => {
+    document.getElementById(id).value = '';
   });
+  renderCustomQList();
+  showToast('เพิ่มคำถามแล้ว! ' + qs.length + ' คำถามทั้งหมด');
 }
 
-function renderQuizResult(allCorrect, pts, noName) {
-  document.getElementById('quizCard').innerHTML =
-    '<div class="result-box">' +
-    '<div class="result-emoji">'+(allCorrect?'🎊':'🙂')+'</div>' +
-    '<div class="result-title">'+(allCorrect?'เยี่ยม! ถูกทุกข้อ!':'ถูก '+quizState.correct+'/'+quizData.length+' ข้อ')+'</div>' +
-    '<div class="result-sub">'+(allCorrect?'คุณรู้จักเพื่อนร่วมงานดีมาก!':'ไตรมาสหน้ามาลองใหม่นะคะ 💪')+'</div>' +
-    (noName ? '<div class="result-sub" style="color:var(--rose);margin-top:8px">⚠️ ยืนยันชื่อก่อนจึงจะบันทึกแต้มได้</div>' : '<div class="pts-earned">+'+pts+' ⭐ แต้ม</div>') +
-    '</div>';
+function deleteCustomQ(idx) {
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
+  const qs = getCustomQuestions(empKey);
+  qs.splice(idx, 1);
+  saveCustomQuestions(empKey, qs);
+  renderCustomQList();
+  showToast('ลบคำถามแล้ว');
 }
 
-function renderQuizDone() {
-  document.getElementById('quizCard').innerHTML =
-    '<div class="result-box"><div class="result-emoji">✅</div>' +
-    '<div class="result-title">คุณทำ Quiz แล้ว!</div>' +
-    '<div class="result-sub">ไตรมาสหน้ามาลุ้นอีกครั้งนะคะ 😊</div></div>';
+// Override generateQuestions to include custom questions
+const _origGenQ = generateQuestions;
+function generateQuestions(emp) {
+  const auto = _origGenQ(emp);
+  const empKey = emp ? (emp.code||emp.name) : '';
+  const custom = getCustomQuestions(empKey).map(q => ({
+    ...q,
+    opts: [...q.opts].sort(()=>Math.random()-.5), // shuffle options
+  }));
+  // Interleave: auto first, then custom, shuffle together
+  const all = [...auto, ...custom].sort(()=>Math.random()-.5);
+  return all;
 }
+
+// customQList rendered inside enterAdmin directly
+
 
 // ══════════════════════════════════════════════════
 // LEADERBOARD
 // ══════════════════════════════════════════════════
-var curLbTab = 'pts';
-function showLbTab(type, btn) {
-  document.querySelectorAll('.lb-tab').forEach(function(t){t.classList.remove('active')});
-  btn.classList.add('active');
-  curLbTab = type;
-  loadLeaderboard(type);
+let lbTab = 'game';
+
+function switchLbTab(tab) {
+  lbTab = tab;
+  document.getElementById('lbTabGame').classList.toggle('active', tab==='game');
+  document.getElementById('lbTabLike').classList.toggle('active', tab==='like');
+  renderLeaderboard();
 }
 
-function loadLeaderboard(type) {
-  var el = document.getElementById('lbContent');
-  el.innerHTML = '<div class="no-data skeleton">กำลังโหลด...</div>';
-
-  if (type === 'pts') {
-    api('getLeaderboard', {quarter: QUARTER, limit:'20'}, function(r) {
-      if (!r || !r.board || !r.board.length) { el.innerHTML = '<div class="no-data">ยังไม่มีข้อมูล</div>'; return; }
-      renderLbRows(el, r.board.map(function(x,i) {
-        return {rank:i+1, name:x.name, main:x.totalPts+' แต้ม', sub:'💌'+x.wishPts+' 🎯'+x.quizPts};
-      }));
-    });
-  } else if (type === 'quiz') {
-    api('getLeaderboard', {quarter: QUARTER, limit:'20'}, function(r) {
-      if (!r || !r.board || !r.board.length) { el.innerHTML = '<div class="no-data">ยังไม่มีข้อมูล</div>'; return; }
-      var sorted = r.board.slice().sort(function(a,b){return (b.quizPts||0)-(a.quizPts||0)});
-      renderLbRows(el, sorted.map(function(x,i) {
-        return {rank:i+1, name:x.name, main:x.quizPts+' คะแนน', sub:''};
-      }));
-    });
+function saveGameScore(playerName, score, total) {
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+  const key = 'lbGame_' + empKey;
+  const board = JSON.parse(localStorage.getItem(key)||'[]');
+  const ts = new Date().toLocaleString('th-TH');
+  const existing = board.find(r=>r.name===playerName);
+  if (existing) {
+    existing.score = Math.max(existing.score||0, score);
+    existing.games = (existing.games||0) + 1;
+    existing.lastScore = score;
+    existing.lastTs = ts;
   } else {
-    api('getWishes', {}, function(r) {
-      if (!r || !r.wishes || !r.wishes.length) { el.innerHTML = '<div class="no-data">ยังไม่มีข้อมูล</div>'; return; }
-      var cnt = {};
-      r.wishes.forEach(function(w) { cnt[w.name] = (cnt[w.name]||0) + (w.likes||0); });
-      var arr = Object.keys(cnt).map(function(k){return {name:k,likes:cnt[k]}}).sort(function(a,b){return b.likes-a.likes});
-      renderLbRows(el, arr.slice(0,20).map(function(x,i) {
-        return {rank:i+1, name:x.name, main:x.likes+' ❤️', sub:''};
-      }));
+    board.push({name:playerName, score, games:1, lastScore:score, lastTs:ts});
+  }
+  board.sort((a,b)=>b.score-a.score);
+  localStorage.setItem(key, JSON.stringify(board.slice(0,50)));
+  renderLeaderboard();
+  renderParticipants();
+  // Show wheel and participants
+  const ps = document.getElementById('partSection');
+  const ws = document.getElementById('wheelSection');
+  if(ps) ps.style.display='block';
+  if(ws) ws.style.display='block';
+  drawWheel();
+  // Fire-and-forget push to server so scores persist across devices
+  apiGet({action:'saveGameScore', empId:empKey, playerName, score, total}).catch(()=>{});
+}
+
+// Fetch the per-employee game leaderboard from the server and merge it
+// into the local cache so it can be rendered/used offline too.
+async function loadGameLeaderboard(empKey){
+  const remote = await apiGet({action:'getGameLeaderboard', empId:empKey});
+  if(!remote || !Array.isArray(remote.board)) return null;
+  const key = 'lbGame_' + empKey;
+  const local = JSON.parse(localStorage.getItem(key)||'[]');
+  const localMap = {};
+  local.forEach(r=>{ localMap[r.name]=r; });
+  const merged = remote.board.map(r=>({
+    name: r.playerName,
+    score: r.bestScore||0,
+    games: r.plays||1,
+    lastScore: (localMap[r.playerName]&&localMap[r.playerName].lastScore) || r.bestScore || 0,
+    lastTs: r.lastTs || (localMap[r.playerName]&&localMap[r.playerName].lastTs) || ''
+  }));
+  merged.sort((a,b)=>b.score-a.score);
+  if(merged.length){
+    localStorage.setItem(key, JSON.stringify(merged.slice(0,50)));
+  }
+  return merged;
+}
+
+function renderLeaderboard() {
+  const el = document.getElementById('lbList');
+  if (!el) return;
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+  const medals = ['🥇','🥈','🥉'];
+
+  if (lbTab === 'game') {
+    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+    if (!board.length) {
+      el.innerHTML='<div class="lb-empty">ยังไม่มีคะแนน — เล่นเกมเพื่อขึ้นกระดาน!</div>'; return;
+    }
+    el.innerHTML = board.slice(0,10).map((r,i)=>`
+      <div class="lb-row">
+        <span class="lb-rank">${medals[i]||'#'+(i+1)}</span>
+        <div class="lb-ava">${r.name.substring(0,2)}</div>
+        <div class="lb-name">${escHtml(r.name)}</div>
+        <div class="lb-score">${r.score} แต้ม · ${r.games} รอบ</div>
+      </div>`).join('');
+  } else {
+    // Like leaderboard: who sent most-liked wishes
+    const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
+    const wishes = localWishes[empKey]||[];
+    const senderVotes = {};
+    wishes.forEach(w=>{
+      const wid = String(w.ts||w.timestamp||w.senderName||w.msg);
+      const v = votes[wid]||0;
+      const sender = w.senderName||w.name||'ไม่ระบุ';
+      senderVotes[sender] = (senderVotes[sender]||0) + v;
     });
+    const sorted = Object.entries(senderVotes).sort((a,b)=>b[1]-a[1]).filter(e=>e[1]>0);
+    if (!sorted.length) {
+      el.innerHTML='<div class="lb-empty">ยังไม่มีคะแนนไลก์ — ส่งคำอวยพรให้คนอื่นโหวต!</div>'; return;
+    }
+    el.innerHTML = sorted.slice(0,10).map(([name,v],i)=>`
+      <div class="lb-row">
+        <span class="lb-rank">${medals[i]||'#'+(i+1)}</span>
+        <div class="lb-ava">${name.substring(0,2)}</div>
+        <div class="lb-name">${escHtml(name)}</div>
+        <div class="lb-score">❤️ ${v} ไลก์</div>
+      </div>`).join('');
   }
 }
 
-function renderLbRows(el, rows) {
-  var medals = ['🥇','🥈','🥉'];
-  el.innerHTML = rows.map(function(r) {
-    return '<div class="lb-row">' +
-      '<div class="lb-rank">'+(medals[r.rank-1]||r.rank+'.')+'</div>' +
-      '<div class="lb-name">'+escHtml(r.name)+(r.name===myName?' <span style="color:var(--purple);font-size:.72rem">← คุณ</span>':'')+'</div>' +
-      '<div><div class="lb-pts">'+r.main+'</div>'+(r.sub?'<div class="lb-sub">'+r.sub+'</div>':'')+'</div>' +
-      '</div>';
-  }).join('');
-}
 
-// ══════════════════════════════════════════════════
-// MONTHLY STATS
-// ══════════════════════════════════════════════════
-function loadMonthlyStats() {
-  document.getElementById('statsTbody').innerHTML =
-    '<tr><td colspan="5" class="no-data skeleton">กำลังดึงข้อมูลจาก Google Sheets...</td></tr>';
-  document.getElementById('sumWish').textContent  = '...';
-  document.getElementById('sumQuiz').textContent  = '...';
-  document.getElementById('sumTotal').textContent = '...';
-
-  api('getMonthlyStats', {}, function(r) {
-    if (!r || r.error) {
-      document.getElementById('statsTbody').innerHTML =
-        '<tr><td colspan="5" class="no-data">ไม่สามารถโหลดข้อมูลได้ — ตรวจสอบ API URL</td></tr>';
-      return;
-    }
-
-    // Summary
-    var s = r.summary || {};
-    document.getElementById('sumWish').textContent  = s.totalWish  || 0;
-    document.getElementById('sumQuiz').textContent  = s.totalQuiz  || 0;
-    document.getElementById('sumTotal').textContent = s.totalUnique || 0;
-
-    // Top 10 table
-    var top10 = r.top10 || [];
-    var allStats = r.stats || [];
-    var maxPart = Math.max.apply(null, top10.map(function(x){return x.totalParticipants||0}).concat([1]));
-    var medals = ['🥇','🥈','🥉'];
-
-    document.getElementById('statsTbody').innerHTML = top10.length
-      ? top10.map(function(row, i) {
-          var wPct = maxPart ? Math.round((row.wishCount||0)/maxPart*100) : 0;
-          var qPct = maxPart ? Math.round((row.quizCount||0)/maxPart*100) : 0;
-          return '<tr>' +
-            '<td><span class="rank-medal">'+(medals[i]||('No.'+(i+1)))+'</span></td>' +
-            '<td><span class="month-tag">'+(row.monthShort||'')+'&nbsp;'+(row.year||'')+'</span></td>' +
-            '<td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill bar-wish" style="width:'+wPct+'%"></div></div>'+(row.wishCount||0)+'</div></td>' +
-            '<td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill bar-quiz" style="width:'+qPct+'%"></div></div>'+(row.quizCount||0)+'</div></td>' +
-            '<td style="font-weight:700;color:var(--green)">'+(row.totalParticipants||0)+'</td>' +
-            '</tr>';
-        }).join('')
-      : '<tr><td colspan="5" class="no-data">ยังไม่มีข้อมูล — รอพนักงานเข้าร่วมกิจกรรมค่ะ</td></tr>';
-
-    // All months chips
-    var chips = document.getElementById('allMonthsRow');
-    chips.innerHTML = allStats.map(function(m) {
-      var total = m.totalParticipants || 0;
-      var hasData = total > 0;
-      return '<div style="text-align:center;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:8px 10px;min-width:68px;">' +
-        '<div style="font-size:.75rem;color:var(--sub)">'+(m.monthShort||'')+'</div>' +
-        '<div style="font-size:1.1rem;font-weight:700;color:'+(hasData?'var(--green)':'var(--sub)')+'">'+total+'</div>' +
-        '<div style="font-size:.65rem;color:var(--sub)">คน</div>' +
-        '</div>';
-    }).join('');
-  });
-}
-
-// ══════════════════════════════════════════════════
-// ADMIN
-// ══════════════════════════════════════════════════
-function doAdminLogin() {
-  var pwd = document.getElementById('adminPwd').value;
-  if (pwd === ADMIN_PWD) {
-    isAdmin = true;
-    document.body.classList.add('admin-mode');
-    document.getElementById('adminLoginCard').style.display = 'none';
-    document.getElementById('adminPanel').style.display     = 'block';
-    document.getElementById('adminTab').style.display       = 'inline-block';
-    buildQRCode();
-    initWheel();
-    toast('👑 เข้าสู่ระบบ Admin แล้วค่ะ');
-  } else {
-    toast('❌ รหัสผ่านไม่ถูกต้อง');
+function doSaveScore(s, total) {
+  const inp = document.getElementById('lbNameInput');
+  const name = inp ? inp.value.trim() : localStorage.getItem('playerName');
+  if (name) {
+    localStorage.setItem('playerName', name);
+    saveGameScore(name, s, total);
+    showToast('บันทึกคะแนนแล้ว! ดู 🏆 กระดานด้านล่าง');
   }
 }
 
-function logoutAdmin() {
-  isAdmin = false;
-  document.body.classList.remove('admin-mode');
-  document.getElementById('adminTab').style.display = 'none';
-  document.getElementById('adminPwd').value = '';
-  document.getElementById('adminLoginCard').style.display = 'block';
-  document.getElementById('adminPanel').style.display     = 'none';
-}
-
-function importPersonsAdmin() {
-  toast('⏳ กำลังนำเข้าข้อมูลพนักงาน...');
-  api('seedPersons', {}, function(r) {
-    if (r && r.ok) {
-      toast('✅ นำเข้าสำเร็จ! เพิ่มใหม่ ' + r.added + ' คน (รวม ' + r.total + ' คน)');
-      loadPersons();
-    } else {
-      toast('❌ นำเข้าไม่สำเร็จ ลองใหม่นะคะ');
+function autoSaveThenRestart() {
+  // Scroll to wish form so user fills in name
+  const wf = document.getElementById('wish-form');
+  if (wf) {
+    wf.scrollIntoView({behavior:'smooth', block:'center'});
+    // Highlight the name input
+    const inp = document.getElementById('wf-name');
+    if (inp) {
+      inp.focus();
+      inp.style.borderColor = '#f5c842';
+      inp.placeholder = 'กรอกชื่อที่นี่ก่อนเพื่อขึ้นกระดานคะแนน...';
+      setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ชื่อ-นามสกุล หรือ ชื่อเล่น'; }, 3000);
     }
-  });
+  }
+  showToast('กรอกชื่อในช่อง "เขียนคำอวยพร" ด้านล่างนะครับ');
 }
 
-function openQRModal()   { showTab('admin', document.getElementById('adminTab')); }
-function openWheelModal(){ showTab('admin', document.getElementById('adminTab')); }
 
-// ── QR CODE ──
-function buildQRCode() {
-  var el = document.getElementById('qrcode');
-  if (!el || el.querySelector('canvas')) return;
-  new QRCode(el, {text:PAGE_URL, width:180, height:180, colorDark:'#7c3aed', colorLight:'#fff', correctLevel:QRCode.CorrectLevel.M});
-  document.getElementById('qrUrl').textContent = PAGE_URL;
+// ══════════════════════════════════════════════════
+// PARTICIPANTS LIST
+// ══════════════════════════════════════════════════
+function renderParticipants() {
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+  const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  const grid = document.getElementById('partGrid');
+  const cnt  = document.getElementById('partCount');
+  if (!grid) return;
+  const ps = document.getElementById('partSection');
+  const ws = document.getElementById('wheelSection');
+  if (!board.length) {
+    if(ps) ps.style.display='none';
+    if(ws) ws.style.display='none';
+    return;
+  }
+  if(ps) ps.style.display='block';
+  if(ws) ws.style.display='block';
+  if(cnt) cnt.textContent = board.length + ' คน';
+  const winner = localStorage.getItem('wheelWinner_'+empKey)||'';
+  grid.innerHTML = board.map(r=>`
+    <div class="part-chip${r.name===winner?' winner':''}">
+      ${r.name===winner?'🏆 ':''}${escHtml(r.name)}
+      <span style="opacity:.5;font-size:.65rem">${r.score}แต้ม</span>
+    </div>`).join('');
+  drawWheel();
 }
 
-function downloadQR() {
-  var c = document.querySelector('#qrcode canvas');
-  if (!c) return toast('ไม่พบ QR Code');
-  var a = document.createElement('a');
-  a.download = 'SML_Birthday_QR.png'; a.href = c.toDataURL(); a.click();
+// ══════════════════════════════════════════════════
+// WHEEL OF FORTUNE
+// ══════════════════════════════════════════════════
+const WHEEL_COLORS = [
+  '#E94560','#F5A623','#7ED321','#4A90D9','#9B59B6',
+  '#1ABC9C','#E67E22','#E91E63','#00BCD4','#8BC34A',
+  '#FF5722','#3F51B5','#009688','#FF9800','#673AB7'
+];
+let wheelAngle = 0;
+let wheelSpinning = false;
+
+function getWheelNames() {
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+  const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  return board.map(r=>r.name);
 }
 
-// ── SPIN WHEEL ──
-var wheelSegments = ['🎁 ของรางวัล','🎫 คูปอง','☕ กาแฟ','🍰 เค้ก','💐 ดอกไม้','📌 ลองใหม่'];
-var wheelColors   = ['#7c3aed','#db2777','#ea580c','#0ea5e9','#22c55e','#a855f7'];
-var wheelAngle    = 0;
-
-function initWheel() {
-  var canvas = document.getElementById('wheel');
+function drawWheel(highlightIdx=-1) {
+  const canvas = document.getElementById('wheelCanvas');
   if (!canvas) return;
-  drawWheel(canvas, 0);
-}
+  const ctx = canvas.getContext('2d');
+  const names = getWheelNames();
+  if (!names.length) {
+    ctx.clearRect(0,0,260,260);
+    // Draw decorative empty wheel
+    const emptyColors=['#2a1a4e','#3d2a6e','#2a1a5e','#1a2a5e','#2a3a6e','#1a3a4e','#3a2a5e','#2a3a5e'];
+    const emptyLabels=['🎂','🎉','🌟','🎁','🥳','✨','💖','🎊'];
+    const eArc = Math.PI*2/8;
+    for(let i=0;i<8;i++){
+      ctx.beginPath(); ctx.moveTo(130,130);
+      ctx.arc(130,130,120,i*eArc,(i+1)*eArc); ctx.closePath();
+      ctx.fillStyle=emptyColors[i]; ctx.fill();
+      ctx.strokeStyle='rgba(245,200,66,.2)'; ctx.lineWidth=1; ctx.stroke();
+      ctx.save(); ctx.translate(130,130); ctx.rotate(i*eArc+eArc/2);
+      ctx.font='18px sans-serif'; ctx.textAlign='right';
+      ctx.fillText(emptyLabels[i],105,6); ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(130,130,22,0,Math.PI*2);
+    ctx.fillStyle='#0f0c1d'; ctx.fill();
+    ctx.strokeStyle='#f5c842'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='#f5c842'; ctx.font='bold 10px Kanit,sans-serif';
+    ctx.textAlign='center'; ctx.fillText('SML',130,134);
+    // Center text
+    ctx.fillStyle='rgba(255,255,255,.4)'; ctx.font='13px Kanit,sans-serif';
+    ctx.fillText('เลือกพนักงาน',130,180);
+    ctx.font='11px Kanit,sans-serif'; ctx.fillStyle='rgba(255,255,255,.25)';
+    ctx.fillText('แล้วเล่นเกมเพื่อขึ้นวงล้อ',130,198);
+    return;
+  }
+  const n = names.length;
+  const arc = (Math.PI*2)/n;
+  ctx.clearRect(0,0,260,260);
 
-function drawWheel(canvas, rotate) {
-  var ctx = canvas.getContext('2d');
-  var cx = canvas.width/2, cy = canvas.height/2, r = cx - 8;
-  var seg = wheelSegments.length, arc = 2*Math.PI/seg;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  wheelSegments.forEach(function(label, i) {
-    var start = rotate + i*arc, end = start + arc;
-    ctx.beginPath(); ctx.moveTo(cx,cy);
-    ctx.arc(cx,cy,r,start,end); ctx.closePath();
-    ctx.fillStyle = wheelColors[i%wheelColors.length]; ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 11px Kanit'; ctx.textAlign = 'center';
-    ctx.save(); ctx.translate(cx,cy);
+  for (let i=0;i<n;i++) {
+    const start = wheelAngle + i*arc;
+    const end   = start + arc;
+    const color = WHEEL_COLORS[i%WHEEL_COLORS.length];
+    // Sector
+    ctx.beginPath();
+    ctx.moveTo(130,130);
+    ctx.arc(130,130,120,start,end);
+    ctx.closePath();
+    ctx.fillStyle = i===highlightIdx ? '#f5c842' : color;
+    ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,.15)';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+    // Text
+    ctx.save();
+    ctx.translate(130,130);
     ctx.rotate(start + arc/2);
-    ctx.fillText(label, r*0.6, 4); ctx.restore();
-  });
-  ctx.beginPath(); ctx.arc(cx,cy,18,0,2*Math.PI);
-  ctx.fillStyle='#fff'; ctx.fill();
+    ctx.textAlign='right';
+    ctx.fillStyle='#fff';
+    ctx.font=`${Math.min(13, 200/n)}px Kanit,sans-serif`;
+    ctx.shadowColor='rgba(0,0,0,.5)';
+    ctx.shadowBlur=3;
+    const name = names[i].split(' ')[0]; // first name only
+    const maxLen = Math.floor(100/Math.max(8,name.length));
+    ctx.fillText(name.substring(0,maxLen+(maxLen<name.length?-1:0))+(name.length>maxLen?'…':''), 110, 5);
+    ctx.restore();
+  }
+  // Center circle
+  ctx.beginPath();
+  ctx.arc(130,130,22,0,Math.PI*2);
+  ctx.fillStyle='#1a0a2e';
+  ctx.fill();
+  ctx.strokeStyle='#f5c842';
+  ctx.lineWidth=2;
+  ctx.stroke();
+  ctx.fillStyle='#f5c842';
+  ctx.font='bold 11px Kanit,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('SML',130,134);
 }
 
 function spinWheel() {
-  if (wheelSpinning) return;
+  if (!document.body.classList.contains('admin-mode')) {
+    showToast('เฉพาะ Admin เท่านั้นที่กดหมุนได้ครับ','warn'); return;
+  }
+  const names = getWheelNames();
+  if (!names.length || wheelSpinning) return;
   wheelSpinning = true;
-  document.getElementById('wheelResult').textContent = '';
-  var canvas = document.getElementById('wheel');
-  var extra   = Math.random()*360 + 1440;
-  var duration = 3500;
-  var start    = performance.now();
-  var startAngle = wheelAngle;
+  const btn = document.getElementById('wheelSpinBtn');
+  const resEl = document.getElementById('wheelResult');
+  btn.disabled = true;
+  btn.textContent = '🌀 กำลังหมุน...';
+  if(resEl) resEl.textContent = '';
 
-  function step(now) {
-    var elapsed = now - start;
-    var progress = Math.min(elapsed/duration, 1);
-    var ease = 1 - Math.pow(1-progress, 4);
-    wheelAngle = startAngle + extra * ease * Math.PI/180;
-    drawWheel(canvas, wheelAngle);
-    if (progress < 1) { requestAnimationFrame(step); return; }
+  // Pick random winner
+  const winIdx = Math.floor(Math.random()*names.length);
+  const arc = (Math.PI*2)/names.length;
+  // Calculate target angle: pointer at top = -π/2, sector center at winIdx
+  const targetSectorAngle = -(winIdx * arc + arc/2) - Math.PI/2;
+  const spins = 5 + Math.random()*4; // 5-9 full rotations
+  const totalRot = spins * Math.PI*2 + ((targetSectorAngle - wheelAngle) % (Math.PI*2));
+  const duration = 4500;
+  const startAngle = wheelAngle;
+  const start = performance.now();
 
-    wheelSpinning = false;
-    var seg = wheelSegments.length;
-    var arc = 2*Math.PI/seg;
-    var norm = (((-wheelAngle) % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
-    var idx  = Math.floor(norm/arc) % seg;
-    document.getElementById('wheelResult').textContent = '🎉 ' + wheelSegments[idx];
-    confetti();
+  function animate(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed/duration, 1);
+    // Ease out cubic
+    const ease = 1 - Math.pow(1-progress, 3);
+    wheelAngle = startAngle + totalRot * ease;
+    drawWheel();
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      wheelAngle = startAngle + totalRot;
+      drawWheel(winIdx);
+      wheelSpinning = false;
+      btn.disabled = false;
+      btn.textContent = '🎡 หมุนอีกครั้ง!';
+      const winner = names[winIdx];
+      if(resEl) resEl.innerHTML = `🏆 ผู้โชคดีคือ <span style="color:#f5c842;font-weight:600">${escHtml(winner)}</span>!`;
+      // Save winner
+      const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+      localStorage.setItem('wheelWinner_'+empKey, winner);
+      renderParticipants();
+      fireConfetti();
+      showToast('🏆 ผู้โชคดี: ' + winner);
+    }
   }
-  requestAnimationFrame(step);
+  requestAnimationFrame(animate);
 }
 
-// ── EXPORT ──
-function exportScores() {
-  api('getLeaderboard', {quarter:QUARTER, limit:'99'}, function(r) {
-    if (!r || !r.board) return toast('ไม่มีข้อมูล');
-    var rows = [['ชื่อ','แต้มรวม','แต้มอวยพร','แต้ม Quiz']];
-    r.board.forEach(function(x) { rows.push([x.name, x.totalPts, x.wishPts||0, x.quizPts||0]); });
-    var csv = rows.map(function(r){return r.join(',')}).join('\n');
-    var a = document.createElement('a');
-    a.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
-    a.download = 'SML_Points_'+QUARTER+'.csv'; a.click();
-    toast('✅ Export แล้วค่ะ');
+// ══════════════════════════════════════════════════
+// EXPORT SCORES TO EXCEL
+// ══════════════════════════════════════════════════
+function exportScoresExcel() {
+  if (!document.body.classList.contains('admin-mode')) {
+    showToast('เฉพาะ Admin เท่านั้นครับ','warn'); return;
+  }
+  if (typeof XLSX==='undefined') {
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onload=exportScoresExcel; document.head.appendChild(s); return;
+  }
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
+  const empName = curEmp ? curEmp.name : 'ทั้งหมด';
+  const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+  const winner = localStorage.getItem('wheelWinner_'+empKey)||'';
+
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: Scores
+  const hdr = [['อันดับ','ชื่อ','คะแนนสูงสุด','จำนวนครั้งที่เล่น','คะแนนล่าสุด','วันที่','ผู้โชคดี']];
+  const rows = board.map((r,i)=>[
+    i+1, r.name, r.score, r.games, r.lastScore||r.score,
+    r.lastTs||'', r.name===winner?'🏆 ผู้โชคดี':''
+  ]);
+  const ws1 = XLSX.utils.aoa_to_sheet([...hdr,...rows]);
+  ws1['!cols']=[{wch:6},{wch:24},{wch:14},{wch:16},{wch:14},{wch:20},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws1,'คะแนนเกม');
+
+  // Sheet 2: Summary
+  const summary = [
+    ['เกมวันเกิด','คุณเป็นแฟนพันธุ์แท้ของ '+empName+' หรือไม่?'],
+    ['จำนวนผู้เข้าร่วม',board.length],
+    ['ผู้โชคดี (วงล้อ)',winner||'ยังไม่ได้สุ่ม'],
+    ['คะแนนสูงสุด',board[0]?board[0].score:'—'],
+    ['ผู้ชนะ',board[0]?board[0].name:'—'],
+  ];
+  const ws2 = XLSX.utils.aoa_to_sheet(summary);
+  ws2['!cols']=[{wch:20},{wch:40}];
+  XLSX.utils.book_append_sheet(wb,ws2,'สรุป');
+
+  const fname = 'SML_Game_Score_'+empName.replace(/\s+/g,'_')+'_'+new Date().toLocaleDateString('th-TH').replace(/\//g,'-')+'.xlsx';
+  XLSX.writeFile(wb, fname);
+  showToast('Export คะแนนสำเร็จ!');
+}
+
+
+// ══════════════════════════════════════════════════
+// ADMIN AUTH & SETTINGS
+// ══════════════════════════════════════════════════
+function getMasterKey(){
+  let mk = localStorage.getItem('adminMasterKey');
+  if (!mk) {
+    // Generate random 8-char key on first use
+    mk = Math.random().toString(36).substring(2,6).toUpperCase() +
+         Math.random().toString(36).substring(2,6).toUpperCase();
+    localStorage.setItem('adminMasterKey', mk);
+  }
+  return mk;
+}
+
+function showAdminLoginModal(){
+  const m = document.getElementById('loginModal');
+  if(m){ m.style.display='flex'; setTimeout(()=>document.getElementById('loginPassInput').focus(),100); }
+}
+
+function doLogin(){
+  const inp = document.getElementById('loginPassInput');
+  if(!inp) return;
+  const pw = inp.value;
+  if(pw === getAdminPass() || pw === getMasterKey()){
+    inp.value='';
+    document.getElementById('loginModal').style.display='none';
+    enterAdmin();
+  } else {
+    inp.style.borderColor='#ff6b9d';
+    inp.value='';
+    inp.placeholder='รหัสไม่ถูกต้อง ลองใหม่...';
+    setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ใส่รหัส Admin...'; },2000);
+    showToast('รหัสไม่ถูกต้องครับ','warn');
+  }
+}
+
+function showAdminSettings(){
+  const m = document.getElementById('settingsModal');
+  if(m){ m.style.display='flex'; }
+  // Clear fields
+  ['settOldPass','settNewPass','settConfPass'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
   });
+  const sm = document.getElementById('settSuccessMsg');
+  if(sm) sm.style.display='none';
+  const mkd = document.getElementById('masterKeyDisplay');
+  if(mkd) mkd.textContent='••••••••';
 }
 
-// ══════════════════════════════════════════════════
-// API CALLER
-// ══════════════════════════════════════════════════
-function api(action, params, cb) {
-  params.action = action;
-  var qs = Object.keys(params).map(function(k) {
-    return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);
-  }).join('&');
-  var url = API_URL + '?' + qs;
+function changePassword(){
+  const old   = (document.getElementById('settOldPass')||{value:''}).value;
+  const nw    = (document.getElementById('settNewPass')||{value:''}).value;
+  const conf  = (document.getElementById('settConfPass')||{value:''}).value;
+  const sm    = document.getElementById('settSuccessMsg');
 
-  fetch(url, {redirect:'follow'})
-    .then(function(r){return r.json()})
-    .then(cb)
-    .catch(function(err) {
-      console.warn('API error:', err);
-      cb && cb({error: err.toString()});
-    });
-}
-
-// ══════════════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════════════
-function toast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._t); t._t = setTimeout(function(){t.classList.remove('show')}, 2800);
-}
-
-function confetti() {
-  var colors = ['#ff6b9d','#ffd93d','#a78bfa','#22c55e','#60a5fa'];
-  for (var i = 0; i < 35; i++) {
-    var d = document.createElement('div');
-    d.style.cssText = 'position:fixed;width:8px;height:8px;border-radius:2px;' +
-      'background:'+colors[i%5]+';left:'+Math.random()*100+'vw;' +
-      'top:-12px;z-index:9999;pointer-events:none;' +
-      'animation:fall '+(1.2+Math.random()*1.5)+'s ease-in forwards;' +
-      'animation-delay:'+Math.random()*0.4+'s';
-    document.body.appendChild(d);
-    setTimeout(function(){d.remove()}, 3000);
+  if(old !== getAdminPass() && old !== getMasterKey()){
+    showToast('รหัสเดิมไม่ถูกต้อง','warn'); return;
   }
-  if (!document.getElementById('fallStyle')) {
-    var s = document.createElement('style'); s.id='fallStyle';
-    s.textContent = '@keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:0}}';
-    document.head.appendChild(s);
+  if(nw.length < 4){ showToast('รหัสใหม่ต้องมีอย่างน้อย 4 ตัว','warn'); return; }
+  if(nw !== conf){ showToast('รหัสยืนยันไม่ตรงกัน','warn'); return; }
+
+  setAdminPass(nw);
+  ['settOldPass','settNewPass','settConfPass'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  if(sm){ sm.style.display='block'; setTimeout(()=>sm.style.display='none',3000); }
+  showToast('เปลี่ยนรหัสผ่านสำเร็จ!');
+}
+
+function showMasterKey(){
+  const mk = getMasterKey();
+  const el = document.getElementById('masterKeyDisplay');
+  if(el){
+    if(el.textContent==='••••••••'){
+      el.textContent = mk;
+      showToast('Master Key: ' + mk + ' — จำไว้ด้วยนะครับ');
+    } else {
+      el.textContent='••••••••';
+    }
   }
 }
 
-function escHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function showForgotPass(){
+  document.getElementById('loginModal').style.display='none';
+  const m = document.getElementById('forgotModal');
+  if(m){ m.style.display='flex'; setTimeout(()=>document.getElementById('forgotMasterKey').focus(),100); }
 }
 
-function fmtTime(iso) {
-  if (!iso) return '';
-  try {
-    var d = new Date(iso);
-    return d.toLocaleDateString('th-TH',{day:'numeric',month:'short'}) + ' ' +
-           d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
-  } catch(e) { return ''; }
+function resetWithMasterKey(){
+  const mk  = (document.getElementById('forgotMasterKey')||{value:''}).value;
+  const nw  = (document.getElementById('forgotNewPass')||{value:''}).value;
+  if(mk !== getMasterKey()){ showToast('Master Key ไม่ถูกต้อง','warn'); return; }
+  if(nw.length < 4){ showToast('รหัสใหม่ต้องมีอย่างน้อย 4 ตัว','warn'); return; }
+  setAdminPass(nw);
+  document.getElementById('forgotModal').style.display='none';
+  showToast('รีเซ็ตรหัสผ่านสำเร็จ! รหัสใหม่: ' + nw);
+  // Auto open login modal
+  setTimeout(showAdminLoginModal, 1000);
 }
+
+
 </script>
+
 </body>
 </html>
