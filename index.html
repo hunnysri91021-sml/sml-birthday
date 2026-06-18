@@ -482,7 +482,11 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
     <div class="qe-opt-row"><input type="radio" name="qeCorrect" value="3"><input class="qe-inp" id="qeOpt3" placeholder="ตัวเลือก 3"></div>
     <div class="qe-opt-row"><input type="radio" name="qeCorrect" value="4"><input class="qe-inp" id="qeOpt4" placeholder="ตัวเลือก 4"></div>
   </div>
-  <button class="qe-add" onclick="addCustomQuestion()" style="margin-top:.28rem">+ เพิ่มคำถาม</button>
+  <button class="qe-add" id="qeSubmitBtn" onclick="addCustomQuestion()" style="margin-top:.28rem">+ เพิ่มคำถาม</button>
+  <button class="qe-add" id="qeCancelBtn" onclick="cancelEditCustomQ()" style="margin-top:.28rem;display:none;background:rgba(255,107,157,.08);border-color:rgba(255,107,157,.2);color:var(--rose)">✕ ยกเลิกการแก้ไข</button>
+  <div class="qe-lbl" style="margin-top:.6rem">📥 นำเข้าคำถาม-คำตอบจากไฟล์ Excel (เช่นผลสำรวจ)</div>
+  <input type="file" id="qeImportInput" accept=".xlsx,.xls" style="display:none" onchange="importQuestionsFromExcel(event)">
+  <button class="qe-add" onclick="document.getElementById('qeImportInput').click()">📥 เลือกไฟล์ Excel เพื่อนำเข้า</button>
 </div>
 
 <!-- VOTE -->
@@ -1576,6 +1580,8 @@ async function loadCustomQuestions(empKey) {
   return qs;
 }
 
+let editingCustomQId = null;
+
 function renderCustomQList() {
   const el = document.getElementById('customQList');
   if (!el) return;
@@ -1588,8 +1594,41 @@ function renderCustomQList() {
   el.innerHTML = qs.map((q,i) => `
     <div class="qe-item">
       <span class="qe-item-q" title="${q.q}">${i+1}. ${q.q} <span style="color:var(--mint)">(ถูก: ${escHtml(q.ans)})</span></span>
+      <button class="qe-del" onclick="editCustomQ('${String(q.id).replace(/'/g,"\\'")}')" title="แก้ไข" style="color:var(--gold)">✏️</button>
       <button class="qe-del" onclick="deleteCustomQ('${String(q.id).replace(/'/g,"\\'")}')" title="ลบ">✕</button>
     </div>`).join('');
+}
+
+function editCustomQ(id) {
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
+  const q = getCustomQuestions(empKey).find(x=>String(x.id)===String(id));
+  if (!q) return;
+  editingCustomQId = id;
+  document.getElementById('qeQuestion').value = q.q;
+  document.getElementById('qeOpt1').value = q.opts[0] || '';
+  document.getElementById('qeOpt2').value = q.opts[1] || '';
+  document.getElementById('qeOpt3').value = q.opts[2] || '';
+  document.getElementById('qeOpt4').value = q.opts[3] || '';
+  const correctIdx = Math.max(0, q.opts.indexOf(q.ans));
+  const radio = document.querySelector(`input[name="qeCorrect"][value="${correctIdx+1}"]`);
+  if (radio) radio.checked = true;
+  const submitBtn = document.getElementById('qeSubmitBtn');
+  if (submitBtn) submitBtn.textContent = '💾 บันทึกการแก้ไข';
+  const cancelBtn = document.getElementById('qeCancelBtn');
+  if (cancelBtn) cancelBtn.style.display = 'block';
+}
+
+function cancelEditCustomQ() {
+  editingCustomQId = null;
+  ['qeQuestion','qeOpt1','qeOpt2','qeOpt3','qeOpt4'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  const radio1 = document.querySelector('input[name="qeCorrect"][value="1"]');
+  if (radio1) radio1.checked = true;
+  const submitBtn = document.getElementById('qeSubmitBtn');
+  if (submitBtn) submitBtn.textContent = '+ เพิ่มคำถาม';
+  const cancelBtn = document.getElementById('qeCancelBtn');
+  if (cancelBtn) cancelBtn.style.display = 'none';
 }
 
 async function addCustomQuestion() {
@@ -1605,6 +1644,21 @@ async function addCustomQuestion() {
   const ans = opts[correctIdx] || opts[0];
   const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
   if (!empKey) { showToast('กรุณาเลือกคนเกิดก่อนครับ','warn'); return; }
+
+  if (editingCustomQId) {
+    const id = editingCustomQId;
+    const res = await apiPostJson({action:'updateCustomQuestion', id, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans});
+    if (!res || !res.ok) { showToast('แก้ไขคำถามไม่สำเร็จ ลองใหม่นะ','warn'); return; }
+    const qs = getCustomQuestions(empKey);
+    const idx = qs.findIndex(x=>String(x.id)===String(id));
+    if (idx !== -1) qs[idx] = { id, empId: empKey, q, opts, ans };
+    customQCache[empKey] = qs;
+    localStorage.setItem('customQ_'+empKey, JSON.stringify(qs));
+    cancelEditCustomQ();
+    renderCustomQList();
+    showToast('แก้ไขคำถามแล้ว!');
+    return;
+  }
 
   const res = await apiPostJson({action:'addCustomQuestion', empId: empKey, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans});
   if (!res || !res.ok) { showToast('บันทึกคำถามไม่สำเร็จ ลองใหม่นะ','warn'); return; }
@@ -1631,8 +1685,77 @@ async function deleteCustomQ(id) {
   const qs = getCustomQuestions(empKey).filter(q=>String(q.id)!==String(id));
   customQCache[empKey] = qs;
   localStorage.setItem('customQ_'+empKey, JSON.stringify(qs));
+  if (editingCustomQId === id) cancelEditCustomQ();
   renderCustomQList();
   showToast('ลบคำถามแล้ว');
+}
+
+// ══════════════════════════════════════════════════
+// IMPORT CUSTOM QUESTIONS FROM EXCEL (เช่นผลสำรวจ Forms)
+// คาดหวังคอลัมน์: รหัสพนักงาน + คอลัมน์คำถามอื่นๆ (หัวคอลัมน์ = คำถาม,
+// ค่าในแถว = คำตอบของพนักงานคนนั้น). คำตอบของคนอื่นในคอลัมน์เดียวกัน
+// จะถูกสุ่มมาเป็นตัวเลือกผิดให้อัตโนมัติ
+// ══════════════════════════════════════════════════
+function importQuestionsFromExcel(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  if (typeof XLSX === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onload = () => importQuestionsFromExcel(evt);
+    document.head.appendChild(s);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const wb = XLSX.read(e.target.result, {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+      if (!rows.length) { showToast('ไม่พบข้อมูลในไฟล์','warn'); return; }
+
+      const codeKey = Object.keys(rows[0]).find(k => k.indexOf('รหัสพนักงาน') !== -1);
+      if (!codeKey) { showToast('ไม่พบคอลัมน์ "รหัสพนักงาน" ในไฟล์','warn'); return; }
+      const skipKeys = new Set([codeKey,'Id','Start time','Completion time','Email','Name','ชื่อ นามสกุล ของท่าน']);
+      const qKeys = Object.keys(rows[0]).filter(k => !skipKeys.has(k));
+      if (!qKeys.length) { showToast('ไม่พบคอลัมน์คำถามในไฟล์','warn'); return; }
+
+      showToast('กำลังนำเข้าคำถาม... รอสักครู่ 📥');
+      const items = [];
+      qKeys.forEach(qKey => {
+        const answersByCode = rows
+          .map(r => ({ code: String(r[codeKey]||'').trim(), ans: String(r[qKey]||'').trim() }))
+          .filter(r => r.code && r.ans);
+        const pool = answersByCode.map(r => r.ans);
+        answersByCode.forEach(({code, ans}) => {
+          const wrongPool = [...new Set(pool.filter(a => a !== ans))].sort(()=>Math.random()-.5).slice(0,3);
+          if (wrongPool.length < 1) return; // ต้องมีตัวเลือกผิดอย่างน้อย 1 ตัว
+          const opts = [ans, ...wrongPool];
+          items.push({ empId: code, q: qKey, opt1: opts[0]||'', opt2: opts[1]||'', opt3: opts[2]||'', opt4: opts[3]||'', ans });
+        });
+      });
+
+      if (!items.length) { showToast('ไม่มีคำถามที่นำเข้าได้ (ต้องมีคำตอบมากกว่า 1 คนต่อคำถาม)','warn'); return; }
+
+      // ส่งเป็นชุดๆ ละ 50 รายการ กันคำขอใหญ่เกินไป
+      const chunkSize = 50;
+      let imported = 0;
+      for (let i = 0; i < items.length; i += chunkSize) {
+        const chunk = items.slice(i, i+chunkSize);
+        const res = await apiPostJson({action:'bulkAddCustomQuestions', items: chunk});
+        if (res && res.ok) imported += res.count || chunk.length;
+      }
+      // เคลียร์ cache เพื่อให้โหลดข้อมูลใหม่จากเซิร์ฟเวอร์
+      customQCache = {};
+      if (curEmp) { await loadCustomQuestions(curEmp.code||curEmp.name); renderCustomQList(); }
+      showToast(`นำเข้าคำถามสำเร็จ ${imported}/${items.length} รายการ! 🎉`);
+    } catch (err) {
+      console.error(err);
+      showToast('นำเข้าไฟล์ไม่สำเร็จ ตรวจรูปแบบไฟล์อีกครั้ง','warn');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  evt.target.value = '';
 }
 
 // Override generateQuestions to include custom questions
