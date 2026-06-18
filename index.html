@@ -286,6 +286,8 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 .lb-tabs{display:flex;gap:.28rem;margin-bottom:.7rem}
 .lb-tab{padding:.22rem .72rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .15s}
 .lb-tab.active{background:rgba(245,200,66,.12);border-color:var(--gold);color:var(--gold)}
+.lb-month-row{margin-bottom:.6rem}
+.lb-month-sel{width:100%;padding:.4rem .6rem;border-radius:10px;border:1px solid var(--b2);background:var(--c2);color:var(--text);font-family:'Kanit',sans-serif;font-size:.76rem;outline:none}
 .lb-row{display:flex;align-items:center;gap:.5rem;padding:.38rem .6rem;border-radius:9px;background:var(--c2);margin-bottom:.28rem}
 .lb-rank{font-size:.9rem;width:20px;text-align:center;flex-shrink:0}
 .lb-ava{width:24px;height:24px;border-radius:50%;background:rgba(245,200,66,.14);display:flex;align-items:center;justify-content:center;font-size:.58rem;color:var(--gold);flex-shrink:0;font-weight:600}
@@ -377,8 +379,11 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 <div class="lb-sec" id="lbSection">
   <div class="sec-hdr"><div class="sec-title">🏆 กระดานคะแนน</div></div>
   <div class="lb-tabs">
-    <button class="lb-tab active" id="lbTabGame" onclick="switchLbTab('game')">🎯 เกม</button>
+    <button class="lb-tab active" id="lbTabGame" onclick="switchLbTab('game')">🏆 คะแนนสะสม</button>
     <button class="lb-tab" id="lbTabLike" onclick="switchLbTab('like')">❤️ ไลก์</button>
+  </div>
+  <div class="lb-month-row" id="lbMonthRow">
+    <select class="lb-month-sel" id="lbMonthSel" onchange="loadMonthlyLeaderboard(this.value)"></select>
   </div>
   <div id="lbList"><div class="lb-empty">เล่นเกมเพื่อขึ้นกระดาน!</div></div>
 </div>
@@ -944,6 +949,7 @@ async function submitWish(){
       // Mark as participant even without playing game
       saveGameScore(name, 0, 0);
     }
+    apiGet({action:'addWishPoint', name, empId, month:curEmp.month}).then(()=>loadMonthlyLeaderboard());
   }
   // UI
   document.getElementById('wf-name').value='';
@@ -1131,6 +1137,7 @@ function onTextInput(){
   setInterval(loadWishes, 30000);
   // Draw placeholder top10 chart on load
   setTimeout(renderTop10Chart, 300);
+  setTimeout(()=>loadMonthlyLeaderboard(), 300);
   // Init emoji grid + templates
   initStickerSystem();
   renderTemplates();
@@ -1415,6 +1422,8 @@ function renderGame() {
     if (savedName) {
       localStorage.setItem('playerName', savedName);
       saveGameScore(savedName, s, total);
+      const empKey = curEmp.code||curEmp.name;
+      apiGet({action:'addQuizPoint', name:savedName, empId:empKey, month:curEmp.month, score:s, total}).then(()=>loadMonthlyLeaderboard());
     }
     const hasName = !!savedName;
     body.innerHTML = `<div class="qi-result">
@@ -1783,7 +1792,59 @@ function switchLbTab(tab) {
   lbTab = tab;
   document.getElementById('lbTabGame').classList.toggle('active', tab==='game');
   document.getElementById('lbTabLike').classList.toggle('active', tab==='like');
-  renderLeaderboard();
+  const monthRow = document.getElementById('lbMonthRow');
+  if (monthRow) monthRow.style.display = tab==='game' ? 'block' : 'none';
+  if (tab==='game') loadMonthlyLeaderboard();
+  else renderLeaderboard();
+}
+
+// คนเดียวกันได้สัตว์น่ารักตัวเดิมเสมอ (ไม่มีรูปก็ยังจำหน้าได้)
+const CUTE_ANIMALS = ['🐶','🐱','🐰','🐻','🐼','🦊','🐨','🐯','🦁','🐸','🐵','🐹','🦄','🐷','🐮','🐔','🦉','🐢'];
+function animalEmoji(name) {
+  const s = String(name||'');
+  let h = 0;
+  for (let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) >>> 0;
+  return CUTE_ANIMALS[h % CUTE_ANIMALS.length];
+}
+
+function initLbMonthSel() {
+  const sel = document.getElementById('lbMonthSel');
+  if (!sel || sel.options.length) return;
+  const cur = new Date().getMonth() + 1;
+  sel.innerHTML = MTH.map((m,i)=>{
+    const month = i+1;
+    return `<option value="${month}" ${month===cur?'selected':''}>${m}</option>`;
+  }).join('');
+}
+
+async function loadMonthlyLeaderboard(month) {
+  initLbMonthSel();
+  const sel = document.getElementById('lbMonthSel');
+  const m = month || (sel && sel.value) || (new Date().getMonth()+1);
+  if (sel) sel.value = m;
+  const el = document.getElementById('lbList');
+  if (!el) return;
+  const res = await apiGet({action:'getMonthlyLeaderboard', month:m, limit:10});
+  const board = (res && Array.isArray(res.board)) ? res.board : [];
+  if (!board.length) {
+    el.innerHTML = '<div class="lb-empty">ยังไม่มีคะแนนในเดือนนี้</div>';
+    return;
+  }
+  const maxPts = Math.max(1, board[0].totalPts||1);
+  const medals = ['🥇','🥈','🥉'];
+  el.innerHTML = board.map((r,i)=>{
+    const pct = Math.max(4, Math.round((r.totalPts/maxPts)*100));
+    const ava = r.photo ? `<img src="${r.photo}" alt="">` : animalEmoji(r.name);
+    return `
+    <div class="top10-row">
+      <div class="top10-rank">${medals[i]||'#'+(i+1)}</div>
+      <div class="top10-ava">${ava}</div>
+      <div class="top10-bar-wrap">
+        <div class="top10-name"><b>${escHtml(r.name)}</b><span class="top10-score">${r.totalPts} แต้ม</span></div>
+        <div class="top10-bar-track"><div class="top10-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function saveGameScore(playerName, score, total) {
@@ -1844,17 +1905,7 @@ function renderLeaderboard() {
   const medals = ['🥇','🥈','🥉'];
 
   if (lbTab === 'game') {
-    const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
-    if (!board.length) {
-      el.innerHTML='<div class="lb-empty">ยังไม่มีคะแนน — เล่นเกมเพื่อขึ้นกระดาน!</div>'; return;
-    }
-    el.innerHTML = board.slice(0,10).map((r,i)=>`
-      <div class="lb-row">
-        <span class="lb-rank">${medals[i]||'#'+(i+1)}</span>
-        <div class="lb-ava">${r.name.substring(0,2)}</div>
-        <div class="lb-name">${escHtml(r.name)}</div>
-        <div class="lb-score">${r.score} แต้ม · ${r.games} รอบ</div>
-      </div>`).join('');
+    loadMonthlyLeaderboard();
   } else {
     // Like leaderboard: who sent most-liked wishes
     const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
