@@ -826,7 +826,7 @@ function selectPerson(code){
   const ps=document.getElementById('partSection');
   if(ps) ps.style.display='block';
   startGame();
-  renderCustomQList();
+  loadCustomQuestions(curEmp.code||curEmp.name).then(()=>renderCustomQList());
   renderParticipants();
   renderLeaderboard();
   setTimeout(renderTop10Chart, 100);
@@ -1381,8 +1381,10 @@ function generateQuestions(emp) {
   return qs;
 }
 
-function startGame() {
+async function startGame() {
   if (!curEmp) return;
+  const empKey = curEmp.code||curEmp.name;
+  if (!customQCache[empKey]) await loadCustomQuestions(empKey);
   gameState = {score:0, qIdx:0, questions:generateQuestions(curEmp), answered:false};
   renderGame();
 }
@@ -1553,11 +1555,25 @@ function spawnHearts() {
 // ══════════════════════════════════════════════════
 // CUSTOM QUIZ QUESTIONS (ADMIN)
 // ══════════════════════════════════════════════════
+// Custom quiz questions are stored on the server (CustomQuestions sheet) so
+// every employee on every device sees the SAME questions/answers for each
+// birthday person — not just the admin's own browser.
+let customQCache = {}; // empKey -> [{id,q,opts,ans}]
+
 function getCustomQuestions(empKey) {
+  // Server-synced cache first; falls back to the (legacy) local copy so the
+  // quiz still works offline / before the first sync completes.
+  if (customQCache[empKey]) return customQCache[empKey];
   return JSON.parse(localStorage.getItem('customQ_'+(empKey||''))||'[]');
 }
-function saveCustomQuestions(empKey, qs) {
-  localStorage.setItem('customQ_'+(empKey||''), JSON.stringify(qs));
+
+async function loadCustomQuestions(empKey) {
+  if (!empKey) return [];
+  const res = await apiGet({action:'getCustomQuestions', empId: empKey});
+  const qs = Array.isArray(res) ? res : [];
+  customQCache[empKey] = qs;
+  localStorage.setItem('customQ_'+empKey, JSON.stringify(qs));
+  return qs;
 }
 
 function renderCustomQList() {
@@ -1572,11 +1588,11 @@ function renderCustomQList() {
   el.innerHTML = qs.map((q,i) => `
     <div class="qe-item">
       <span class="qe-item-q" title="${q.q}">${i+1}. ${q.q} <span style="color:var(--mint)">(ถูก: ${escHtml(q.ans)})</span></span>
-      <button class="qe-del" onclick="deleteCustomQ(${i})" title="ลบ">✕</button>
+      <button class="qe-del" onclick="deleteCustomQ('${String(q.id).replace(/'/g,"\\'")}')" title="ลบ">✕</button>
     </div>`).join('');
 }
 
-function addCustomQuestion() {
+async function addCustomQuestion() {
   const q  = document.getElementById('qeQuestion').value.trim();
   const o1 = document.getElementById('qeOpt1').value.trim();
   const o2 = document.getElementById('qeOpt2').value.trim();
@@ -1588,9 +1604,16 @@ function addCustomQuestion() {
   const correctIdx = correctEl ? parseInt(correctEl.value, 10) - 1 : 0;
   const ans = opts[correctIdx] || opts[0];
   const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
+  if (!empKey) { showToast('กรุณาเลือกคนเกิดก่อนครับ','warn'); return; }
+
+  const res = await apiPostJson({action:'addCustomQuestion', empId: empKey, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans});
+  if (!res || !res.ok) { showToast('บันทึกคำถามไม่สำเร็จ ลองใหม่นะ','warn'); return; }
+
   const qs = getCustomQuestions(empKey);
-  qs.push({ q, opts, ans });
-  saveCustomQuestions(empKey, qs);
+  qs.push({ id: res.id, empId: empKey, q, opts, ans });
+  customQCache[empKey] = qs;
+  localStorage.setItem('customQ_'+empKey, JSON.stringify(qs));
+
   // Clear inputs
   ['qeQuestion','qeOpt1','qeOpt2','qeOpt3','qeOpt4'].forEach(id => {
     document.getElementById(id).value = '';
@@ -1598,14 +1621,16 @@ function addCustomQuestion() {
   const radio1 = document.querySelector('input[name="qeCorrect"][value="1"]');
   if (radio1) radio1.checked = true;
   renderCustomQList();
-  showToast('เพิ่มคำถามแล้ว! ' + qs.length + ' คำถามทั้งหมด');
+  showToast('เพิ่มคำถามแล้ว! ' + qs.length + ' คำถามทั้งหมด (ทุกคนเห็นเหมือนกัน)');
 }
 
-function deleteCustomQ(idx) {
+async function deleteCustomQ(id) {
   const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
-  const qs = getCustomQuestions(empKey);
-  qs.splice(idx, 1);
-  saveCustomQuestions(empKey, qs);
+  const res = await apiPostJson({action:'deleteCustomQuestion', id});
+  if (!res || !res.ok) { showToast('ลบคำถามไม่สำเร็จ','warn'); return; }
+  const qs = getCustomQuestions(empKey).filter(q=>String(q.id)!==String(id));
+  customQCache[empKey] = qs;
+  localStorage.setItem('customQ_'+empKey, JSON.stringify(qs));
   renderCustomQList();
   showToast('ลบคำถามแล้ว');
 }
