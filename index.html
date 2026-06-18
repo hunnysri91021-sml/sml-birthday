@@ -1417,15 +1417,15 @@ function renderGame() {
       saveGameScore(savedName, s, total);
     }
     const hasName = !!savedName;
-    body.innerHTML = `<div class="quiz-result">
+    body.innerHTML = `<div class="qi-result">
       <div style="font-size:2rem;margin-bottom:.5rem">${s===total?'🏆':s>total/2?'🌟':'💪'}</div>
       <div style="font-size:1rem;font-weight:500;margin-bottom:.3rem">${msg}</div>
-      <div style="font-size:.82rem;color:rgba(74,51,88,.5);margin-bottom:.65rem">${s}/${total} ข้อถูก</div>
+      <div style="font-size:.82rem;color:var(--mute);margin-bottom:.65rem">${s}/${total} ข้อถูก</div>
       ${hasName
         ? `<div style="font-size:.78rem;color:rgba(245,200,66,.8);margin-bottom:.5rem">✅ บันทึกคะแนนของ <b>${escHtml(savedName)}</b> แล้ว</div>`
-        : `<div style="font-size:.75rem;color:rgba(74,51,88,.4);margin-bottom:.45rem">กรอกชื่อในช่องเขียนคำอวยพรก่อนนะ เพื่อขึ้นกระดานคะแนน</div>`
+        : `<div style="font-size:.75rem;color:var(--mute);margin-bottom:.45rem">กรอกชื่อในช่องเขียนคำอวยพรก่อนนะ เพื่อขึ้นกระดานคะแนน</div>`
       }
-      <button class="quiz-next" onclick="${!hasName?`autoSaveThenRestart();`:'startGame()'}">
+      <button class="qi-next" onclick="${!hasName?`autoSaveThenRestart();`:'startGame()'}">
         ${!hasName?'⬇ เลื่อนลงกรอกชื่อ':'🔄 เล่นอีกครั้ง'}
       </button>
     </div>`;
@@ -1433,16 +1433,16 @@ function renderGame() {
   }
   const q = qs[gameState.qIdx];
   body.innerHTML = `
-    <div class="quiz-question">${q.q}${q.fun?' <span style="font-size:.72rem;color:var(--gold)">(ข้อสนุก!)</span>':''}</div>
-    <div class="quiz-options">
-      ${q.opts.map(o=>`<button class="quiz-opt" onclick="answerGame(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}','${q.fun?'fun':''}')">${o}</button>`).join('')}
+    <div class="qi-q">${q.q}${q.fun?' <span style="font-size:.72rem;color:var(--gold)">(ข้อสนุก!)</span>':''}</div>
+    <div class="qi-opts">
+      ${q.opts.map(o=>`<button class="qopt" onclick="answerGame(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}','${q.fun?'fun':''}')">${o}</button>`).join('')}
     </div>`;
 }
 
 function answerGame(btn, selected, ans, type) {
   if (gameState.answered) return;
   gameState.answered = true;
-  const opts = document.querySelectorAll('.quiz-opt');
+  const opts = document.querySelectorAll('.qopt');
   const isCorrect = type==='fun' || selected===ans;
   opts.forEach(o => {
     o.disabled = true;
