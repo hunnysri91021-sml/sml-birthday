@@ -1362,7 +1362,7 @@ function onPhotoSelected(evt) {
 // ══════════════════════════════════════════════════
 let gameState = {score:0, qIdx:0, questions:[], answered:false};
 
-function generateQuestions(emp) {
+function generateAutoQuestions(emp) {
   if (!emp) return [];
   const qs = [];
   const mthName = MTH[emp.month];
@@ -1758,10 +1758,9 @@ function importQuestionsFromExcel(evt) {
   evt.target.value = '';
 }
 
-// Override generateQuestions to include custom questions
-const _origGenQ = generateQuestions;
+// generateQuestions merges auto-generated and custom questions
 function generateQuestions(emp) {
-  const auto = _origGenQ(emp);
+  const auto = generateAutoQuestions(emp);
   const empKey = emp ? (emp.code||emp.name) : '';
   const custom = getCustomQuestions(empKey).map(q => ({
     ...q,
