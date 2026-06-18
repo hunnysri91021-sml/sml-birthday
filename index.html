@@ -920,7 +920,7 @@ async function loadPersonsFromSheet(){
         pos:     String(p.pos||'').trim(),
         faction: String(p.faction||'').trim(),
         day:     parseInt(p.day)||1,
-        month:   typeof p.month==='number' ? p.month : Math.max(0,parseInt(p.month||0)-1),
+        month:   Math.max(0, parseInt(p.month||0, 10) - 1),
       }));
     if(parsed.length === 0) return false;
     calPersons = parsed;
