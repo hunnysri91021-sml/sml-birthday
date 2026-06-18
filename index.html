@@ -159,6 +159,8 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 .qe-del{background:none;border:none;color:rgba(255,107,157,.4);cursor:pointer;font-size:.78rem;flex-shrink:0}
 .qe-del:hover{color:var(--rose)}
 .qe-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.28rem;margin-bottom:.3rem}
+.qe-opt-row{display:flex;align-items:center;gap:.32rem}
+.qe-opt-row input[type=radio]{accent-color:var(--gold);flex-shrink:0;cursor:pointer}
 .qe-inp{background:rgba(74,51,88,.06);border:1px solid var(--b2);border-radius:8px;padding:.36rem .58rem;color:var(--text);font-family:'Kanit',sans-serif;font-size:.72rem;width:100%;outline:none}
 .qe-inp:focus{border-color:rgba(245,200,66,.38)}
 .qe-add{padding:.38rem;background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.17);border-radius:8px;color:var(--gold);font-family:'Kanit',sans-serif;font-size:.7rem;cursor:pointer;width:100%}
@@ -472,13 +474,14 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
   <div class="qe-lbl">✏️ Admin — เพิ่มคำถามเอง</div>
   <div class="qe-list" id="customQList"></div>
   <input class="qe-inp" id="qeQuestion" placeholder="คำถาม เช่น คุณ... ชอบอาหารอะไร?" style="width:100%;margin-bottom:.28rem">
+  <div class="qe-lbl" style="margin-top:.2rem">เลือกตัวเลือกที่เป็นคำตอบที่ถูกต้อง 👇</div>
   <div class="qe-form-grid">
-    <input class="qe-inp" id="qeOpt1" placeholder="ตัวเลือก 1 (ถูก)">
-    <input class="qe-inp" id="qeOpt2" placeholder="ตัวเลือก 2">
-    <input class="qe-inp" id="qeOpt3" placeholder="ตัวเลือก 3">
-    <input class="qe-inp" id="qeOpt4" placeholder="ตัวเลือก 4">
+    <div class="qe-opt-row"><input type="radio" name="qeCorrect" value="1" checked><input class="qe-inp" id="qeOpt1" placeholder="ตัวเลือก 1"></div>
+    <div class="qe-opt-row"><input type="radio" name="qeCorrect" value="2"><input class="qe-inp" id="qeOpt2" placeholder="ตัวเลือก 2"></div>
+    <div class="qe-opt-row"><input type="radio" name="qeCorrect" value="3"><input class="qe-inp" id="qeOpt3" placeholder="ตัวเลือก 3"></div>
+    <div class="qe-opt-row"><input type="radio" name="qeCorrect" value="4"><input class="qe-inp" id="qeOpt4" placeholder="ตัวเลือก 4"></div>
   </div>
-  <button class="qe-add" onclick="addCustomQuestion()" style="margin-top:.28rem">+ เพิ่มคำถาม (ตัวเลือก 1 = ถูก)</button>
+  <button class="qe-add" onclick="addCustomQuestion()" style="margin-top:.28rem">+ เพิ่มคำถาม</button>
 </div>
 
 <!-- VOTE -->
@@ -1535,7 +1538,7 @@ function renderCustomQList() {
   }
   el.innerHTML = qs.map((q,i) => `
     <div class="qe-item">
-      <span class="qe-item-q" title="${q.q}">${i+1}. ${q.q}</span>
+      <span class="qe-item-q" title="${q.q}">${i+1}. ${q.q} <span style="color:var(--mint)">(ถูก: ${escHtml(q.ans)})</span></span>
       <button class="qe-del" onclick="deleteCustomQ(${i})" title="ลบ">✕</button>
     </div>`).join('');
 }
@@ -1547,15 +1550,20 @@ function addCustomQuestion() {
   const o3 = document.getElementById('qeOpt3').value.trim();
   const o4 = document.getElementById('qeOpt4').value.trim();
   if (!q || !o1 || !o2) { showToast('กรอกคำถาม + ตัวเลือก 1-2 ก่อนนะ','warn'); return; }
-  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
   const opts = [o1, o2, o3, o4].filter(Boolean);
+  const correctEl = document.querySelector('input[name="qeCorrect"]:checked');
+  const correctIdx = correctEl ? parseInt(correctEl.value, 10) - 1 : 0;
+  const ans = opts[correctIdx] || opts[0];
+  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
   const qs = getCustomQuestions(empKey);
-  qs.push({ q, opts, ans: o1 });
+  qs.push({ q, opts, ans });
   saveCustomQuestions(empKey, qs);
   // Clear inputs
   ['qeQuestion','qeOpt1','qeOpt2','qeOpt3','qeOpt4'].forEach(id => {
     document.getElementById(id).value = '';
   });
+  const radio1 = document.querySelector('input[name="qeCorrect"][value="1"]');
+  if (radio1) radio1.checked = true;
   renderCustomQList();
   showToast('เพิ่มคำถามแล้ว! ' + qs.length + ' คำถามทั้งหมด');
 }
