@@ -53,7 +53,8 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 .admin-strip{display:none;background:linear-gradient(135deg,rgba(30,15,60,.95),rgba(20,10,45,.98));border-bottom:2px solid rgba(245,200,66,.35);padding:.65rem 1rem;gap:.4rem;flex-wrap:wrap;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .admin-mode .admin-strip{display:flex}
 .as-lbl{font-size:.6rem;color:rgba(245,200,66,.5);letter-spacing:.08em;text-transform:uppercase;flex-shrink:0}
-.as-inp{flex:1;min-width:120px;background:rgba(74,51,88,.07);border:1px solid rgba(245,200,66,.25);border-radius:8px;padding:.32rem .65rem;color:var(--text);font-family:'Kanit',sans-serif;font-size:.7rem;outline:none;transition:border-color .2s}
+.as-inp{flex:1;min-width:120px;background:rgba(255,255,255,.1);border:1px solid rgba(245,200,66,.25);border-radius:8px;padding:.32rem .65rem;color:#fff;font-family:'Kanit',sans-serif;font-size:.7rem;outline:none;transition:border-color .2s}
+.as-inp::placeholder{color:rgba(255,255,255,.4)}
 .as-inp:focus{border-color:rgba(245,200,66,.6)}
 .as-btn{padding:.3rem .65rem;border-radius:8px;border:1px solid rgba(245,200,66,.28);background:rgba(245,200,66,.06);color:rgba(245,200,66,.8);font-family:'Kanit',sans-serif;font-size:.67rem;cursor:pointer;white-space:nowrap;transition:all .15s;font-weight:500}
 .as-btn:hover{background:rgba(245,200,66,.18);color:var(--gold);border-color:var(--gold);transform:translateY(-1px)}
@@ -149,7 +150,7 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 .qi-name-inp{width:100%;background:rgba(74,51,88,.07);border:1px solid var(--b2);border-radius:9px;padding:.45rem .7rem;color:var(--text);font-family:'Kanit',sans-serif;font-size:.82rem;outline:none;margin:.5rem 0}
 .qi-name-inp:focus{border-color:rgba(245,200,66,.4)}
 /* ADMIN QUIZ EDITOR */
-.qe-panel{display:none;margin:0 1rem .4rem;background:rgba(245,200,66,.04);border-radius:14px;padding:.85rem 1rem;border:1px solid rgba(245,200,66,.12)}
+.qe-panel{display:none;margin:0 1rem .4rem;background:var(--c1);border-radius:14px;padding:.85rem 1rem;border:1px solid rgba(245,200,66,.3)}
 .admin-mode .qe-panel{display:block}
 .qe-lbl{font-size:.62rem;color:rgba(245,200,66,.6);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.4rem}
 .qe-list{display:flex;flex-direction:column;gap:.3rem;max-height:130px;overflow-y:auto;margin-bottom:.4rem}
