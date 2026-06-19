@@ -3,7 +3,7 @@
 // เพิ่มใหม่: Points, Monthly_Stats, QR, ยอดสะสม มิ.ย.-ธ.ค. 2569
 // ============================================================
 // Sheet ID เดิม — ไม่ต้องเปลี่ยน
-var SHEET_ID      = 'PUT_YOUR_GOOGLE_SHEET_ID_HERE'; // TODO: ใส่รหัส Google Sheet ID ของคุณ
+var SHEET_ID      = '1rpJKzrWoBQwJAM9OiByecs1CYLB-CSumkdXg6ldJ0JU'; // TODO: ใส่รหัส Google Sheet ID ของคุณ
 var SHEET_WISHES  = 'Wishes';
 var SHEET_PERSONS = 'Persons';
 var SHEET_POINTS  = 'Points';        // ใหม่
@@ -1568,15 +1568,14 @@ function forceDriveAuth() {
   DriveApp.getRootFolder().getName();
   SpreadsheetApp.openById(SHEET_ID).getName();
 }
-// ============================================================
-// ── ADMIN EMERGENCY RESET (Run manually from Apps Script only)
-// ============================================================
+
+
 function resetAdminPasswordToDefault() {
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var cred = getAdminCredsRow(ss);
 
   if (!cred) {
-    Logger.log('No admin configured. Run setup() or initAdminCreds() first.');
+    Logger.log('No admin configured. Run initAdminCreds() first.');
     return;
   }
 
@@ -1590,6 +1589,5 @@ function resetAdminPasswordToDefault() {
   cred.ws.getRange(cred.rowIdx, cred.IDX['LockedUntil'] + 1).setValue('');
   cred.ws.getRange(cred.rowIdx, cred.IDX['UpdatedAt'] + 1).setValue(new Date());
 
-  logAudit('system', 'resetAdminPasswordToDefault', 'admin', 'password reset to default via Apps Script editor', 'ok');
   Logger.log('Admin password reset to: sml2569');
 }
