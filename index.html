@@ -611,8 +611,7 @@ function updateStatRow(){
   const empKey=curEmp?(curEmp.code||curEmp.name):'';
   const wishes=localWishes[empKey]||[];
   const board=JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
-  const votes=JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
-  const totalLikes=Object.values(votes).reduce((a,b)=>a+b,0);
+  const totalLikes=Object.values(likesCache).reduce((a,b)=>a+b,0);
   const wc=document.getElementById('wish-count');const lt=document.getElementById('like-total');const pc=document.getElementById('player-count');
   if(wc)wc.textContent=wishes.length;
   if(lt)lt.textContent='❤️ '+totalLikes;
@@ -694,7 +693,8 @@ function saveApiUrl(){
 
 const ADMIN_API_ACTIONS = new Set([
   'deleteWish','setLbRange','addCustomQuestion','updateCustomQuestion','deleteCustomQuestion',
-  'bulkAddCustomQuestions','uploadPhoto','seedPersons','getAuditLog','changePassword','logout'
+  'bulkAddCustomQuestions','uploadPhoto','seedPersons','getAuditLog','changePassword','logout',
+  'toggleHideWish','setActiveMonths'
 ]);
 function getAdminToken(){ return sessionStorage.getItem('sml_admin_token') || ''; }
 function setAdminToken(token){ if(token) sessionStorage.setItem('sml_admin_token', token); }
@@ -910,14 +910,14 @@ async function loadWishes(){
   } else {
     wishes=localWishes[empId]||[];
   }
+  await refreshLikes();
   renderWishes(wishes);
   document.getElementById('wish-count').textContent=wishes.length;
 }
 function renderWishes(wishes){
   const grid=document.getElementById('wish-grid');
   const isAdmin=document.body.classList.contains('admin-mode');
-  const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
-  const visible=isAdmin ? wishes : wishes.filter(w=>!hidden.includes(String(w.ts||w.timestamp||w.senderName)));
+  const visible=isAdmin ? wishes : wishes.filter(w=>!w.hidden);
 
   if(!visible.length){
     grid.innerHTML='<div class="wish-empty"><div class="wish-empty-icon">💭</div><div>ยังไม่มีคำอวยพร<br><span style="font-size:.75rem">เป็นคนแรกที่ส่งคำอวยพร!</span></div></div>';
@@ -927,7 +927,7 @@ function renderWishes(wishes){
 
   grid.innerHTML=wishes.map((w,i)=>{
     const wid=String(w.ts||w.timestamp||w.senderName||i);
-    const isHidden=hidden.includes(wid);
+    const isHidden=!!w.hidden;
     if(!isAdmin && isHidden) return '';
     return `<div class="wish-card wc-${i%6}${isHidden?' wish-hidden':''}" style="animation-delay:${i*0.05}s;position:relative">
       <div class="wish-actions">
@@ -1178,6 +1178,7 @@ function onTextInput(){
     testApi();
     // Load persons from Sheet before building UI
     await loadPersonsFromSheet();
+    await fetchActiveMonths();
   }
   // Build UI
   buildMonthTabs();
@@ -1202,16 +1203,30 @@ function onTextInput(){
 })();
 
 
-// ── ADMIN MONTH CONTROL ─────────────────────────────────────────────
+// ── ADMIN MONTH CONTROL ──────────────────────────────────────────────
+// เก็บที่ Google Sheet (Settings) เพื่อให้ทุกเครื่องเห็นเดือนที่เปิดตรงกัน
+// localStorage ใช้แค่เป็น cache ให้ใช้งานได้ทันทีก่อนข้อมูลจาก server มาถึง
+let activeMonthsCache = JSON.parse(localStorage.getItem('sml_active_months')||'null') || [new Date().getMonth()];
+
 function getActiveMonths(){
-  const saved=localStorage.getItem('sml_active_months');
-  if(saved) return JSON.parse(saved);
-  // Default: current month only
-  return [new Date().getMonth()];
+  return activeMonthsCache;
 }
 
-function saveActiveMonths(arr){
+async function fetchActiveMonths(){
+  const r = await apiGet({action:'getActiveMonths'});
+  if(r && r.ok && Array.isArray(r.months)){
+    activeMonthsCache = r.months;
+    localStorage.setItem('sml_active_months', JSON.stringify(r.months));
+    buildMonthTabs();
+    if(document.body.classList.contains('admin-mode')) buildAmcGrid();
+  }
+}
+
+async function saveActiveMonths(arr){
+  activeMonthsCache = arr;
   localStorage.setItem('sml_active_months', JSON.stringify(arr));
+  const r = await apiGet({action:'setActiveMonths', months: JSON.stringify(arr)});
+  if(!r || !r.ok) showToast('บันทึกเดือนไปยัง Google Sheet ไม่สำเร็จ (บันทึกในเครื่องไว้ก่อน)','warn');
 }
 
 function buildAmcGrid(){
@@ -1224,7 +1239,7 @@ function buildAmcGrid(){
 }
 
 function toggleAdminMonth(mi){
-  const active=getActiveMonths();
+  const active=getActiveMonths().slice();
   const idx=active.indexOf(mi);
   if(idx>=0) active.splice(idx,1);
   else active.push(mi);
@@ -1304,14 +1319,14 @@ async function exitAdmin(){
 }
 
 // ── HIDE / SHOW WISH ─────────────────────────────────────────────────
-function toggleHideWish(wid, btn){
-  const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
-  const idx=hidden.indexOf(wid);
-  if(idx>=0){ hidden.splice(idx,1); }
-  else { hidden.push(wid); }
-  localStorage.setItem('sml_hidden',JSON.stringify(hidden));
+async function toggleHideWish(wid, btn){
+  const result=await apiGet({action:'toggleHideWish', wid});
+  if(result&&result.ok){
+    showToast(result.hidden?'ซ่อนคำอวยพรแล้ว':'แสดงคำอวยพรแล้ว');
+  } else {
+    showToast('ซ่อน/แสดงไม่สำเร็จ — ตรวจสอบ Script URL/Token','warn');
+  }
   loadWishes();
-  showToast(idx>=0?'แสดงคำอวยพรแล้ว':'ซ่อนคำอวยพรแล้ว');
 }
 
 // ── DELETE WISH ──────────────────────────────────────────────────────
@@ -1325,11 +1340,7 @@ async function deleteWish(wid, btn){
       localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
     }
   }
-  // 2. Remove from hidden list
-  const hidden=JSON.parse(localStorage.getItem('sml_hidden')||'[]');
-  const hi=hidden.indexOf(wid);
-  if(hi>=0){ hidden.splice(hi,1); localStorage.setItem('sml_hidden',JSON.stringify(hidden)); }
-  // 3. Delete from Google Sheet via API
+  // 2. Delete from Google Sheet via API
   const result=await apiGet({action:'deleteWish', wid:encodeURIComponent(wid)});
   if(result&&result.ok){
     showToast('ลบออกจาก Google Sheet แล้ว');
@@ -1552,8 +1563,23 @@ function answerGame(btn, selected, ans, type) {
 }
 
 // ══════════════════════════════════════════════════
-// VOTE FEATURE
+// VOTE / LIKE FEATURE — counts เก็บที่ Google Sheet 'Likes' เพื่อให้ทุกเครื่องเห็นตรงกัน
+// voterKey เป็น id สุ่มต่อเครื่อง (ไม่ผูกบัญชี) ใช้แค่กันโหวตซ้ำ/toggle ของเครื่องนั้นๆ
 // ══════════════════════════════════════════════════
+let likesCache = {};   // wishId -> count (จาก server, ทุกเครื่องเห็นตรงกัน)
+let myVotesCache = {}; // wishId -> true ถ้าเครื่องนี้กดไลก์ไว้
+
+function getVoterKey(){
+  let k = localStorage.getItem('sml_voter_id');
+  if(!k){ k = 'v'+Date.now()+'_'+Math.random().toString(36).slice(2); localStorage.setItem('sml_voter_id', k); }
+  return k;
+}
+
+async function refreshLikes(){
+  const r = await apiGet({action:'getLikes', voterKey:getVoterKey()});
+  if(r && r.ok){ likesCache = r.counts||{}; myVotesCache = r.myVotes||{}; }
+}
+
 function renderVoteList(wishes) {
   const voteEl = document.getElementById('voteSection');
   const listEl = document.getElementById('voteList');
@@ -1562,21 +1588,18 @@ function renderVoteList(wishes) {
     voteEl.style.display='none'; return;
   }
   voteEl.style.display='block';
-  const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
-  const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
   // Sort by vote count desc
   const wWithVotes = wishes
     .filter(w=>(w.msg||w.message))
-    .map(w=>({...w, voteCount: votes[String(w.ts||w.timestamp||w.senderName||w.msg)]||0}))
+    .map(w=>({...w, voteCount: likesCache[String(w.ts||w.timestamp||w.senderName||w.msg)]||0}))
     .sort((a,b)=>b.voteCount-a.voteCount)
     .slice(0,5);
   const maxV = Math.max(...wWithVotes.map(w=>w.voteCount), 1);
-  const myVote = localStorage.getItem('myvote_'+empKey);
   const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
   listEl.innerHTML = wWithVotes.map((w,i)=>{
     const wid = String(w.ts||w.timestamp||w.senderName||w.msg||i);
     const pct = Math.round(w.voteCount/maxV*100);
-    const isVoted = myVote===wid;
+    const isVoted = !!myVotesCache[wid];
     return `<div class="vote-card${isVoted?' voted':''}" onclick="voteWish('${wid.replace(/'/g,"\\'")}')">
       <span class="vote-heart">${medals[i]||'⭐'}</span>
       <div style="flex:1;min-width:0">
@@ -1590,23 +1613,14 @@ function renderVoteList(wishes) {
   }).join('');
 }
 
-function voteWish(wid) {
+async function voteWish(wid) {
   if (!curEmp) return;
-  const empKey = curEmp.code||curEmp.name;
-  const prev = localStorage.getItem('myvote_'+empKey);
-  const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
-  if (prev === wid) {
-    votes[wid] = Math.max(0,(votes[wid]||1)-1);
-    localStorage.removeItem('myvote_'+empKey);
-    showLikeNotif('💔 ยกเลิกไลก์แล้ว', false);
-  } else {
-    if (prev) votes[prev] = Math.max(0,(votes[prev]||1)-1);
-    votes[wid] = (votes[wid]||0)+1;
-    localStorage.setItem('myvote_'+empKey, wid);
-    showLikeNotif('❤️ ไลก์คำอวยพรนี้แล้ว!', true);
-    spawnHearts();
-  }
-  localStorage.setItem('votes_'+empKey, JSON.stringify(votes));
+  const result = await apiGet({action:'toggleLike', wishId:wid, voterKey:getVoterKey()});
+  if(!result || !result.ok){ showToast('กดไลก์ไม่สำเร็จ — ตรวจสอบ Script URL','warn'); return; }
+  likesCache[wid] = result.count;
+  myVotesCache[wid] = result.liked;
+  if(result.liked){ showLikeNotif('❤️ ไลก์คำอวยพรนี้แล้ว!', true); spawnHearts(); }
+  else { showLikeNotif('💔 ยกเลิกไลก์แล้ว', false); }
   const empId = curEmp.code||curEmp.name;
   const ws = localWishes[empId]||[];
   renderVoteList(ws.slice(0,10));
@@ -2017,12 +2031,11 @@ function renderLeaderboard() {
     loadMonthlyLeaderboard();
   } else {
     // Like leaderboard: who sent most-liked wishes
-    const votes = JSON.parse(localStorage.getItem('votes_'+empKey)||'{}');
     const wishes = localWishes[empKey]||[];
     const senderVotes = {};
     wishes.forEach(w=>{
       const wid = String(w.ts||w.timestamp||w.senderName||w.msg);
-      const v = votes[wid]||0;
+      const v = likesCache[wid]||0;
       const sender = w.senderName||w.name||'ไม่ระบุ';
       senderVotes[sender] = (senderVotes[sender]||0) + v;
     });
