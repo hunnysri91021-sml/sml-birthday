@@ -1069,7 +1069,11 @@ function addQuizPoint(p) {
   var quizDone = curRow[IDX['QuizDone']] === true || curRow[IDX['QuizDone']] === 'TRUE';
   if (quizDone) return {ok: false, error: 'already_done', msg: 'ตอบ Quiz คนนี้ไปแล้ว'};
 
-  var earned  = (score === total && total > 0) ? 2 : 1;
+  // total <= 0 หมายถึงไม่ได้ตอบคำถามเลย ไม่ควรได้คะแนน และไม่ถือว่า "ตอบไปแล้ว"
+  // (เผื่อให้ตอบจริงในครั้งถัดไปได้ ตามเงื่อนไข "เพื่อน 1 คน ตอบได้ 1 ครั้งเท่านั้น")
+  if (total <= 0) return {ok: true, earned: 0, totalPts: parseFloat(curRow[IDX['WishPts']]) || 0};
+
+  var earned  = (score === total) ? 2 : 1;
   var wishPts = parseFloat(curRow[IDX['WishPts']]) || 0;
   ws.getRange(rowIdx, IDX['QuizPts']    + 1).setValue(earned);
   ws.getRange(rowIdx, IDX['QuizDone']   + 1).setValue(true);
