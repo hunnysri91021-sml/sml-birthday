@@ -720,18 +720,31 @@ async function testApi(){
   }catch(e){setApiStatus('err','❌ เชื่อมต่อไม่ได้');}
 }
 
-async function apiGet(action, params = {}) {
-  const base = document.getElementById('apiUrl').value.trim();
-  const url = new URL(base);
+async function apiGet(actionOrParams, params = {}){
+  const url = getApiUrl();
+  if(!url) return null;
 
-  url.searchParams.set('action', action);
+  // รองรับได้ทั้ง apiGet({action:'login', password:'...'}) และ apiGet('login', {password:'...'})
+  const payload = (typeof actionOrParams === 'string')
+    ? Object.assign({action: actionOrParams}, params || {})
+    : Object.assign({}, actionOrParams || {});
 
-  Object.keys(params).forEach(k => {
-    url.searchParams.set(k, params[k]);
-  });
+  const data = addTokenIfNeeded(payload);
+  const qs = Object.entries(data)
+    .filter(([k,v]) => v !== undefined && v !== null)
+    .map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
+    .join('&');
 
-  const r = await fetch(url.toString());
-  return await r.json();
+  try{
+    const r = await fetch(url + '?' + qs);
+    const text = await r.text();
+    if(!r.ok) throw new Error('HTTP ' + r.status + ' ' + text);
+    try { return JSON.parse(text); }
+    catch(err){ return {ok:false,error:'invalid_json',detail:text}; }
+  }catch(e){
+    console.error('apiGet error:', e);
+    return {ok:false,error:'network_error',detail:e.message};
+  }
 }
 
 async function apiPost(body){
@@ -1352,56 +1365,25 @@ function loadEmpPhoto(empKey) {
   } else {
     img.src=''; img.style.display='none'; emoji.style.display='block';
   }
+}
 function adminUploadPhoto() {
   if (!document.body.classList.contains('admin-mode')) return;
   document.getElementById('photoInput').click();
 }
-
-async function onPhotoSelected(event) {
-  const file = event.target.files[0];
-  if (!file || !curEmp) return;
-
-  const reader = new FileReader();
-
-  reader.onload = async function(e) {
-    const photo = e.target.result;
-    const code = curEmp.code;
-
-    const token = localStorage.getItem('adminToken');
-
-    const res = await apiPostJson({
-      action: 'uploadPhoto',
-      token: token,
-      code: code,
-      photo: photo
-    });
-
-    if (res && res.ok) {
-      curEmp.photo = res.photoUrl;
-
-      const img = document.getElementById('empPhoto');
-      const emoji = document.getElementById('empPhotoEmoji');
-
-      img.src = res.photoUrl;
-      img.style.display = 'block';
-      emoji.style.display = 'none';
-
-      alert('อัปโหลดรูปสำเร็จ');
-    } else {
-      alert('อัปโหลดรูปไม่สำเร็จ: ' + (res?.error || res?.detail || 'unknown'));
-    }
-  };
-
-  reader.readAsDataURL(file);
-}
-  
 function onPhotoSelected(evt) {
-  const file = evt.target.files[0]; if(!file||!curEmp) return;
+  const file = evt.target.files[0];
+  if(!file || !curEmp) return;
+
+  if(!getAdminToken()){
+    showToast('Session Admin หมดอายุ กรุณา Login ใหม่','warn');
+    return;
+  }
+
   const reader = new FileReader();
   reader.onload = function(e) {
-    const empKey = curEmp.code||curEmp.name;
-    const key = 'photo_'+empKey;
-    // Resize to ~300px for storage efficiency
+    const empKey = curEmp.code || curEmp.name;
+
+    // Resize to ~300px for storage efficiency before upload
     const canvas = document.createElement('canvas');
     const tmpImg = new Image();
     tmpImg.onload = async function() {
@@ -1409,22 +1391,34 @@ function onPhotoSelected(evt) {
       canvas.width = size; canvas.height = size;
       const ctx = canvas.getContext('2d');
       const min = Math.min(tmpImg.width, tmpImg.height);
-      const sx = (tmpImg.width-min)/2, sy = (tmpImg.height-min)/2;
+      const sx = (tmpImg.width - min) / 2;
+      const sy = (tmpImg.height - min) / 2;
       ctx.drawImage(tmpImg, sx, sy, min, min, 0, 0, size, size);
       const data = canvas.toDataURL('image/jpeg', 0.82);
-      localStorage.setItem(key, data);
-      curEmp.photo = data;
-      loadEmpPhoto(empKey);
-      showToast('อัปโหลดรูปสำเร็จ');
-      // อัปโหลดขึ้น Google Drive ให้ทุกคนเห็นรูปเดียวกัน
-      const res = await apiPostJson({action:'uploadPhoto', code: empKey, photo: data});
-      if (res && res.ok) {
+
+      showToast('กำลังอัปโหลดรูปขึ้น Google Drive...');
+
+      const res = await apiPostJson({
+        action: 'uploadPhoto',
+        token: getAdminToken(),
+        code: empKey,
+        photo: data
+      });
+
+      if (res && res.ok && res.photoUrl) {
         curEmp.photo = res.photoUrl;
-        const p = calPersons.find(x=>x.code===curEmp.code);
+        const p = calPersons.find(x => String(x.code) === String(curEmp.code));
         if (p) p.photo = res.photoUrl;
+
+        const img = document.getElementById('empPhoto');
+        const emoji = document.getElementById('empPhotoEmoji');
+        if(img){ img.src = res.photoUrl; img.style.display = 'block'; }
+        if(emoji){ emoji.style.display = 'none'; }
+
         showToast('บันทึกรูปขึ้น Google สำเร็จ ✅');
       } else {
-        showToast('บันทึกรูปขึ้น Google ไม่สำเร็จ (เก็บไว้ในเครื่องนี้ก่อน)','warn');
+        console.warn('uploadPhoto failed:', res);
+        showToast('บันทึกรูปไม่สำเร็จ: ' + ((res && (res.detail || res.error)) || 'unknown'), 'warn');
       }
     };
     tmpImg.src = e.target.result;
@@ -2275,20 +2269,34 @@ function showAdminLoginModal(){
   if(m){ m.style.display='flex'; setTimeout(()=>document.getElementById('loginPassInput').focus(),100); }
 }
 
-async function doLogin() {
-  const pass = document.getElementById('loginPassInput').value.trim();
+async function doLogin(){
+  const inp = document.getElementById('loginPassInput');
+  if(!inp) return;
+  if(!getApiUrl()) { showToast('กรุณาใส่ Script URL ก่อนเข้าสู่ Admin','warn'); return; }
 
-  const res = await apiGet('login', {
-    password: pass
-  });
+  const pw = inp.value.trim();
+  if(!pw){ showToast('กรุณาใส่รหัสผ่าน Admin','warn'); return; }
 
-  if (res && res.ok && res.token) {
-    localStorage.setItem('adminToken', res.token);
-    document.body.classList.add('admin-mode');
-    document.getElementById('loginModal').style.display = 'none';
-    alert('เข้าสู่ระบบ Admin สำเร็จ');
+  // ใช้ POST ก่อน และ fallback เป็น GET เพื่อให้ใช้ได้กับ GitHub Pages/Apps Script บางกรณี
+  let res = await apiPostJson({action:'login', password: pw});
+  if(!res || res.error === 'network_error'){
+    res = await apiGet('login', {password: pw});
+  }
+
+  if(res && res.ok && res.token){
+    setAdminToken(res.token); // เก็บเฉพาะ session token ชั่วคราวใน sessionStorage
+    inp.value='';
+    const modal = document.getElementById('loginModal');
+    if(modal) modal.style.display='none';
+    enterAdmin();
+    showToast('เข้าสู่ระบบ Admin สำเร็จ ✅');
   } else {
-    alert('รหัสผ่านไม่ถูกต้อง: ' + (res?.error || 'unknown'));
+    console.warn('Login failed:', res);
+    inp.style.borderColor='#ff6b9d';
+    inp.value='';
+    inp.placeholder=(res && (res.msg || res.detail || res.error)) ? (res.msg || res.detail || res.error) : 'รหัสไม่ถูกต้อง ลองใหม่...';
+    setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ใส่รหัส Admin...'; },2500);
+    showToast((res && (res.msg || res.detail || res.error)) || 'เข้าสู่ระบบไม่ได้','warn');
   }
 }
 

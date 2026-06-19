@@ -1568,3 +1568,28 @@ function forceDriveAuth() {
   DriveApp.getRootFolder().getName();
   SpreadsheetApp.openById(SHEET_ID).getName();
 }
+// ============================================================
+// ── ADMIN EMERGENCY RESET (Run manually from Apps Script only)
+// ============================================================
+function resetAdminPasswordToDefault() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var cred = getAdminCredsRow(ss);
+
+  if (!cred) {
+    Logger.log('No admin configured. Run setup() or initAdminCreds() first.');
+    return;
+  }
+
+  var newPass = 'sml2569';
+  var newSalt = genSalt();
+  var newHash = hashWithSalt(newPass, newSalt);
+
+  cred.ws.getRange(cred.rowIdx, cred.IDX['PasswordHash'] + 1).setValue(newHash);
+  cred.ws.getRange(cred.rowIdx, cred.IDX['Salt'] + 1).setValue(newSalt);
+  cred.ws.getRange(cred.rowIdx, cred.IDX['FailedAttempts'] + 1).setValue(0);
+  cred.ws.getRange(cred.rowIdx, cred.IDX['LockedUntil'] + 1).setValue('');
+  cred.ws.getRange(cred.rowIdx, cred.IDX['UpdatedAt'] + 1).setValue(new Date());
+
+  logAudit('system', 'resetAdminPasswordToDefault', 'admin', 'password reset to default via Apps Script editor', 'ok');
+  Logger.log('Admin password reset to: sml2569');
+}
