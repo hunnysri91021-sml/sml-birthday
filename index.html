@@ -1194,6 +1194,8 @@ function onTextInput(){
   // Draw placeholder top10 chart on load
   setTimeout(renderTop10Chart, 300);
   setTimeout(()=>loadMonthlyLeaderboard(), 300);
+  // Auto-refresh leaderboard every 30s so every device sees score changes without a manual refresh
+  setInterval(loadMonthlyLeaderboard, 30000);
   // Init emoji grid + templates
   initStickerSystem();
   renderTemplates();
