@@ -1436,9 +1436,14 @@ function setup() {
     ? '\n\n🔐 บัญชี Admin เริ่มต้น:\nรหัสผ่าน: ' + adminResult.defaultPassword + ' (เปลี่ยนทันทีหลัง deploy!)\nMaster Key: ' + adminResult.masterKey + ' (เก็บไว้ที่ปลอดภัย ใช้กู้รหัสผ่านได้ — แสดงให้เห็นครั้งนี้ครั้งเดียวเท่านั้น)'
     : '\n\n🔐 บัญชี Admin มีอยู่แล้ว (ไม่เปลี่ยนแปลง)';
 
-  SpreadsheetApp.getUi().alert(
-    '✅ Setup สำเร็จ!\n\nSheets ที่พร้อมแล้ว:\n- Wishes (เพิ่ม EmpId/SenderDept/Emoji/Ts)\n- Persons (นำเข้าพนักงานใหม่ ' + seedResult.added + ' คน, เพิ่ม Pos/Day)\n- Points (ใหม่)\n- Monthly_Stats มิ.ย.-ธ.ค. 2569 (ใหม่)\n- GameScores (ใหม่)\n- AdminCreds / Sessions / AuditLog (ใหม่ — Phase 1 Security)' + adminMsg
-  );
+  var msg = '✅ Setup สำเร็จ!\n\nSheets ที่พร้อมแล้ว:\n- Wishes (เพิ่ม EmpId/SenderDept/Emoji/Ts)\n- Persons (นำเข้าพนักงานใหม่ ' + seedResult.added + ' คน, เพิ่ม Pos/Day)\n- Points (ใหม่)\n- Monthly_Stats มิ.ย.-ธ.ค. 2569 (ใหม่)\n- GameScores (ใหม่)\n- AdminCreds / Sessions / AuditLog (ใหม่ — Phase 1 Security)' + adminMsg;
+
+  try {
+    SpreadsheetApp.getUi().alert(msg);
+  } catch (e) {
+    // เรียกจาก Apps Script editor โดยตรง (ไม่ใช่จากเมนูใน Sheet) จะไม่มี UI context ให้ alert
+    Logger.log(msg);
+  }
 }
 
 function importPersonsMenu() {
