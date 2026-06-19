@@ -302,12 +302,22 @@ function getCustomQuestions(p) {
   var list = [];
   for (var i = 1; i < rows.length; i++) {
     var r = rows[i];
-    if (!r[0]) continue;
-    if (empId && String(r[1]) !== empId) continue;
+    // ข้ามแถวที่ไม่มีคำถามเลย (แถวว่างจริงๆ) แต่ถ้า admin พิมพ์คำถามตรงใน Sheet
+    // เองโดยไม่ได้กรอกคอลัมน์ Id (A) ก็ต้อง gen id ให้ ไม่ใช่ข้ามแถวทิ้งไปเงียบๆ
+    if (!r[2]) continue;
+    var rowEmpId = String(r[1] || '').trim();
+    if (empId && rowEmpId !== empId) continue;
+    var rowId = r[0];
+    if (!rowId) {
+      // แถวที่ admin พิมพ์ตรงใน Sheet เองไม่ได้กรอก Id — gen ให้ครั้งนี้แล้วเขียนกลับ
+      // ลงคอลัมน์ A ทันที เพื่อให้ updateCustomQuestion/deleteCustomQuestion ใช้ id นี้ได้ต่อไป
+      rowId = 'R' + (i + 1) + '_' + new Date().getTime();
+      ws.getRange(i + 1, 1).setValue(rowId);
+    }
     var opts = [r[3], r[4], r[5], r[6]].filter(function(o){ return o !== '' && o != null; });
     list.push({
-      id:     r[0],
-      empId:  String(r[1] || ''),
+      id:     rowId,
+      empId:  rowEmpId,
       q:      r[2] || '',
       opts:   opts,
       ans:    r[7] || ''
