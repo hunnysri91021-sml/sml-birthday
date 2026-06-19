@@ -27,7 +27,7 @@ var ADMIN_ONLY_ACTIONS = [
   'deleteWish', 'setLbRange', 'addCustomQuestion', 'updateCustomQuestion',
   'deleteCustomQuestion', 'bulkAddCustomQuestions', 'uploadPhoto',
   'seedPersons', 'getAuditLog', 'changePassword',
-  'toggleHideWish', 'setActiveMonths'
+  'toggleHideWish', 'setActiveMonths', 'resetPoints', 'resetWishes'
 ];
 
 function checkAuth(action, p) {
@@ -152,6 +152,8 @@ function doGet(e) {
     else if (action === 'changePassword') result = changePassword(p);
     else if (action === 'resetWithMasterKey') result = resetWithMasterKey(p);
     else if (action === 'getAuditLog')    result = getAuditLog(p);
+    else if (action === 'resetPoints')    result = resetPoints(p);
+    else if (action === 'resetWishes')    result = resetWishes(p);
     else result = {error: 'unknown action: ' + action};
 
     return jsonOut(result, cb);
@@ -186,6 +188,8 @@ function doPost(e) {
     else if (action === 'changePassword') result = changePassword(p);
     else if (action === 'resetWithMasterKey') result = resetWithMasterKey(p);
     else if (action === 'getAuditLog')    result = getAuditLog(p);
+    else if (action === 'resetPoints')    result = resetPoints(p);
+    else if (action === 'resetWishes')    result = resetWishes(p);
     else result = {error: 'unknown action: ' + action};
     return jsonOut(result);
   } catch(err) {
@@ -1582,6 +1586,37 @@ function ensureStatsSheet(ss) {
     ws.getRange(1, 1, 1, 9).setBackground('#FF6B9D').setFontColor('#fff').setFontWeight('bold');
   }
   return ws;
+}
+
+// ============================================================
+// ── RESET (สำหรับทดสอบระบบ แล้วเริ่มนับใหม่) ────────────────
+// ============================================================
+function clearSheetData_(ws) {
+  var lastRow = ws.getLastRow();
+  if (lastRow > 1) ws.getRange(2, 1, lastRow - 1, ws.getLastColumn()).clearContent();
+}
+
+// GET/POST: action=resetPoints&token=...
+// ล้างคะแนนสะสมทั้งหมด (Points, ScoreTransactions, GameScores, Monthly_Stats)
+// เพื่อทดลองระบบแล้วเริ่มนับคะแนนใหม่ — ไม่กระทบ Wishes/Persons/Photos
+function resetPoints(p) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  clearSheetData_(ensurePointsSheet(ss));
+  clearSheetData_(ensureScoreTransactionsSheet(ss));
+  clearSheetData_(ensureGameScoresSheet(ss));
+  clearSheetData_(ensureStatsSheet(ss));
+  logAudit('admin', 'resetPoints', 'Points/ScoreTransactions/GameScores/Monthly_Stats', '', 'ok');
+  return {ok: true};
+}
+
+// GET/POST: action=resetWishes&token=...
+// ล้างคำอวยพรและไลก์ทั้งหมด เพื่อทดลองระบบแล้วเริ่มใหม่ — ไม่กระทบคะแนน/รูป/ข้อมูลพนักงาน
+function resetWishes(p) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  clearSheetData_(ensureWishesSheet(ss));
+  clearSheetData_(ensureLikesSheet(ss));
+  logAudit('admin', 'resetWishes', 'Wishes/Likes', '', 'ok');
+  return {ok: true};
 }
 
 // ============================================================
