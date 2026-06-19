@@ -26,7 +26,8 @@ var LOCKOUT_MS         = 15 * 60 * 1000;     // 15 นาที
 var ADMIN_ONLY_ACTIONS = [
   'deleteWish', 'setLbRange', 'addCustomQuestion', 'updateCustomQuestion',
   'deleteCustomQuestion', 'bulkAddCustomQuestions', 'uploadPhoto',
-  'seedPersons', 'getAuditLog', 'changePassword'
+  'seedPersons', 'getAuditLog', 'changePassword',
+  'toggleHideWish', 'setActiveMonths'
 ];
 
 function checkAuth(action, p) {
@@ -123,6 +124,11 @@ function doGet(e) {
     if (action === 'getWishes')           result = getWishes(p);
     else if (action === 'addWish')        result = addWish(p);
     else if (action === 'deleteWish')     result = deleteWish(p);
+    else if (action === 'toggleHideWish') result = toggleHideWish(p);
+    else if (action === 'toggleLike')     result = toggleLike(p);
+    else if (action === 'getLikes')       result = getLikes(p);
+    else if (action === 'getActiveMonths') result = getActiveMonths();
+    else if (action === 'setActiveMonths') result = setActiveMonths(p);
     else if (action === 'getPersons')     result = getPersons();
     else if (action === 'addWishPoint')   result = addWishPoint(p);
     else if (action === 'addQuizPoint')   result = addQuizPoint(p);
@@ -748,7 +754,7 @@ function ensureWishesSheet(ss) {
   }
   // Backward-compat: add any missing columns to old sheets
   var headers = ws.getRange(1, 1, 1, Math.max(ws.getLastColumn(), 1)).getValues()[0];
-  var want = ['ID','Name','Message','Mood','Photo','Likes','Timestamp','Month','EmpId','EmpName','SenderDept','Emoji','Ts'];
+  var want = ['ID','Name','Message','Mood','Photo','Likes','Timestamp','Month','EmpId','EmpName','SenderDept','Emoji','Ts','Hidden'];
   for (var i = 0; i < want.length; i++) {
     if (headers.indexOf(want[i]) === -1) {
       ws.getRange(1, ws.getLastColumn() + 1).setValue(want[i]);
@@ -790,10 +796,37 @@ function getWishes(p) {
       photo:      r[IDX['Photo']]      || '',
       likes:      r[IDX['Likes']]      || 0,
       timestamp:  tsIso,
-      month:      r[IDX['Month']]      || ''
+      month:      r[IDX['Month']]      || '',
+      hidden:     r[IDX['Hidden']] === true || r[IDX['Hidden']] === 'TRUE'
     });
   }
   return wishes.reverse();
+}
+
+// ลบ/แสดง คำอวยพร 1 แถวตาม wid (จับคู่แบบเดียวกับ deleteWish) — admin only
+// สลับสถานะ Hidden ใน Sheet กลาง เพื่อให้ทุกเครื่องเห็นการซ่อนตรงกัน
+function toggleHideWish(p) {
+  var wid = (p.wid || '').trim();
+  if (!wid) return {ok: false, error: 'wid required'};
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureWishesSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  if (rows.length < 2) return {ok: false, error: 'no wishes'};
+  var headers = rows[0];
+  var IDX = makeIdx(headers);
+  for (var i = 1; i < rows.length; i++) {
+    var r = rows[i];
+    var rowTs   = String(r[IDX['Ts']] || '');
+    var rowTime = r[IDX['Timestamp']] ? new Date(r[IDX['Timestamp']]).toISOString() : '';
+    var rowName = String(r[IDX['Name']] || '');
+    if (wid === rowTs || wid === rowTime || wid === rowName || wid === String(r[0])) {
+      var wasHidden = r[IDX['Hidden']] === true || r[IDX['Hidden']] === 'TRUE';
+      ws.getRange(i + 1, IDX['Hidden'] + 1).setValue(!wasHidden);
+      logAudit('admin', 'toggleHideWish', wid, '', !wasHidden ? 'hidden' : 'shown');
+      return {ok: true, hidden: !wasHidden};
+    }
+  }
+  return {ok: false, error: 'not found'};
 }
 
 function addWish(p) {
@@ -845,6 +878,72 @@ function deleteWish(p) {
     }
   }
   return {ok: false, error: 'not found'};
+}
+
+// ============================================================
+// ── LIKES (โหวตคำอวยพร) ──────────────────────────────────
+// เก็บเป็นรายแถวต่อ (WishId, VoterKey) เพื่อให้ toggle ได้และนับยอดได้
+// VoterKey = id แบบสุ่มที่เก็บใน localStorage ของแต่ละเครื่อง (ไม่ผูกบัญชี)
+// ============================================================
+var SHEET_LIKES = 'Likes';
+
+function ensureLikesSheet(ss) {
+  var ws = ss.getSheetByName(SHEET_LIKES);
+  if (!ws) {
+    ws = ss.insertSheet(SHEET_LIKES);
+    ws.appendRow(['WishId', 'VoterKey', 'Ts']);
+    ws.setFrozenRows(1);
+    ws.getRange(1, 1, 1, 3).setBackground('#FF6B9D').setFontColor('#fff').setFontWeight('bold');
+  }
+  return ws;
+}
+
+// GET: ?action=toggleLike&wishId=...&voterKey=...
+function toggleLike(p) {
+  var wishId   = String(p.wishId   || '').trim();
+  var voterKey = String(p.voterKey || '').trim();
+  if (!wishId || !voterKey) return {ok: false, error: 'wishId/voterKey required'};
+
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureLikesSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  var rowIdx = -1;
+  var count = 0;
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) === wishId) {
+      count++;
+      if (String(rows[i][1]) === voterKey) rowIdx = i + 1;
+    }
+  }
+
+  var liked;
+  if (rowIdx > 0) {
+    ws.deleteRow(rowIdx);
+    count--;
+    liked = false;
+  } else {
+    ws.appendRow([wishId, voterKey, new Date()]);
+    count++;
+    liked = true;
+  }
+  return {ok: true, liked: liked, count: count};
+}
+
+// GET: ?action=getLikes — คืน {wishId: count} ของคำอวยพรทั้งหมด, และ voterKey ถ้าส่งมา จะคืน myVotes ด้วย
+function getLikes(p) {
+  var voterKey = String((p && p.voterKey) || '').trim();
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var ws = ensureLikesSheet(ss);
+  var rows = ws.getDataRange().getValues();
+  var counts = {};
+  var myVotes = {};
+  for (var i = 1; i < rows.length; i++) {
+    var wid = String(rows[i][0]);
+    if (!wid) continue;
+    counts[wid] = (counts[wid] || 0) + 1;
+    if (voterKey && String(rows[i][1]) === voterKey) myVotes[wid] = true;
+  }
+  return {ok: true, counts: counts, myVotes: myVotes};
 }
 
 // ============================================================
@@ -1078,6 +1177,30 @@ function setLbRange(p) {
   setSetting('lbRangeEnd', end);
   logAudit('admin', 'setLbRange', '', 'start=' + start + ' end=' + end, 'ok');
   return {ok: true, start: start, end: end};
+}
+
+// GET: ?action=getActiveMonths — เดือน (0-11) ที่ admin เปิดให้พนักงานเห็น, ใช้ร่วมกันทุกเครื่อง
+function getActiveMonths() {
+  var saved = getSetting('activeMonths', '');
+  if (!saved) return {ok: true, months: [new Date().getMonth()]};
+  try {
+    return {ok: true, months: JSON.parse(saved)};
+  } catch (e) {
+    return {ok: true, months: [new Date().getMonth()]};
+  }
+}
+
+// GET: ?action=setActiveMonths&months=[0,1,2]
+function setActiveMonths(p) {
+  var months = [];
+  try {
+    months = JSON.parse(p.months || '[]');
+  } catch (e) {
+    return {ok: false, error: 'invalid months'};
+  }
+  setSetting('activeMonths', JSON.stringify(months));
+  logAudit('admin', 'setActiveMonths', '', JSON.stringify(months), 'ok');
+  return {ok: true, months: months};
 }
 
 // ============================================================
