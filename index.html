@@ -736,7 +736,7 @@ async function apiGet(actionOrParams, params = {}){
     .join('&');
 
   try{
-    const r = await fetch(url + '?' + qs);
+    const r = await fetch(url + '?' + qs, {cache:'no-store'});
     const text = await r.text();
     if(!r.ok) throw new Error('HTTP ' + r.status + ' ' + text);
     try { return JSON.parse(text); }
@@ -754,7 +754,7 @@ async function apiPost(body){
     const data = addTokenIfNeeded(body);
     const params = new URLSearchParams();
     Object.entries(data).forEach(([k,v]) => params.append(k, v));
-    const r = await fetch(url + '?' + params.toString());
+    const r = await fetch(url + '?' + params.toString(), {cache:'no-store'});
     const text = await r.text();
     try { return JSON.parse(text); }
     catch(err){ return {ok:false,error:'invalid_json',detail:text}; }
