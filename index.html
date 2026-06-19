@@ -1173,8 +1173,15 @@ function onTextInput(){
 }
 
 (async function(){
-  // Load saved API URL
-  const savedUrl=getApiUrl();
+  // Load saved API URL — ถ้ายังไม่มี (เครื่อง/เบราว์เซอร์ใหม่) ให้ถามครั้งเดียวแล้วจำไว้
+  let savedUrl=getApiUrl();
+  if(!savedUrl){
+    const entered=(window.prompt('ใส่ Google Apps Script Web App URL เพื่อดึงข้อมูล\n(ขอจากแอดมิน หรือดูได้จาก Apps Script > Deploy > Manage deployments)','')||'').trim();
+    if(entered){
+      localStorage.setItem('sml_api_url', entered);
+      savedUrl=entered;
+    }
+  }
   if(savedUrl){
     document.getElementById('apiUrl').value=savedUrl;
     testApi();
