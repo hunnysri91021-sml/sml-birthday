@@ -78,8 +78,8 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 /* MONTH SCROLL */
 .month-row{display:flex;gap:.3rem;overflow-x:auto;padding:.65rem 1rem .35rem;scrollbar-width:none}
 .month-row::-webkit-scrollbar{display:none}
-.mtab{flex-shrink:0;padding:.3rem .7rem;border-radius:20px;border:1px solid var(--b);background:transparent;color:var(--mute);font-family:'Kanit',sans-serif;font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap}
-.mtab:hover{border-color:var(--b2);color:var(--sub)}
+.mtab{flex-shrink:0;padding:.3rem .7rem;border-radius:20px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:rgba(255,255,255,.75);font-family:'Kanit',sans-serif;font-size:.75rem;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.mtab:hover{border-color:rgba(255,255,255,.4);color:#fff}
 .mtab.active{background:rgba(245,200,66,.14);border-color:var(--gold);color:var(--gold);font-weight:500}
 .mtab.hidden-month{opacity:.28;text-decoration:line-through}
 /* PERSON ROW */
@@ -87,7 +87,7 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 .person-row::-webkit-scrollbar{display:none}
 .pchip{flex-shrink:0;padding:.28rem .78rem;border-radius:20px;border:1px solid var(--b);background:var(--c1);color:var(--sub);font-size:.75rem;cursor:pointer;transition:all .15s;white-space:nowrap}
 .pchip.active{background:rgba(255,107,157,.12);border-color:var(--rose);color:var(--rose);font-weight:500}
-.person-locked{font-size:.75rem;color:var(--mute);padding:.35rem 1rem}
+.person-locked{font-size:.75rem;color:rgba(255,255,255,.6);padding:.35rem 1rem}
 /* HERO */
 .hero{padding:.85rem 1rem 1rem;text-align:center;background:linear-gradient(180deg,rgba(255,178,217,.25) 0%,transparent 100%)}
 .hero-photo-wrap{display:flex;justify-content:center;margin-bottom:.75rem}
