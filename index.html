@@ -69,8 +69,8 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
 .amp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.3rem}
 .amp-chip{padding:.32rem .2rem;border-radius:8px;font-family:'Kanit',sans-serif;font-size:.7rem;cursor:pointer;text-align:center;transition:all .18s;font-weight:500;border:1.5px solid}
 .amp-chip.on{background:rgba(245,200,66,.2);border-color:var(--gold);color:var(--gold);box-shadow:0 0 8px rgba(245,200,66,.25)}
-.amp-chip.off{background:rgba(74,51,88,.04);border-color:rgba(74,51,88,.1);color:rgba(74,51,88,.35)}
-.amp-chip.off:hover{background:rgba(74,51,88,.08);border-color:rgba(74,51,88,.2);color:rgba(74,51,88,.6)}
+.amp-chip.off{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14);color:rgba(255,255,255,.55)}
+.amp-chip.off:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff}
 .amp-confirm{margin-top:.55rem;display:flex;align-items:center;gap:.5rem;background:rgba(0,229,204,.06);border:1px solid rgba(0,229,204,.18);border-radius:10px;padding:.45rem .75rem}
 .amp-confirm-icon{font-size:.95rem;flex-shrink:0}
 .amp-confirm-text{font-size:.7rem;color:rgba(0,229,204,.8);flex:1;line-height:1.45}
@@ -1234,7 +1234,7 @@ function buildAmcGrid(){
   const grid=document.getElementById('amcGrid');
   if(!grid) return;
   grid.innerHTML=MTH.map((m,i)=>
-    `<button class="amc-chip${active.includes(i)?' on':''}" onclick="toggleAdminMonth(${i})" id="amc-${i}">${m.substring(0,3)}</button>`
+    `<button class="amp-chip ${active.includes(i)?'on':'off'}" onclick="toggleAdminMonth(${i})" id="amc-${i}">${m.substring(0,3)}</button>`
   ).join('');
 }
 
