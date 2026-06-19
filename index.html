@@ -691,11 +691,6 @@ function saveApiUrl(){
   localStorage.setItem('sml_api_url', url);
   setApiStatus('pending','ยังไม่ได้ทดสอบ');
 }
-function setApiStatus(type, text){
-  const el = document.getElementById('apiStatus');
-  el.className = 'api-status api-'+type;
-  el.textContent = text;
-}
 async function testApi(){
   const url = getApiUrl();
   if(!url){setApiStatus('err','ยังไม่ได้ใส่ URL');return;}
