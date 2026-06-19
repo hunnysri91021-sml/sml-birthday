@@ -1141,3 +1141,44 @@ function onOpen() {
     .addItem('🔄 คำนวณยอดสะสมใหม่ทั้งหมด', 'recalcAllStats')
     .addToUi();
 }
+
+function testUploadPermission() {
+  try {
+    var folder = getOrCreatePhotosFolder();
+    Logger.log('Folder OK: ' + folder.getName());
+
+    var blob = Utilities.newBlob(
+      'TEST',
+      'text/plain',
+      'test.txt'
+    );
+
+    var file = folder.createFile(blob);
+
+    file.setSharing(
+      DriveApp.Access.ANYONE_WITH_LINK,
+      DriveApp.Permission.VIEW
+    );
+
+    Logger.log('File Created: ' + file.getUrl());
+
+    return {
+      ok: true,
+      folder: folder.getName(),
+      fileUrl: file.getUrl()
+    };
+
+  } catch(err) {
+    Logger.log(err.toString());
+
+    return {
+      ok: false,
+      error: err.toString()
+    };
+  }
+}
+
+function forceDriveAuth() {
+  DriveApp.getRootFolder().getName();
+  SpreadsheetApp.openById(SHEET_ID).getName();
+}
