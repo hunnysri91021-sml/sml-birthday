@@ -1037,7 +1037,11 @@ async function loadPersonsFromSheet(){
   if(statusEl) statusEl.textContent = 'กำลังโหลดข้อมูลพนักงาน...';
   try{
     const data = await apiGet({action:'getPersons'});
-    if(!data || !Array.isArray(data) || data.length === 0) return false;
+    if(!data || !Array.isArray(data) || data.length === 0){
+      if(statusEl) statusEl.textContent = 'โหลดข้อมูลพนักงานไม่สำเร็จ (เช็ค API URL)';
+      setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 4000);
+      return false;
+    }
     // Convert sheet format → calPersons format
     // Sheet: {code, name(fname+lname), pos, faction, day, month(0-based)}
     const parsed = data
@@ -1051,13 +1055,21 @@ async function loadPersonsFromSheet(){
         month:   Math.max(0, parseInt(p.month||0, 10) - 1),
         photo:   String(p.photo||'').trim(),
       }));
-    if(parsed.length === 0) return false;
+    if(parsed.length === 0){
+      if(statusEl) statusEl.textContent = 'โหลดข้อมูลพนักงานไม่สำเร็จ (เช็ค API URL)';
+      setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 4000);
+      return false;
+    }
     calPersons = parsed;
     if(statusEl) statusEl.textContent = 'โหลดข้อมูลพนักงานแล้ว ' + parsed.length + ' คน';
     setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 3000);
     return true;
   } catch(e){
     console.error('loadPersons error:', e);
+    if(statusEl){
+      statusEl.textContent = 'โหลดข้อมูลพนักงานไม่สำเร็จ (เช็ค API URL)';
+      setTimeout(()=>{ statusEl.textContent=''; }, 4000);
+    }
     return false;
   }
 }
