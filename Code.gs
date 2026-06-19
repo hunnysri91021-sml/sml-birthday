@@ -191,7 +191,16 @@ function uploadPhoto(p) {
   }
 
   var file = folder.createFile(blob);
-  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  try {
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  } catch (shareErr) {
+    // นโยบายโดเมนบางองค์กรห้ามแชร์แบบ "ทุกคนที่มีลิงก์" ลองแชร์แบบ "ทุกคนในโดเมน" แทน
+    try {
+      file.setSharing(DriveApp.Access.DOMAIN_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (shareErr2) {
+      // ถ้าแชร์ไม่ได้เลย ก็ยังบันทึกไฟล์และ URL ไว้ก่อน ไม่ปล่อยให้การอัปโหลดล้มเหลวทั้งหมด
+    }
+  }
   var fileId = file.getId();
   var photoUrl = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000';
 
