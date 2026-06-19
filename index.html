@@ -2279,7 +2279,7 @@ async function doLogin(){
 
   // ใช้ GET โดยตรง เพราะ Google Apps Script Web App บน GitHub Pages มักติด CORS กับ POST
   // Backend ทดสอบผ่านแล้วด้วย ?action=login&password=sml2569
-  const res = await apiGet('login', {password: pw});
+  const res = await apiGet({action:'login', password: pw});
 
   if(res && res.ok && res.token){
     setAdminToken(res.token); // เก็บเฉพาะ session token ชั่วคราวใน sessionStorage
