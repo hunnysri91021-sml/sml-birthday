@@ -2277,11 +2277,9 @@ async function doLogin(){
   const pw = inp.value.trim();
   if(!pw){ showToast('กรุณาใส่รหัสผ่าน Admin','warn'); return; }
 
-  // ใช้ POST ก่อน และ fallback เป็น GET เพื่อให้ใช้ได้กับ GitHub Pages/Apps Script บางกรณี
-  let res = await apiPostJson({action:'login', password: pw});
-  if(!res || res.error === 'network_error'){
-    res = await apiGet('login', {password: pw});
-  }
+  // ใช้ GET โดยตรง เพราะ Google Apps Script Web App บน GitHub Pages มักติด CORS กับ POST
+  // Backend ทดสอบผ่านแล้วด้วย ?action=login&password=sml2569
+  const res = await apiGet('login', {password: pw});
 
   if(res && res.ok && res.token){
     setAdminToken(res.token); // เก็บเฉพาะ session token ชั่วคราวใน sessionStorage
@@ -2294,9 +2292,10 @@ async function doLogin(){
     console.warn('Login failed:', res);
     inp.style.borderColor='#ff6b9d';
     inp.value='';
-    inp.placeholder=(res && (res.msg || res.detail || res.error)) ? (res.msg || res.detail || res.error) : 'รหัสไม่ถูกต้อง ลองใหม่...';
+    const msg = (res && (res.msg || res.detail || res.error)) || 'เข้าสู่ระบบไม่ได้';
+    inp.placeholder = msg;
     setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ใส่รหัส Admin...'; },2500);
-    showToast((res && (res.msg || res.detail || res.error)) || 'เข้าสู่ระบบไม่ได้','warn');
+    showToast(msg,'warn');
   }
 }
 

@@ -79,3 +79,7 @@ var SHEET_ID = 'PUT_YOUR_GOOGLE_SHEET_ID_HERE';
 - Google Drive
 - Google Sheets
 - External request
+
+
+## Admin Login Fix
+Frontend login now uses GET API (`action=login`) to avoid Apps Script POST/CORS issues from GitHub Pages.
