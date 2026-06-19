@@ -1252,6 +1252,13 @@ function showAdminPrompt(){
   if(document.body.classList.contains('admin-mode')){
     exitAdmin(); return;
   }
+  if(!getApiUrl()){
+    const url=(window.prompt('ใส่ Google Apps Script Web App URL ก่อนเข้าสู่ Admin\n(ดูได้จาก Deploy > Manage deployments)','')||'').trim();
+    if(!url){ showToast('ต้องใส่ Script URL ก่อนถึงจะเข้า Admin ได้','warn'); return; }
+    localStorage.setItem('sml_api_url', url);
+    const apiUrlInp=document.getElementById('apiUrl');
+    if(apiUrlInp) apiUrlInp.value=url;
+  }
   showAdminLoginModal();
 }
 
