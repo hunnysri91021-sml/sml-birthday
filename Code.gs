@@ -193,7 +193,7 @@ function uploadPhoto(p) {
   var file = folder.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   var fileId = file.getId();
-  var photoUrl = 'https://drive.google.com/uc?export=view&id=' + fileId;
+  var photoUrl = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000';
 
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var ws = ensurePhotosSheet(ss);
