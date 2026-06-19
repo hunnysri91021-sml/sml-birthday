@@ -606,7 +606,6 @@ function toggleMonthCtrl(){const el=document.getElementById('adminMonthCtrl');if
 document.addEventListener('DOMContentLoaded',function(){
   if(typeof initStickerSystem==='function') initStickerSystem();
   if(typeof renderTemplates==='function') renderTemplates();
-  if(typeof restoreAdminSession==='function') restoreAdminSession();
 });
 function updateStatRow(){
   const empKey=curEmp?(curEmp.code||curEmp.name):'';
@@ -686,15 +685,29 @@ let localWishes = JSON.parse(localStorage.getItem('sml_wishes') || '{}');
 let pendingQueue = JSON.parse(localStorage.getItem('sml_pending') || '[]');
 
 // ─── API ───────────────────────────────────────────────────
-// URL นี้ไม่ใช่ความลับ (เป็น public web app endpoint) — ฝังเป็นค่า default
-// เพื่อให้ทุกอุปกรณ์/เบราว์เซอร์ใช้งานได้ทันทีโดยไม่ต้องตั้งค่าเอง
-const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbxWbX1ocTbq2ZP7-gQ8C3y09sqU378mK-2fkrHjbOqohlbzAf9Ib3yfjjHcYpexpXI0/exec';
-function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim() || DEFAULT_API_URL; }
+function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim(); }
 function saveApiUrl(){
   const url = document.getElementById('apiUrl').value.trim();
   localStorage.setItem('sml_api_url', url);
   setApiStatus('pending','ยังไม่ได้ทดสอบ');
 }
+
+const ADMIN_API_ACTIONS = new Set([
+  'deleteWish','setLbRange','addCustomQuestion','updateCustomQuestion','deleteCustomQuestion',
+  'bulkAddCustomQuestions','uploadPhoto','seedPersons','getAuditLog','changePassword','logout'
+]);
+function getAdminToken(){ return sessionStorage.getItem('sml_admin_token') || ''; }
+function setAdminToken(token){ if(token) sessionStorage.setItem('sml_admin_token', token); }
+function clearAdminToken(){ sessionStorage.removeItem('sml_admin_token'); }
+function addTokenIfNeeded(obj){
+  const copy = Object.assign({}, obj || {});
+  if(ADMIN_API_ACTIONS.has(copy.action) && !copy.token){
+    const t = getAdminToken();
+    if(t) copy.token = t;
+  }
+  return copy;
+}
+
 async function testApi(){
   const url = getApiUrl();
   if(!url){setApiStatus('err','ยังไม่ได้ใส่ URL');return;}
@@ -706,43 +719,51 @@ async function testApi(){
     else setApiStatus('err','ตอบกลับผิดปกติ');
   }catch(e){setApiStatus('err','❌ เชื่อมต่อไม่ได้');}
 }
+
 async function apiGet(params){
   const url = getApiUrl();
   if(!url) return null;
-  const qs = Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
-  try{ 
+  const data = addTokenIfNeeded(params);
+  const qs = Object.entries(data).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+  try{
     const r = await fetch(url+'?'+qs);
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return await r.json(); 
-  }
-  catch(e){ console.error('apiGet error:', e); return null; }
+    const text = await r.text();
+    if(!r.ok) throw new Error('HTTP '+r.status+' '+text);
+    try { return JSON.parse(text); }
+    catch(err){ return {ok:false,error:'invalid_json',detail:text}; }
+  }catch(e){ console.error('apiGet error:', e); return null; }
 }
+
 async function apiPost(body){
   const url = getApiUrl();
   if(!url) return null;
   try{
-    // ใช้ GET แทน POST เพื่อหลีกเลี่ยงปัญหา CORS ของ Google Apps Script
+    const data = addTokenIfNeeded(body);
     const params = new URLSearchParams();
-    Object.entries(body).forEach(([k,v]) => params.append(k, v));
+    Object.entries(data).forEach(([k,v]) => params.append(k, v));
     const r = await fetch(url + '?' + params.toString());
-    return await r.json();
+    const text = await r.text();
+    try { return JSON.parse(text); }
+    catch(err){ return {ok:false,error:'invalid_json',detail:text}; }
   }catch(e){
     console.error('API error:', e);
     return null;
   }
 }
+
 async function apiPostJson(body){
-  // POST จริง สำหรับข้อมูลขนาดใหญ่ เช่น รูปภาพ (base64) ที่ใส่ใน query string ไม่ได้
-  // ใช้ Content-Type: text/plain เพื่อเลี่ยง CORS preflight ของ Apps Script
   const url = getApiUrl();
   if(!url) return null;
   try{
+    const data = addTokenIfNeeded(body);
     const r = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body)
+      body: JSON.stringify(data)
     });
-    return await r.json();
+    const text = await r.text();
+    try { return JSON.parse(text); }
+    catch(err){ return {ok:false,error:'invalid_json',detail:text}; }
   }catch(e){
     console.error('API POST error:', e);
     return null;
@@ -1037,11 +1058,7 @@ async function loadPersonsFromSheet(){
   if(statusEl) statusEl.textContent = 'กำลังโหลดข้อมูลพนักงาน...';
   try{
     const data = await apiGet({action:'getPersons'});
-    if(!data || !Array.isArray(data) || data.length === 0){
-      if(statusEl) statusEl.textContent = 'โหลดข้อมูลพนักงานไม่สำเร็จ (เช็ค API URL)';
-      setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 4000);
-      return false;
-    }
+    if(!data || !Array.isArray(data) || data.length === 0) return false;
     // Convert sheet format → calPersons format
     // Sheet: {code, name(fname+lname), pos, faction, day, month(0-based)}
     const parsed = data
@@ -1055,21 +1072,13 @@ async function loadPersonsFromSheet(){
         month:   Math.max(0, parseInt(p.month||0, 10) - 1),
         photo:   String(p.photo||'').trim(),
       }));
-    if(parsed.length === 0){
-      if(statusEl) statusEl.textContent = 'โหลดข้อมูลพนักงานไม่สำเร็จ (เช็ค API URL)';
-      setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 4000);
-      return false;
-    }
+    if(parsed.length === 0) return false;
     calPersons = parsed;
     if(statusEl) statusEl.textContent = 'โหลดข้อมูลพนักงานแล้ว ' + parsed.length + ' คน';
     setTimeout(()=>{ if(statusEl) statusEl.textContent=''; }, 3000);
     return true;
   } catch(e){
     console.error('loadPersons error:', e);
-    if(statusEl){
-      statusEl.textContent = 'โหลดข้อมูลพนักงานไม่สำเร็จ (เช็ค API URL)';
-      setTimeout(()=>{ statusEl.textContent=''; }, 4000);
-    }
     return false;
   }
 }
@@ -1224,6 +1233,8 @@ function toggleAllMonths(){
 }
 
 // ── ADMIN MODE ──────────────────────────────────────────────────────
+// Phase 1 Security: Admin Password เก็บบน Google Sheets ผ่าน Apps Script แล้ว
+// Browser เก็บเฉพาะ session token ชั่วคราวใน sessionStorage
 function showAdminPrompt(){
   if(document.body.classList.contains('admin-mode')){
     exitAdmin(); return;
@@ -1237,22 +1248,16 @@ function enterAdmin(){
   document.getElementById('adminLock').classList.add('active');
   document.getElementById('adminLock').textContent='🔓';
   document.getElementById('adminLock').title='ออกจาก Admin Mode';
-  // Photo hints
   const ph = document.getElementById('photoUploadHint');
   if(ph) ph.style.display='block';
   const pf = document.getElementById('empPhotoFrame');
   if(pf) pf.style.cursor='pointer';
-  // Load saved URL
   const saved=getApiUrl();
   if(saved){ document.getElementById('apiUrl').value=saved; testApi(); }
-  // Build admin month grid
   buildAmcGrid();
-  // Render custom questions
   renderCustomQList();
-  // Show admin-only export button
   const wa=document.getElementById('top10AdminArea');
   if(wa) wa.style.display='flex';
-  // Reload persons from sheet
   loadPersonsFromSheet().then(ok=>{
     buildMonthTabs();
     showToast(ok?'เข้าสู่ Admin Mode — พนักงาน '+calPersons.length+' คน':'เข้าสู่ Admin Mode แล้ว');
@@ -1260,33 +1265,22 @@ function enterAdmin(){
   loadWishes();
 }
 
-function exitAdmin(){
-  const tok = getAdminToken();
-  if(tok) apiPostJson({action:'logout', token: tok});
-  setAdminToken('');
+async function exitAdmin(){
+  try{ await apiPostJson({action:'logout'}); }catch(e){}
+  clearAdminToken();
   document.body.classList.remove('admin-mode');
   document.getElementById('apiBar').classList.remove('show');
   document.getElementById('adminLock').classList.remove('active');
   document.getElementById('adminLock').textContent='🔒';
   document.getElementById('adminLock').title='Admin Login';
-  // Photo hints
   const ph = document.getElementById('photoUploadHint');
   if(ph) ph.style.display='none';
   const pf = document.getElementById('empPhotoFrame');
   if(pf) pf.style.cursor='default';
-  // Hide admin-only export button
   const wa=document.getElementById('top10AdminArea');
   if(wa) wa.style.display='none';
   showToast('ออกจาก Admin Mode แล้ว');
   loadWishes();
-}
-
-async function restoreAdminSession(){
-  const tok = getAdminToken();
-  if(!tok) return;
-  const res = await apiPostJson({action:'verifySession', token: tok});
-  if(res && res.ok) enterAdmin();
-  else setAdminToken('');
 }
 
 // ── HIDE / SHOW WISH ─────────────────────────────────────────────────
@@ -1316,7 +1310,7 @@ async function deleteWish(wid, btn){
   const hi=hidden.indexOf(wid);
   if(hi>=0){ hidden.splice(hi,1); localStorage.setItem('sml_hidden',JSON.stringify(hidden)); }
   // 3. Delete from Google Sheet via API
-  const result=await apiGet({action:'deleteWish', wid, token:getAdminToken()});
+  const result=await apiGet({action:'deleteWish', wid:encodeURIComponent(wid)});
   if(result&&result.ok){
     showToast('ลบออกจาก Google Sheet แล้ว');
   } else {
@@ -1385,7 +1379,7 @@ function onPhotoSelected(evt) {
       loadEmpPhoto(empKey);
       showToast('อัปโหลดรูปสำเร็จ');
       // อัปโหลดขึ้น Google Drive ให้ทุกคนเห็นรูปเดียวกัน
-      const res = await apiPostJson({action:'uploadPhoto', code: empKey, photo: data, token:getAdminToken()});
+      const res = await apiPostJson({action:'uploadPhoto', code: empKey, photo: data});
       if (res && res.ok) {
         curEmp.photo = res.photoUrl;
         const p = calPersons.find(x=>x.code===curEmp.code);
@@ -1700,7 +1694,7 @@ async function addCustomQuestion() {
 
   if (editingCustomQId) {
     const id = editingCustomQId;
-    const res = await apiPostJson({action:'updateCustomQuestion', id, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans, token:getAdminToken()});
+    const res = await apiPostJson({action:'updateCustomQuestion', id, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans});
     if (!res || !res.ok) { showToast('แก้ไขคำถามไม่สำเร็จ ลองใหม่นะ','warn'); return; }
     const qs = getCustomQuestions(empKey);
     const idx = qs.findIndex(x=>String(x.id)===String(id));
@@ -1713,7 +1707,7 @@ async function addCustomQuestion() {
     return;
   }
 
-  const res = await apiPostJson({action:'addCustomQuestion', empId: empKey, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans, token:getAdminToken()});
+  const res = await apiPostJson({action:'addCustomQuestion', empId: empKey, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans});
   if (!res || !res.ok) { showToast('บันทึกคำถามไม่สำเร็จ ลองใหม่นะ','warn'); return; }
 
   const qs = getCustomQuestions(empKey);
@@ -1733,7 +1727,7 @@ async function addCustomQuestion() {
 
 async function deleteCustomQ(id) {
   const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
-  const res = await apiPostJson({action:'deleteCustomQuestion', id, token:getAdminToken()});
+  const res = await apiPostJson({action:'deleteCustomQuestion', id});
   if (!res || !res.ok) { showToast('ลบคำถามไม่สำเร็จ','warn'); return; }
   const qs = getCustomQuestions(empKey).filter(q=>String(q.id)!==String(id));
   customQCache[empKey] = qs;
@@ -1795,7 +1789,7 @@ function importQuestionsFromExcel(evt) {
       let imported = 0;
       for (let i = 0; i < items.length; i += chunkSize) {
         const chunk = items.slice(i, i+chunkSize);
-        const res = await apiPostJson({action:'bulkAddCustomQuestions', items: chunk, token:getAdminToken()});
+        const res = await apiPostJson({action:'bulkAddCustomQuestions', items: chunk});
         if (res && res.ok) imported += res.count || chunk.length;
       }
       // เคลียร์ cache เพื่อให้โหลดข้อมูลใหม่จากเซิร์ฟเวอร์
@@ -1878,7 +1872,7 @@ async function saveLbRange() {
   const start = parseInt(document.getElementById('lbRangeStartSel').value, 10);
   const end = parseInt(document.getElementById('lbRangeEndSel').value, 10);
   if (start > end) { showToast('เดือนเริ่มต้องไม่เกินเดือนสิ้นสุด','warn'); return; }
-  await apiGet({action:'setLbRange', start, end, token:getAdminToken()});
+  await apiGet({action:'setLbRange', start, end});
   lbRange = {start, end};
   const sel = document.getElementById('lbMonthSel');
   if (sel) {
@@ -2236,14 +2230,8 @@ async function exportBirthdayCardsPDF() {
 
 
 // ══════════════════════════════════════════════════
-// ADMIN AUTH & SETTINGS — Phase 1: server-side session, ไม่เก็บ password/
-// master key ใน localStorage อีกต่อไป ทุกการ login/เปลี่ยนรหัส ตรวจสอบที่
-// Apps Script (AdminCreds sheet, hashed) เท่านั้น token เก็บใน sessionStorage
-// (หายไปเมื่อปิดแท็บ/เบราว์เซอร์ — ไม่ persist ข้ามอุปกรณ์โดยเจตนา)
+// ADMIN AUTH & SETTINGS — Google-backed
 // ══════════════════════════════════════════════════
-function getAdminToken(){ return sessionStorage.getItem('sml_admin_token') || ''; }
-function setAdminToken(t){ if(t) sessionStorage.setItem('sml_admin_token', t); else sessionStorage.removeItem('sml_admin_token'); }
-
 function showAdminLoginModal(){
   const m = document.getElementById('loginModal');
   if(m){ m.style.display='flex'; setTimeout(()=>document.getElementById('loginPassInput').focus(),100); }
@@ -2252,12 +2240,9 @@ function showAdminLoginModal(){
 async function doLogin(){
   const inp = document.getElementById('loginPassInput');
   if(!inp) return;
+  if(!getApiUrl()) { showToast('กรุณาใส่ Script URL ก่อนเข้าสู่ Admin','warn'); return; }
   const pw = inp.value;
-  if(!pw) return;
-  const btn = document.querySelector('#loginModal .modal-btn-primary');
-  if(btn) btn.disabled = true;
   const res = await apiPostJson({action:'login', password: pw});
-  if(btn) btn.disabled = false;
   if(res && res.ok && res.token){
     setAdminToken(res.token);
     inp.value='';
@@ -2266,21 +2251,22 @@ async function doLogin(){
   } else {
     inp.style.borderColor='#ff6b9d';
     inp.value='';
-    inp.placeholder = (res && res.error==='locked') ? 'บัญชีถูกล็อกชั่วคราว ลองใหม่ภายหลัง' : 'รหัสไม่ถูกต้อง ลองใหม่...';
+    inp.placeholder=(res && res.msg) ? res.msg : 'รหัสไม่ถูกต้อง ลองใหม่...';
     setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ใส่รหัส Admin...'; },2500);
-    showToast((res && res.msg) || 'รหัสไม่ถูกต้องครับ','warn');
+    showToast((res && (res.msg || res.error)) || 'รหัสไม่ถูกต้องครับ','warn');
   }
 }
 
 function showAdminSettings(){
   const m = document.getElementById('settingsModal');
   if(m){ m.style.display='flex'; }
-  // Clear fields
   ['settOldPass','settNewPass','settConfPass'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
   const sm = document.getElementById('settSuccessMsg');
   if(sm) sm.style.display='none';
+  const mkd = document.getElementById('masterKeyDisplay');
+  if(mkd) mkd.textContent='Master Key จะแสดงเฉพาะตอน Setup ครั้งแรกเท่านั้น';
 }
 
 async function changePassword(){
@@ -2288,20 +2274,22 @@ async function changePassword(){
   const nw    = (document.getElementById('settNewPass')||{value:''}).value;
   const conf  = (document.getElementById('settConfPass')||{value:''}).value;
   const sm    = document.getElementById('settSuccessMsg');
-
   if(nw.length < 4){ showToast('รหัสใหม่ต้องมีอย่างน้อย 4 ตัว','warn'); return; }
   if(nw !== conf){ showToast('รหัสยืนยันไม่ตรงกัน','warn'); return; }
-
-  const res = await apiPostJson({action:'changePassword', token:getAdminToken(), oldPass:old, newPass:nw});
-  if(!res || !res.ok){
-    showToast(res && res.error==='old_password_incorrect' ? 'รหัสเดิมไม่ถูกต้อง' : 'เปลี่ยนรหัสไม่สำเร็จ','warn');
-    return;
+  const res = await apiPostJson({action:'changePassword', oldPass: old, newPass: nw});
+  if(res && res.ok){
+    ['settOldPass','settNewPass','settConfPass'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    if(sm){ sm.style.display='block'; setTimeout(()=>sm.style.display='none',3000); }
+    showToast('เปลี่ยนรหัสผ่านสำเร็จ! ใช้ได้ทุกเครื่องแล้ว');
+  } else {
+    showToast((res && (res.error || res.detail)) || 'เปลี่ยนรหัสไม่สำเร็จ','warn');
   }
-  ['settOldPass','settNewPass','settConfPass'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
-  });
-  if(sm){ sm.style.display='block'; setTimeout(()=>sm.style.display='none',3000); }
-  showToast('เปลี่ยนรหัสผ่านสำเร็จ!');
+}
+
+function showMasterKey(){
+  showToast('เพื่อความปลอดภัย Master Key ไม่แสดงในหน้าเว็บ ให้ดูจากตอน Setup ครั้งแรกเท่านั้น','warn');
 }
 
 function showForgotPass(){
@@ -2313,17 +2301,17 @@ function showForgotPass(){
 async function resetWithMasterKey(){
   const mk  = (document.getElementById('forgotMasterKey')||{value:''}).value;
   const nw  = (document.getElementById('forgotNewPass')||{value:''}).value;
-  if(!mk){ showToast('กรอก Master Key','warn'); return; }
   if(nw.length < 4){ showToast('รหัสใหม่ต้องมีอย่างน้อย 4 ตัว','warn'); return; }
-
-  const res = await apiPostJson({action:'resetWithMasterKey', masterKey:mk, newPass:nw});
-  if(!res || !res.ok){
-    showToast(res && res.error==='invalid_master_key' ? 'Master Key ไม่ถูกต้อง' : 'รีเซ็ตไม่สำเร็จ','warn');
-    return;
+  const res = await apiPostJson({action:'resetWithMasterKey', masterKey: mk, newPass: nw});
+  if(res && res.ok){
+    document.getElementById('forgotMasterKey').value='';
+    document.getElementById('forgotNewPass').value='';
+    document.getElementById('forgotModal').style.display='none';
+    showToast('รีเซ็ตรหัสผ่านสำเร็จ! กรุณา Login ใหม่');
+    setTimeout(showAdminLoginModal, 1000);
+  } else {
+    showToast((res && (res.error || res.detail)) || 'รีเซ็ตรหัสผ่านไม่สำเร็จ','warn');
   }
-  document.getElementById('forgotModal').style.display='none';
-  showToast('รีเซ็ตรหัสผ่านสำเร็จ! เข้าสู่ระบบด้วยรหัสใหม่ได้เลย');
-  setTimeout(showAdminLoginModal, 1000);
 }
 
 

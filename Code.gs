@@ -3,7 +3,7 @@
 // เพิ่มใหม่: Points, Monthly_Stats, QR, ยอดสะสม มิ.ย.-ธ.ค. 2569
 // ============================================================
 // Sheet ID เดิม — ไม่ต้องเปลี่ยน
-var SHEET_ID      = ''; // ใส่รหัส
+var SHEET_ID      = 'PUT_YOUR_GOOGLE_SHEET_ID_HERE'; // TODO: ใส่รหัส Google Sheet ID ของคุณ
 var SHEET_WISHES  = 'Wishes';
 var SHEET_PERSONS = 'Persons';
 var SHEET_POINTS  = 'Points';        // ใหม่
@@ -16,6 +16,7 @@ var PHOTOS_FOLDER_NAME = 'SML Birthday Photos';
 var SHEET_ADMINCREDS = 'AdminCreds';
 var SHEET_SESSIONS   = 'Sessions';
 var SHEET_AUDITLOG   = 'AuditLog';
+var SHEET_SCORETX    = 'ScoreTransactions';
 var SESSION_TTL_MS    = 8 * 60 * 60 * 1000;  // 8 ชั่วโมง
 var LOCKOUT_THRESHOLD = 5;
 var LOCKOUT_MS         = 15 * 60 * 1000;     // 15 นาที
@@ -213,46 +214,51 @@ function uploadPhoto(p) {
 
   var m = photo.match(/^data:(image\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
   if (!m) return {ok: false, error: 'invalid image data'};
+
   var mime = m[1];
   var base64 = m[2];
   var bytes = Utilities.base64Decode(base64);
   var ext = mime.indexOf('png') !== -1 ? 'png' : 'jpg';
-  var blob = Utilities.newBlob(bytes, mime, 'photo_' + code + '.' + ext);
-
-  var folder = getOrCreatePhotosFolder();
-
-  // ลบรูปเก่าของ code นี้ทิ้งก่อน (กันสะสมไฟล์ซ้ำ)
-  var oldFiles = folder.getFilesByName(blob.getName());
-  while (oldFiles.hasNext()) oldFiles.next().setTrashed(true);
-  // ลบไฟล์เก่าตามชื่อรูปแบบ photo_<code>.* ทุกนามสกุล
-  var iter = folder.getFiles();
-  while (iter.hasNext()) {
-    var f = iter.next();
-    if (f.getName().indexOf('photo_' + code + '.') === 0) f.setTrashed(true);
-  }
-
-  var file = folder.createFile(blob);
-  try {
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  } catch (shareErr) {
-    // นโยบายโดเมนบางองค์กรห้ามแชร์แบบ "ทุกคนที่มีลิงก์" ลองแชร์แบบ "ทุกคนในโดเมน" แทน
-    try {
-      file.setSharing(DriveApp.Access.DOMAIN_WITH_LINK, DriveApp.Permission.VIEW);
-    } catch (shareErr2) {
-      // ถ้าแชร์ไม่ได้เลย ก็ยังบันทึกไฟล์และ URL ไว้ก่อน ไม่ปล่อยให้การอัปโหลดล้มเหลวทั้งหมด
-    }
-  }
-  var fileId = file.getId();
-  var photoUrl = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000';
+  var blob = Utilities.newBlob(bytes, mime, 'photo_' + code + '_' + new Date().getTime() + '.' + ext);
 
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var ws = ensurePhotosSheet(ss);
   var rows = ws.getDataRange().getValues();
   var rowIdx = -1;
+  var oldFileId = '';
+
   for (var i = 1; i < rows.length; i++) {
-    if (String(rows[i][0]) === code) { rowIdx = i + 1; break; }
+    if (String(rows[i][0]) === code) {
+      rowIdx = i + 1;
+      oldFileId = rows[i][2] || '';
+      break;
+    }
   }
+
+  // ลบรูปเก่าจาก FileId ที่บันทึกไว้เท่านั้น ไม่วนทั้ง Folder เพื่อให้เร็วขึ้น
+  if (oldFileId) {
+    try {
+      DriveApp.getFileById(oldFileId).setTrashed(true);
+    } catch (oldErr) {
+      // ถ้าลบไม่ได้ให้ไปต่อได้ เพราะไม่ควรทำให้ upload ใหม่ล้ม
+    }
+  }
+
+  var folder = getOrCreatePhotosFolder();
+  var file = folder.createFile(blob);
+
+  try {
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  } catch (shareErr) {
+    try {
+      file.setSharing(DriveApp.Access.DOMAIN_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (shareErr2) {}
+  }
+
+  var fileId = file.getId();
+  var photoUrl = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000';
   var now = new Date();
+
   if (rowIdx > 0) {
     ws.getRange(rowIdx, 1, 1, 4).setValues([[code, photoUrl, fileId, now]]);
   } else {
@@ -260,7 +266,7 @@ function uploadPhoto(p) {
   }
 
   logAudit('admin', 'uploadPhoto', code, photoUrl, 'ok');
-  return {ok: true, photoUrl: photoUrl};
+  return {ok: true, photoUrl: photoUrl, fileId: fileId};
 }
 
 function getPhotosMap() {
@@ -688,6 +694,29 @@ function cleanupExpiredSessions() {
   }
 }
 
+
+function ensureScoreTransactionsSheet(ss) {
+  var ws = ss.getSheetByName(SHEET_SCORETX);
+  if (!ws) {
+    ws = ss.insertSheet(SHEET_SCORETX);
+    ws.appendRow(['Id','Ts','EmpId','EmployeeName','BirthdayOwnerEmpId','BirthdayOwnerName','Activity','Module','Points','Month','Remark']);
+    ws.setFrozenRows(1);
+    ws.getRange(1, 1, 1, 11).setBackground('#0EA5E9').setFontColor('#fff').setFontWeight('bold');
+  }
+  return ws;
+}
+
+function logScoreTransaction(empId, employeeName, ownerEmpId, ownerName, activity, points, month, remark) {
+  try {
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var ws = ensureScoreTransactionsSheet(ss);
+    var id = 'ST' + new Date().getTime() + '_' + Math.floor(Math.random() * 10000);
+    ws.appendRow([id, new Date(), empId || '', employeeName || '', ownerEmpId || '', ownerName || '', activity || '', 'Birthday', points || 0, month || '', remark || '']);
+  } catch (e) {
+    // ไม่ให้ logging ทำให้การให้คะแนนหลักล้ม
+  }
+}
+
 function jsonOut(data, cb) {
   var str = JSON.stringify(data);
   if (cb) str = cb + '(' + str + ')';
@@ -909,6 +938,7 @@ function addWishPoint(p) {
   ws.getRange(rowIdx, IDX['TotalPts']   + 1).setValue(1 + quizPts);
   ws.getRange(rowIdx, IDX['LastUpdated']+ 1).setValue(now);
   updateMonthlyStat(now, 'wish', name);
+  logScoreTransaction(senderEmpId, name, empId, '', 'WISH', 1, month, 'ส่งคำอวยพรวันเกิด');
 
   return {ok: true, earned: 1, totalPts: 1 + quizPts};
 }
@@ -948,6 +978,7 @@ function addQuizPoint(p) {
   ws.getRange(rowIdx, IDX['TotalPts']   + 1).setValue(wishPts + earned);
   ws.getRange(rowIdx, IDX['LastUpdated']+ 1).setValue(now);
   updateMonthlyStat(now, 'quiz', name);
+  logScoreTransaction(senderEmpId, name, empId, '', earned === 2 ? 'QUIZ_FULL' : 'QUIZ_PARTIAL', earned, month, 'Quiz score=' + score + '/' + total);
 
   return {ok: true, earned: earned, totalPts: wishPts + earned};
 }
@@ -1437,6 +1468,7 @@ function setup() {
   ensureGameScoresSheet(ss);
   ensureSessionsSheet(ss);
   ensureAuditLogSheet(ss);
+  ensureScoreTransactionsSheet(ss);
   var statsWs = ensureStatsSheet(ss);
   initActivityMonths(ss, statsWs);
   var seedResult = seedPersons();
@@ -1446,7 +1478,7 @@ function setup() {
     ? '\n\n🔐 บัญชี Admin เริ่มต้น:\nรหัสผ่าน: ' + adminResult.defaultPassword + ' (เปลี่ยนทันทีหลัง deploy!)\nMaster Key: ' + adminResult.masterKey + ' (เก็บไว้ที่ปลอดภัย ใช้กู้รหัสผ่านได้ — แสดงให้เห็นครั้งนี้ครั้งเดียวเท่านั้น)'
     : '\n\n🔐 บัญชี Admin มีอยู่แล้ว (ไม่เปลี่ยนแปลง)';
 
-  var msg = '✅ Setup สำเร็จ!\n\nSheets ที่พร้อมแล้ว:\n- Wishes (เพิ่ม EmpId/SenderDept/Emoji/Ts)\n- Persons (นำเข้าพนักงานใหม่ ' + seedResult.added + ' คน, เพิ่ม Pos/Day)\n- Points (ใหม่)\n- Monthly_Stats มิ.ย.-ธ.ค. 2569 (ใหม่)\n- GameScores (ใหม่)\n- AdminCreds / Sessions / AuditLog (ใหม่ — Phase 1 Security)' + adminMsg;
+  var msg = '✅ Setup สำเร็จ!\n\nSheets ที่พร้อมแล้ว:\n- Wishes (เพิ่ม EmpId/SenderDept/Emoji/Ts)\n- Persons (นำเข้าพนักงานใหม่ ' + seedResult.added + ' คน, เพิ่ม Pos/Day)\n- Points (ใหม่)\n- Monthly_Stats มิ.ย.-ธ.ค. 2569 (ใหม่)\n- GameScores (ใหม่)\n- AdminCreds / Sessions / AuditLog (ใหม่ — Phase 1 Security)\n- ScoreTransactions (ใหม่ — Audit คะแนน)' + adminMsg;
 
   try {
     SpreadsheetApp.getUi().alert(msg);
