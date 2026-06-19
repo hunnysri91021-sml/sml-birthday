@@ -720,18 +720,18 @@ async function testApi(){
   }catch(e){setApiStatus('err','❌ เชื่อมต่อไม่ได้');}
 }
 
-async function apiGet(params){
-  const url = getApiUrl();
-  if(!url) return null;
-  const data = addTokenIfNeeded(params);
-  const qs = Object.entries(data).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
-  try{
-    const r = await fetch(url+'?'+qs);
-    const text = await r.text();
-    if(!r.ok) throw new Error('HTTP '+r.status+' '+text);
-    try { return JSON.parse(text); }
-    catch(err){ return {ok:false,error:'invalid_json',detail:text}; }
-  }catch(e){ console.error('apiGet error:', e); return null; }
+async function apiGet(action, params = {}) {
+  const base = document.getElementById('apiUrl').value.trim();
+  const url = new URL(base);
+
+  url.searchParams.set('action', action);
+
+  Object.keys(params).forEach(k => {
+    url.searchParams.set(k, params[k]);
+  });
+
+  const r = await fetch(url.toString());
+  return await r.json();
 }
 
 async function apiPost(body){
@@ -1352,11 +1352,49 @@ function loadEmpPhoto(empKey) {
   } else {
     img.src=''; img.style.display='none'; emoji.style.display='block';
   }
-}
 function adminUploadPhoto() {
   if (!document.body.classList.contains('admin-mode')) return;
   document.getElementById('photoInput').click();
 }
+
+async function onPhotoSelected(event) {
+  const file = event.target.files[0];
+  if (!file || !curEmp) return;
+
+  const reader = new FileReader();
+
+  reader.onload = async function(e) {
+    const photo = e.target.result;
+    const code = curEmp.code;
+
+    const token = localStorage.getItem('adminToken');
+
+    const res = await apiPostJson({
+      action: 'uploadPhoto',
+      token: token,
+      code: code,
+      photo: photo
+    });
+
+    if (res && res.ok) {
+      curEmp.photo = res.photoUrl;
+
+      const img = document.getElementById('empPhoto');
+      const emoji = document.getElementById('empPhotoEmoji');
+
+      img.src = res.photoUrl;
+      img.style.display = 'block';
+      emoji.style.display = 'none';
+
+      alert('อัปโหลดรูปสำเร็จ');
+    } else {
+      alert('อัปโหลดรูปไม่สำเร็จ: ' + (res?.error || res?.detail || 'unknown'));
+    }
+  };
+
+  reader.readAsDataURL(file);
+}
+  
 function onPhotoSelected(evt) {
   const file = evt.target.files[0]; if(!file||!curEmp) return;
   const reader = new FileReader();
@@ -2237,23 +2275,20 @@ function showAdminLoginModal(){
   if(m){ m.style.display='flex'; setTimeout(()=>document.getElementById('loginPassInput').focus(),100); }
 }
 
-async function doLogin(){
-  const inp = document.getElementById('loginPassInput');
-  if(!inp) return;
-  if(!getApiUrl()) { showToast('กรุณาใส่ Script URL ก่อนเข้าสู่ Admin','warn'); return; }
-  const pw = inp.value;
-  const res = await apiPostJson({action:'login', password: pw});
-  if(res && res.ok && res.token){
-    setAdminToken(res.token);
-    inp.value='';
-    document.getElementById('loginModal').style.display='none';
-    enterAdmin();
+async function doLogin() {
+  const pass = document.getElementById('loginPassInput').value.trim();
+
+  const res = await apiGet('login', {
+    password: pass
+  });
+
+  if (res && res.ok && res.token) {
+    localStorage.setItem('adminToken', res.token);
+    document.body.classList.add('admin-mode');
+    document.getElementById('loginModal').style.display = 'none';
+    alert('เข้าสู่ระบบ Admin สำเร็จ');
   } else {
-    inp.style.borderColor='#ff6b9d';
-    inp.value='';
-    inp.placeholder=(res && res.msg) ? res.msg : 'รหัสไม่ถูกต้อง ลองใหม่...';
-    setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ใส่รหัส Admin...'; },2500);
-    showToast((res && (res.msg || res.error)) || 'รหัสไม่ถูกต้องครับ','warn');
+    alert('รหัสผ่านไม่ถูกต้อง: ' + (res?.error || 'unknown'));
   }
 }
 
