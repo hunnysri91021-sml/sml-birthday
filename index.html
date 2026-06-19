@@ -686,7 +686,10 @@ let localWishes = JSON.parse(localStorage.getItem('sml_wishes') || '{}');
 let pendingQueue = JSON.parse(localStorage.getItem('sml_pending') || '[]');
 
 // ─── API ───────────────────────────────────────────────────
-function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim(); }
+// URL นี้ไม่ใช่ความลับ (เป็น public web app endpoint) — ฝังเป็นค่า default
+// เพื่อให้ทุกอุปกรณ์/เบราว์เซอร์ใช้งานได้ทันทีโดยไม่ต้องตั้งค่าเอง
+const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbw3EzWDk7N2lF_DnKRJSt5uchlZ5kwpsiJgdfHOGK7a2AIE2eTzz3tZZ_FjJIkcvEK-/exec';
+function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim() || DEFAULT_API_URL; }
 function saveApiUrl(){
   const url = document.getElementById('apiUrl').value.trim();
   localStorage.setItem('sml_api_url', url);
