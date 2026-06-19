@@ -379,6 +379,8 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
   <div class="top10-admin-btns" id="top10AdminArea">
     <button class="top10-export-btn" onclick="exportScoresExcel()">📊 Export คะแนน Excel</button>
     <button class="top10-export-btn" onclick="exportBirthdayCardsPDF()">🎂 Export การ์ดวันเกิด PDF</button>
+    <button class="top10-export-btn" style="background:rgba(255,90,90,.15);border-color:rgba(255,90,90,.4);color:#ff8a8a" onclick="adminResetPoints()">♻️ Reset คะแนน</button>
+    <button class="top10-export-btn" style="background:rgba(255,90,90,.15);border-color:rgba(255,90,90,.4);color:#ff8a8a" onclick="adminResetWishes()">♻️ Reset คำอวยพร</button>
   </div>
 </div>
 
@@ -694,7 +696,7 @@ function saveApiUrl(){
 const ADMIN_API_ACTIONS = new Set([
   'deleteWish','setLbRange','addCustomQuestion','updateCustomQuestion','deleteCustomQuestion',
   'bulkAddCustomQuestions','uploadPhoto','seedPersons','getAuditLog','changePassword','logout',
-  'toggleHideWish','setActiveMonths'
+  'toggleHideWish','setActiveMonths','resetPoints','resetWishes'
 ]);
 function getAdminToken(){ return sessionStorage.getItem('sml_admin_token') || ''; }
 function setAdminToken(token){ if(token) sessionStorage.setItem('sml_admin_token', token); }
@@ -1316,6 +1318,31 @@ async function exitAdmin(){
   if(wa) wa.style.display='none';
   showToast('ออกจาก Admin Mode แล้ว');
   loadWishes();
+}
+
+// ── RESET (สำหรับทดสอบระบบ แล้วเริ่มนับคะแนน/คำอวยพรใหม่) ──────────────
+async function adminResetPoints(){
+  if(!confirm('ล้างคะแนนสะสมทั้งหมด (Points, Quiz, กระดานคะแนน) เพื่อเริ่มนับใหม่?\nไม่กระทบคำอวยพร/รูป/ข้อมูลพนักงาน')) return;
+  const r = await apiGet({action:'resetPoints'});
+  if(r && r.ok){
+    showToast('♻️ รีเซ็ตคะแนนแล้ว');
+    loadMonthlyLeaderboard();
+    renderTop10Chart();
+  } else {
+    showToast('❌ รีเซ็ตคะแนนไม่สำเร็จ','warn');
+  }
+}
+
+async function adminResetWishes(){
+  if(!confirm('ล้างคำอวยพรและไลก์ทั้งหมด เพื่อเริ่มใหม่?\nไม่กระทบคะแนน/รูป/ข้อมูลพนักงาน')) return;
+  const r = await apiGet({action:'resetWishes'});
+  if(r && r.ok){
+    showToast('♻️ รีเซ็ตคำอวยพรแล้ว');
+    loadWishes();
+    refreshLikes();
+  } else {
+    showToast('❌ รีเซ็ตคำอวยพรไม่สำเร็จ','warn');
+  }
 }
 
 // ── HIDE / SHOW WISH ─────────────────────────────────────────────────
