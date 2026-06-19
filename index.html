@@ -1861,11 +1861,11 @@ function importQuestionsFromExcel(evt) {
 // generateQuestions merges auto-generated and custom questions
 function generateQuestions(emp) {
   const empKey = emp ? (emp.code||emp.name) : '';
-  const custom = getCustomQuestions(empKey).map(q => ({
+  const custom = getCustomQuestions(empKey).slice(0,5).map(q => ({
     ...q,
     opts: [...q.opts].sort(()=>Math.random()-.5), // shuffle options
   }));
-  // ถ้ามีคำถามแฟนพันธุ์แท้ (custom) ของคนนี้แล้ว ใช้เฉพาะชุดนั้น ไม่ปนคำถาม auto
+  // ถ้ามีคำถามแฟนพันธุ์แท้ (custom) ของคนนี้แล้ว ใช้เฉพาะชุดนั้น ไม่ปนคำถาม auto (สูงสุด 5 ข้อ)
   if (custom.length) return custom.sort(()=>Math.random()-.5);
   return generateAutoQuestions(emp).sort(()=>Math.random()-.5);
 }
