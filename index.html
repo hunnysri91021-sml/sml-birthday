@@ -606,6 +606,7 @@ function toggleMonthCtrl(){const el=document.getElementById('adminMonthCtrl');if
 document.addEventListener('DOMContentLoaded',function(){
   if(typeof initStickerSystem==='function') initStickerSystem();
   if(typeof renderTemplates==='function') renderTemplates();
+  if(typeof restoreAdminSession==='function') restoreAdminSession();
 });
 function updateStatRow(){
   const empKey=curEmp?(curEmp.code||curEmp.name):'';
@@ -685,7 +686,10 @@ let localWishes = JSON.parse(localStorage.getItem('sml_wishes') || '{}');
 let pendingQueue = JSON.parse(localStorage.getItem('sml_pending') || '[]');
 
 // ─── API ───────────────────────────────────────────────────
-function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim(); }
+// URL นี้ไม่ใช่ความลับ (เป็น public web app endpoint) — ฝังเป็นค่า default
+// เพื่อให้ทุกอุปกรณ์/เบราว์เซอร์ใช้งานได้ทันทีโดยไม่ต้องตั้งค่าเอง
+const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbw3EzWDk7N2lF_DnKRJSt5uchlZ5kwpsiJgdfHOGK7a2AIE2eTzz3tZZ_FjJIkcvEK-/exec';
+function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim() || DEFAULT_API_URL; }
 function saveApiUrl(){
   const url = document.getElementById('apiUrl').value.trim();
   localStorage.setItem('sml_api_url', url);
@@ -1208,10 +1212,6 @@ function toggleAllMonths(){
 }
 
 // ── ADMIN MODE ──────────────────────────────────────────────────────
-// Password stored in localStorage — changeable without editing code
-function getAdminPass(){ return localStorage.getItem('adminPass') || 'sml2569'; }
-function setAdminPass(p){ localStorage.setItem('adminPass', p); }
-
 function showAdminPrompt(){
   if(document.body.classList.contains('admin-mode')){
     exitAdmin(); return;
@@ -1249,6 +1249,9 @@ function enterAdmin(){
 }
 
 function exitAdmin(){
+  const tok = getAdminToken();
+  if(tok) apiPostJson({action:'logout', token: tok});
+  setAdminToken('');
   document.body.classList.remove('admin-mode');
   document.getElementById('apiBar').classList.remove('show');
   document.getElementById('adminLock').classList.remove('active');
@@ -1264,6 +1267,14 @@ function exitAdmin(){
   if(wa) wa.style.display='none';
   showToast('ออกจาก Admin Mode แล้ว');
   loadWishes();
+}
+
+async function restoreAdminSession(){
+  const tok = getAdminToken();
+  if(!tok) return;
+  const res = await apiPostJson({action:'verifySession', token: tok});
+  if(res && res.ok) enterAdmin();
+  else setAdminToken('');
 }
 
 // ── HIDE / SHOW WISH ─────────────────────────────────────────────────
@@ -1293,7 +1304,7 @@ async function deleteWish(wid, btn){
   const hi=hidden.indexOf(wid);
   if(hi>=0){ hidden.splice(hi,1); localStorage.setItem('sml_hidden',JSON.stringify(hidden)); }
   // 3. Delete from Google Sheet via API
-  const result=await apiGet({action:'deleteWish', wid:encodeURIComponent(wid)});
+  const result=await apiGet({action:'deleteWish', wid, token:getAdminToken()});
   if(result&&result.ok){
     showToast('ลบออกจาก Google Sheet แล้ว');
   } else {
@@ -1362,7 +1373,7 @@ function onPhotoSelected(evt) {
       loadEmpPhoto(empKey);
       showToast('อัปโหลดรูปสำเร็จ');
       // อัปโหลดขึ้น Google Drive ให้ทุกคนเห็นรูปเดียวกัน
-      const res = await apiPostJson({action:'uploadPhoto', code: empKey, photo: data});
+      const res = await apiPostJson({action:'uploadPhoto', code: empKey, photo: data, token:getAdminToken()});
       if (res && res.ok) {
         curEmp.photo = res.photoUrl;
         const p = calPersons.find(x=>x.code===curEmp.code);
@@ -1677,7 +1688,7 @@ async function addCustomQuestion() {
 
   if (editingCustomQId) {
     const id = editingCustomQId;
-    const res = await apiPostJson({action:'updateCustomQuestion', id, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans});
+    const res = await apiPostJson({action:'updateCustomQuestion', id, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans, token:getAdminToken()});
     if (!res || !res.ok) { showToast('แก้ไขคำถามไม่สำเร็จ ลองใหม่นะ','warn'); return; }
     const qs = getCustomQuestions(empKey);
     const idx = qs.findIndex(x=>String(x.id)===String(id));
@@ -1690,7 +1701,7 @@ async function addCustomQuestion() {
     return;
   }
 
-  const res = await apiPostJson({action:'addCustomQuestion', empId: empKey, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans});
+  const res = await apiPostJson({action:'addCustomQuestion', empId: empKey, q, opt1:o1, opt2:o2, opt3:o3, opt4:o4, ans, token:getAdminToken()});
   if (!res || !res.ok) { showToast('บันทึกคำถามไม่สำเร็จ ลองใหม่นะ','warn'); return; }
 
   const qs = getCustomQuestions(empKey);
@@ -1710,7 +1721,7 @@ async function addCustomQuestion() {
 
 async function deleteCustomQ(id) {
   const empKey = curEmp ? (curEmp.code||curEmp.name) : '';
-  const res = await apiPostJson({action:'deleteCustomQuestion', id});
+  const res = await apiPostJson({action:'deleteCustomQuestion', id, token:getAdminToken()});
   if (!res || !res.ok) { showToast('ลบคำถามไม่สำเร็จ','warn'); return; }
   const qs = getCustomQuestions(empKey).filter(q=>String(q.id)!==String(id));
   customQCache[empKey] = qs;
@@ -1772,7 +1783,7 @@ function importQuestionsFromExcel(evt) {
       let imported = 0;
       for (let i = 0; i < items.length; i += chunkSize) {
         const chunk = items.slice(i, i+chunkSize);
-        const res = await apiPostJson({action:'bulkAddCustomQuestions', items: chunk});
+        const res = await apiPostJson({action:'bulkAddCustomQuestions', items: chunk, token:getAdminToken()});
         if (res && res.ok) imported += res.count || chunk.length;
       }
       // เคลียร์ cache เพื่อให้โหลดข้อมูลใหม่จากเซิร์ฟเวอร์
@@ -1855,7 +1866,7 @@ async function saveLbRange() {
   const start = parseInt(document.getElementById('lbRangeStartSel').value, 10);
   const end = parseInt(document.getElementById('lbRangeEndSel').value, 10);
   if (start > end) { showToast('เดือนเริ่มต้องไม่เกินเดือนสิ้นสุด','warn'); return; }
-  await apiGet({action:'setLbRange', start, end});
+  await apiGet({action:'setLbRange', start, end, token:getAdminToken()});
   lbRange = {start, end};
   const sel = document.getElementById('lbMonthSel');
   if (sel) {
@@ -2213,38 +2224,39 @@ async function exportBirthdayCardsPDF() {
 
 
 // ══════════════════════════════════════════════════
-// ADMIN AUTH & SETTINGS
+// ADMIN AUTH & SETTINGS — Phase 1: server-side session, ไม่เก็บ password/
+// master key ใน localStorage อีกต่อไป ทุกการ login/เปลี่ยนรหัส ตรวจสอบที่
+// Apps Script (AdminCreds sheet, hashed) เท่านั้น token เก็บใน sessionStorage
+// (หายไปเมื่อปิดแท็บ/เบราว์เซอร์ — ไม่ persist ข้ามอุปกรณ์โดยเจตนา)
 // ══════════════════════════════════════════════════
-function getMasterKey(){
-  let mk = localStorage.getItem('adminMasterKey');
-  if (!mk) {
-    // Generate random 8-char key on first use
-    mk = Math.random().toString(36).substring(2,6).toUpperCase() +
-         Math.random().toString(36).substring(2,6).toUpperCase();
-    localStorage.setItem('adminMasterKey', mk);
-  }
-  return mk;
-}
+function getAdminToken(){ return sessionStorage.getItem('sml_admin_token') || ''; }
+function setAdminToken(t){ if(t) sessionStorage.setItem('sml_admin_token', t); else sessionStorage.removeItem('sml_admin_token'); }
 
 function showAdminLoginModal(){
   const m = document.getElementById('loginModal');
   if(m){ m.style.display='flex'; setTimeout(()=>document.getElementById('loginPassInput').focus(),100); }
 }
 
-function doLogin(){
+async function doLogin(){
   const inp = document.getElementById('loginPassInput');
   if(!inp) return;
   const pw = inp.value;
-  if(pw === getAdminPass() || pw === getMasterKey()){
+  if(!pw) return;
+  const btn = document.querySelector('#loginModal .modal-btn-primary');
+  if(btn) btn.disabled = true;
+  const res = await apiPostJson({action:'login', password: pw});
+  if(btn) btn.disabled = false;
+  if(res && res.ok && res.token){
+    setAdminToken(res.token);
     inp.value='';
     document.getElementById('loginModal').style.display='none';
     enterAdmin();
   } else {
     inp.style.borderColor='#ff6b9d';
     inp.value='';
-    inp.placeholder='รหัสไม่ถูกต้อง ลองใหม่...';
-    setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ใส่รหัส Admin...'; },2000);
-    showToast('รหัสไม่ถูกต้องครับ','warn');
+    inp.placeholder = (res && res.error==='locked') ? 'บัญชีถูกล็อกชั่วคราว ลองใหม่ภายหลัง' : 'รหัสไม่ถูกต้อง ลองใหม่...';
+    setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ใส่รหัส Admin...'; },2500);
+    showToast((res && res.msg) || 'รหัสไม่ถูกต้องครับ','warn');
   }
 }
 
@@ -2257,41 +2269,27 @@ function showAdminSettings(){
   });
   const sm = document.getElementById('settSuccessMsg');
   if(sm) sm.style.display='none';
-  const mkd = document.getElementById('masterKeyDisplay');
-  if(mkd) mkd.textContent='••••••••';
 }
 
-function changePassword(){
+async function changePassword(){
   const old   = (document.getElementById('settOldPass')||{value:''}).value;
   const nw    = (document.getElementById('settNewPass')||{value:''}).value;
   const conf  = (document.getElementById('settConfPass')||{value:''}).value;
   const sm    = document.getElementById('settSuccessMsg');
 
-  if(old !== getAdminPass() && old !== getMasterKey()){
-    showToast('รหัสเดิมไม่ถูกต้อง','warn'); return;
-  }
   if(nw.length < 4){ showToast('รหัสใหม่ต้องมีอย่างน้อย 4 ตัว','warn'); return; }
   if(nw !== conf){ showToast('รหัสยืนยันไม่ตรงกัน','warn'); return; }
 
-  setAdminPass(nw);
+  const res = await apiPostJson({action:'changePassword', token:getAdminToken(), oldPass:old, newPass:nw});
+  if(!res || !res.ok){
+    showToast(res && res.error==='old_password_incorrect' ? 'รหัสเดิมไม่ถูกต้อง' : 'เปลี่ยนรหัสไม่สำเร็จ','warn');
+    return;
+  }
   ['settOldPass','settNewPass','settConfPass'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
   if(sm){ sm.style.display='block'; setTimeout(()=>sm.style.display='none',3000); }
   showToast('เปลี่ยนรหัสผ่านสำเร็จ!');
-}
-
-function showMasterKey(){
-  const mk = getMasterKey();
-  const el = document.getElementById('masterKeyDisplay');
-  if(el){
-    if(el.textContent==='••••••••'){
-      el.textContent = mk;
-      showToast('Master Key: ' + mk + ' — จำไว้ด้วยนะครับ');
-    } else {
-      el.textContent='••••••••';
-    }
-  }
 }
 
 function showForgotPass(){
@@ -2300,15 +2298,19 @@ function showForgotPass(){
   if(m){ m.style.display='flex'; setTimeout(()=>document.getElementById('forgotMasterKey').focus(),100); }
 }
 
-function resetWithMasterKey(){
+async function resetWithMasterKey(){
   const mk  = (document.getElementById('forgotMasterKey')||{value:''}).value;
   const nw  = (document.getElementById('forgotNewPass')||{value:''}).value;
-  if(mk !== getMasterKey()){ showToast('Master Key ไม่ถูกต้อง','warn'); return; }
+  if(!mk){ showToast('กรอก Master Key','warn'); return; }
   if(nw.length < 4){ showToast('รหัสใหม่ต้องมีอย่างน้อย 4 ตัว','warn'); return; }
-  setAdminPass(nw);
+
+  const res = await apiPostJson({action:'resetWithMasterKey', masterKey:mk, newPass:nw});
+  if(!res || !res.ok){
+    showToast(res && res.error==='invalid_master_key' ? 'Master Key ไม่ถูกต้อง' : 'รีเซ็ตไม่สำเร็จ','warn');
+    return;
+  }
   document.getElementById('forgotModal').style.display='none';
-  showToast('รีเซ็ตรหัสผ่านสำเร็จ! รหัสใหม่: ' + nw);
-  // Auto open login modal
+  showToast('รีเซ็ตรหัสผ่านสำเร็จ! เข้าสู่ระบบด้วยรหัสใหม่ได้เลย');
   setTimeout(showAdminLoginModal, 1000);
 }
 
