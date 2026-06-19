@@ -1301,7 +1301,7 @@ async function deleteWish(wid, btn){
   const hi=hidden.indexOf(wid);
   if(hi>=0){ hidden.splice(hi,1); localStorage.setItem('sml_hidden',JSON.stringify(hidden)); }
   // 3. Delete from Google Sheet via API
-  const result=await apiGet({action:'deleteWish', wid:encodeURIComponent(wid), token:getAdminToken()});
+  const result=await apiGet({action:'deleteWish', wid, token:getAdminToken()});
   if(result&&result.ok){
     showToast('ลบออกจาก Google Sheet แล้ว');
   } else {
