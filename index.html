@@ -1795,15 +1795,14 @@ function importQuestionsFromExcel(evt) {
 
 // generateQuestions merges auto-generated and custom questions
 function generateQuestions(emp) {
-  const auto = generateAutoQuestions(emp);
   const empKey = emp ? (emp.code||emp.name) : '';
   const custom = getCustomQuestions(empKey).map(q => ({
     ...q,
     opts: [...q.opts].sort(()=>Math.random()-.5), // shuffle options
   }));
-  // Interleave: auto first, then custom, shuffle together
-  const all = [...auto, ...custom].sort(()=>Math.random()-.5);
-  return all;
+  // ถ้ามีคำถามแฟนพันธุ์แท้ (custom) ของคนนี้แล้ว ใช้เฉพาะชุดนั้น ไม่ปนคำถาม auto
+  if (custom.length) return custom.sort(()=>Math.random()-.5);
+  return generateAutoQuestions(emp).sort(()=>Math.random()-.5);
 }
 
 // customQList rendered inside enterAdmin directly
