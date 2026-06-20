@@ -2121,14 +2121,12 @@ function renderParticipants() {
   const cnt  = document.getElementById('partCount');
   if (!grid) return;
   const ps = document.getElementById('partSection');
-  const ws = document.getElementById('top10Section');
+  // top10Section แสดงคะแนนกลางจากเซิร์ฟเวอร์เสมอ ไม่เกี่ยวกับผู้เล่นเกมในเครื่องนี้
   if (!board.length) {
     if(ps) ps.style.display='none';
-    if(ws) ws.style.display='none';
     return;
   }
   if(ps) ps.style.display='block';
-  if(ws) ws.style.display='block';
   if(cnt) cnt.textContent = board.length + ' คน';
   const topScore = Math.max(...board.map(r=>r.score||0));
   grid.innerHTML = board.map(r=>`
