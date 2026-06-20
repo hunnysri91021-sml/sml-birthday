@@ -1324,12 +1324,17 @@ async function exitAdmin(){
 
 // ── RESET (สำหรับทดสอบระบบ แล้วเริ่มนับคะแนน/คำอวยพรใหม่) ──────────────
 async function adminResetPoints(){
-  if(!confirm('ล้างคะแนนสะสมทั้งหมด (Points, Quiz, กระดานคะแนน) เพื่อเริ่มนับใหม่?\nไม่กระทบคำอวยพร/รูป/ข้อมูลพนักงาน')) return;
+  if(!confirm('ล้างคะแนนสะสม + รายชื่อ/จำนวนผู้ตอบคำถามทั้งหมด เพื่อเริ่มนับใหม่?\nไม่กระทบคำอวยพร/รูป/ข้อมูลพนักงาน')) return;
   const r = await apiGet({action:'resetPoints'});
   if(r && r.ok){
-    showToast('♻️ รีเซ็ตคะแนนแล้ว');
+    // ล้างแคชผู้ร่วมตอบคำถาม/ชื่อผู้เล่นในเครื่องนี้ด้วย ไม่ให้ชื่อเก่าค้างอยู่
+    Object.keys(localStorage).filter(k=>k.startsWith('lbGame_')).forEach(k=>localStorage.removeItem(k));
+    localStorage.removeItem('playerName');
+    localStorage.removeItem('playerEmpId');
+    showToast('♻️ รีเซ็ตคะแนนและรายชื่อผู้ตอบแล้ว');
     loadMonthlyLeaderboard();
     renderTop10Chart();
+    renderParticipants();
   } else {
     showToast('❌ รีเซ็ตคะแนนไม่สำเร็จ','warn');
   }
@@ -2044,9 +2049,8 @@ async function loadGameLeaderboard(empKey){
     lastTs: r.lastTs || (localMap[r.playerName]&&localMap[r.playerName].lastTs) || ''
   }));
   merged.sort((a,b)=>b.score-a.score);
-  if(merged.length){
-    localStorage.setItem(key, JSON.stringify(merged.slice(0,50)));
-  }
+  // เขียนทับเสมอ (แม้ว่าง) เพื่อให้การ reset จากแอดมินไหลมาถึงทุกเครื่องตอนโหลดหน้าใหม่
+  localStorage.setItem(key, JSON.stringify(merged.slice(0,50)));
   return merged;
 }
 
