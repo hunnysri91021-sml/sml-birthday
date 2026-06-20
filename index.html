@@ -686,7 +686,9 @@ let localWishes = JSON.parse(localStorage.getItem('sml_wishes') || '{}');
 let pendingQueue = JSON.parse(localStorage.getItem('sml_pending') || '[]');
 
 // ─── API ───────────────────────────────────────────────────
-function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim(); }
+// Worker proxy ที่ปลอดภัยให้เปิดเผยได้ (ซ่อน URL จริงของ Apps Script ไว้เป็น secret หลัง Worker)
+const DEFAULT_API_URL = 'https://sml-birthday-proxy.hunnysri91021.workers.dev/';
+function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim() || DEFAULT_API_URL; }
 function saveApiUrl(){
   const url = document.getElementById('apiUrl').value.trim();
   localStorage.setItem('sml_api_url', url);
@@ -1173,22 +1175,13 @@ function onTextInput(){
 }
 
 (async function(){
-  // Load saved API URL — ถ้ายังไม่มี (เครื่อง/เบราว์เซอร์ใหม่) ให้ถามครั้งเดียวแล้วจำไว้
-  let savedUrl=getApiUrl();
-  if(!savedUrl){
-    const entered=(window.prompt('ใส่ Google Apps Script Web App URL เพื่อดึงข้อมูล\n(ขอจากแอดมิน หรือดูได้จาก Apps Script > Deploy > Manage deployments)','')||'').trim();
-    if(entered){
-      localStorage.setItem('sml_api_url', entered);
-      savedUrl=entered;
-    }
-  }
-  if(savedUrl){
-    document.getElementById('apiUrl').value=savedUrl;
-    testApi();
-    // Load persons from Sheet before building UI
-    await loadPersonsFromSheet();
-    await fetchActiveMonths();
-  }
+  // getApiUrl() คืนค่า default (Worker proxy) ถ้าเครื่องนี้ไม่มี URL บันทึกไว้เอง
+  const savedUrl=getApiUrl();
+  document.getElementById('apiUrl').value=savedUrl;
+  testApi();
+  // Load persons from Sheet before building UI
+  await loadPersonsFromSheet();
+  await fetchActiveMonths();
   // Build UI
   buildMonthTabs();
   // Auto-select current month
