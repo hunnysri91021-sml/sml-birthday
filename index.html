@@ -972,6 +972,7 @@ async function submitWish(){
     action:'addWish', empId, empName:curEmp.name,
     senderName:name, senderEmpId, senderDept:dept||'ทีมงาน', msg:text,
     emoji:EMOJIS[~~(Math.random()*EMOJIS.length)],
+    month:curEmp.month+1,
     ts:new Date().toLocaleString('th-TH')
   };
 
