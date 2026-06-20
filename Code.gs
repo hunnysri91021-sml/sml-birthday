@@ -27,7 +27,8 @@ var ADMIN_ONLY_ACTIONS = [
   'deleteWish', 'setLbRange', 'addCustomQuestion', 'updateCustomQuestion',
   'deleteCustomQuestion', 'bulkAddCustomQuestions', 'uploadPhoto',
   'seedPersons', 'getAuditLog', 'changePassword',
-  'toggleHideWish', 'setActiveMonths', 'resetPoints', 'resetWishes'
+  'toggleHideWish', 'setActiveMonths', 'resetPoints', 'resetWishes',
+  'generateDefaultQuestions'
 ];
 
 function checkAuth(action, p) {
@@ -154,6 +155,7 @@ function doGet(e) {
     else if (action === 'getAuditLog')    result = getAuditLog(p);
     else if (action === 'resetPoints')    result = resetPoints(p);
     else if (action === 'resetWishes')    result = resetWishes(p);
+    else if (action === 'generateDefaultQuestions') result = generateDefaultQuestions(p);
     else result = {error: 'unknown action: ' + action};
 
     return jsonOut(result, cb);
@@ -190,6 +192,7 @@ function doPost(e) {
     else if (action === 'getAuditLog')    result = getAuditLog(p);
     else if (action === 'resetPoints')    result = resetPoints(p);
     else if (action === 'resetWishes')    result = resetWishes(p);
+    else if (action === 'generateDefaultQuestions') result = generateDefaultQuestions(p);
     else result = {error: 'unknown action: ' + action};
     return jsonOut(result);
   } catch(err) {
@@ -422,6 +425,70 @@ function bulkAddCustomQuestions(p) {
   }
   logAudit('admin', 'bulkAddCustomQuestions', '', 'imported ' + count + ' questions', 'ok');
   return {ok: true, count: count};
+}
+
+function shuffleArr_(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+// GET/POST: action=generateDefaultQuestions&token=...
+// สร้างคำถาม 3 ข้อ/คน อัตโนมัติจากข้อมูลพนักงานจริง (เดือนเกิด, แผนก, ตำแหน่ง)
+// แล้วเขียนลง Sheet CustomQuestions ให้เลย — เฉพาะคนที่ "ยังไม่มี" คำถามของตัวเอง
+// (ไม่แทนที่คำถามที่ admin สร้าง/แก้ไว้เองอยู่แล้ว เพื่อไม่ให้ของที่ตั้งใจแก้หายไป)
+function generateDefaultQuestions(p) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var persons = getPersons().filter(function(pp){ return pp.active; });
+  var existing = getCustomQuestions({});
+  var hasQ = {};
+  existing.forEach(function(q){ hasQ[String(q.empId)] = true; });
+
+  var months = THAI_MONTHS.slice(1); // index 0 ตัดออก เพราะ THAI_MONTHS[0]=''
+  var allDepts = persons.map(function(pp){ return pp.dept; }).filter(Boolean);
+  allDepts = allDepts.filter(function(d, i){ return allDepts.indexOf(d) === i; });
+  var allPos = persons.map(function(pp){ return pp.pos; }).filter(Boolean);
+  allPos = allPos.filter(function(d, i){ return allPos.indexOf(d) === i; });
+
+  var rowsToAppend = [];
+  var now = new Date();
+  var empCount = 0;
+  persons.forEach(function(person) {
+    var empId = String(person.code);
+    if (hasQ[empId]) return; // มีคำถามของตัวเองอยู่แล้ว ไม่แทนที่
+    var firstName = String(person.name).split(' ')[0];
+    var ts = now.getTime();
+
+    var correctMonth = months[parseInt(person.month, 10) - 1];
+    if (correctMonth) {
+      var wrongM = shuffleArr_(months.filter(function(m){ return m !== correctMonth; })).slice(0, 3);
+      var optsM = shuffleArr_([correctMonth].concat(wrongM));
+      rowsToAppend.push(['Q' + ts + '_' + empId + '_1', empId, 'คุณ' + firstName + ' เกิดเดือนอะไร?', optsM[0], optsM[1], optsM[2], optsM[3], correctMonth, now]);
+    }
+
+    if (person.dept && allDepts.length >= 4) {
+      var wrongD = shuffleArr_(allDepts.filter(function(d){ return d !== person.dept; })).slice(0, 3);
+      var optsD = shuffleArr_([person.dept].concat(wrongD));
+      rowsToAppend.push(['Q' + ts + '_' + empId + '_2', empId, 'คุณ' + firstName + ' อยู่แผนกไหน?', optsD[0], optsD[1], optsD[2], optsD[3], person.dept, now]);
+    }
+
+    if (person.pos && allPos.length >= 4) {
+      var wrongP = shuffleArr_(allPos.filter(function(d){ return d !== person.pos; })).slice(0, 3);
+      var optsP = shuffleArr_([person.pos].concat(wrongP));
+      rowsToAppend.push(['Q' + ts + '_' + empId + '_3', empId, 'คุณ' + firstName + ' ดำรงตำแหน่งอะไร?', optsP[0], optsP[1], optsP[2], optsP[3], person.pos, now]);
+    }
+    empCount++;
+  });
+
+  if (rowsToAppend.length) {
+    var ws = ensureCustomQSheet(ss);
+    ws.getRange(ws.getLastRow() + 1, 1, rowsToAppend.length, 9).setValues(rowsToAppend);
+  }
+  logAudit('admin', 'generateDefaultQuestions', '', 'generated for ' + empCount + ' employees, ' + rowsToAppend.length + ' questions', 'ok');
+  return {ok: true, employees: empCount, questions: rowsToAppend.length};
 }
 
 // ============================================================
