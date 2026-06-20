@@ -1007,7 +1007,7 @@ async function submitWish(){
       // Mark as participant even without playing game
       saveGameScore(name, 0, 0);
     }
-    apiGet({action:'addWishPoint', name, senderEmpId, empId, month:curEmp.month}).then(()=>loadMonthlyLeaderboard());
+    apiGet({action:'addWishPoint', name, senderEmpId, empId, month:curEmp.month+1}).then(()=>loadMonthlyLeaderboard());
   }
   // UI
   document.getElementById('wf-name').value='';
@@ -1558,7 +1558,7 @@ function renderGame() {
       localStorage.setItem('playerEmpId', validSenderEmpId);
       saveGameScore(savedName, s, total);
       const empKey = curEmp.code||curEmp.name;
-      apiGet({action:'addQuizPoint', name:savedName, senderEmpId:validSenderEmpId, empId:empKey, month:curEmp.month, score:s, total}).then(()=>loadMonthlyLeaderboard());
+      apiGet({action:'addQuizPoint', name:savedName, senderEmpId:validSenderEmpId, empId:empKey, month:curEmp.month+1, score:s, total}).then(()=>loadMonthlyLeaderboard());
     }
     const hasName = !!(savedName && validSenderEmpId);
     body.innerHTML = `<div class="qi-result">

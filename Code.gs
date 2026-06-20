@@ -1158,7 +1158,9 @@ function addQuizPoint(p) {
 }
 
 // GET: ?action=getMonthlyLeaderboard&month=6&limit=10
-// สรุปคะแนนสะสมของแต่ละคน ตามเดือนเกิดของเจ้าของวันเกิดที่เขาไปอวยพร/ตอบคำถามให้
+// สรุปคะแนนที่แต่ละ "เจ้าของวันเกิด" ของเดือนนั้นได้รับ (จากคนที่มาอวยพร/ตอบคำถามให้)
+// แสดงคนที่เกิดเดือนนั้นครบทุกคน แม้ยังไม่มีใครอวยพร/ตอบควิซให้ (totalPts = 0)
+// อ้างอิงเดือนเกิดจริงจาก Persons sheet (Google) ไม่ใช่ค่า Month ที่บันทึกไว้ในแถว Points
 // GET: ?action=getMonthlyLeaderboard&start=1&end=6&limit=10  (สะสมหลายเดือน)
 // GET: ?action=getMonthlyLeaderboard&month=6&limit=10         (เดือนเดียว, รองรับไว้เผื่อใช้)
 function getMonthlyLeaderboard(p) {
@@ -1166,33 +1168,39 @@ function getMonthlyLeaderboard(p) {
   var start = hasRange ? parseInt(p.start, 10) : parseInt(p.month || (new Date().getMonth() + 1), 10);
   var end   = hasRange ? parseInt(p.end, 10)   : start;
   var limit = parseInt(p.limit || '10', 10);
+
+  var persons = getPersons().filter(function(pp){ return pp.active; });
+  var birthdayPersons = persons.filter(function(pp){
+    var m = parseInt(pp.month, 10);
+    return m >= start && m <= end;
+  });
+
+  var totals = {}; // empId -> totalPts
+  birthdayPersons.forEach(function(pp){ totals[String(pp.code)] = 0; });
+
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var ws = ensurePointsSheet(ss);
   var rows = ws.getDataRange().getValues();
-  if (rows.length < 2) return {start: start, end: end, board: []};
-  var headers = rows[0];
-  var IDX = makeIdx(headers);
-
-  var totals = {}; // senderEmpId -> {name, totalPts}
-  for (var i = 1; i < rows.length; i++) {
-    var r = rows[i];
-    var m = parseInt(r[IDX['Month']], 10);
-    if (m < start || m > end) continue;
-    var pts = parseFloat(r[IDX['TotalPts']]) || 0;
-    if (pts <= 0) continue;
-    var key = String(r[IDX['SenderEmpId']] || normName(r[IDX['Name']]));
-    if (!totals[key]) totals[key] = {name: r[IDX['Name']], totalPts: 0};
-    totals[key].totalPts += pts;
-    totals[key].name = r[IDX['Name']]; // ใช้ชื่อล่าสุดที่บันทึก
+  if (rows.length >= 2) {
+    var headers = rows[0];
+    var IDX = makeIdx(headers);
+    for (var i = 1; i < rows.length; i++) {
+      var r = rows[i];
+      var empId = String(r[IDX['EmpId']]);
+      if (!(empId in totals)) continue; // นับเฉพาะคนที่เกิดเดือนในช่วงนี้
+      totals[empId] += parseFloat(r[IDX['TotalPts']]) || 0;
+    }
   }
 
-  var persons = getPersons();
-  var photoByCode = {};
-  for (var j = 0; j < persons.length; j++) photoByCode[String(persons[j].code)] = persons[j].photo;
+  var nameByCode = {}, photoByCode = {};
+  birthdayPersons.forEach(function(pp){
+    nameByCode[String(pp.code)] = pp.name;
+    photoByCode[String(pp.code)] = pp.photo;
+  });
 
   var board = [];
   for (var k in totals) {
-    board.push({name: totals[k].name, totalPts: totals[k].totalPts, photo: photoByCode[k] || ''});
+    board.push({name: nameByCode[k] || '', totalPts: totals[k], photo: photoByCode[k] || ''});
   }
   board.sort(function(a, b) { return b.totalPts - a.totalPts; });
   return {start: start, end: end, board: board.slice(0, limit)};
