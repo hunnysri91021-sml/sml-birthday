@@ -509,6 +509,8 @@ html,body{min-height:100vh;background:var(--bg);background-attachment:fixed;colo
   <div class="qe-lbl" style="margin-top:.6rem">📥 นำเข้าคำถาม-คำตอบจากไฟล์ Excel (เช่นผลสำรวจ)</div>
   <input type="file" id="qeImportInput" accept=".xlsx,.xls" style="display:none" onchange="importQuestionsFromExcel(event)">
   <button class="qe-add" onclick="document.getElementById('qeImportInput').click()">📥 เลือกไฟล์ Excel เพื่อนำเข้า</button>
+  <div class="qe-lbl" style="margin-top:.6rem">🤖 สร้างคำถามอัตโนมัติจากข้อมูลพนักงาน (เดือนเกิด/แผนก/ตำแหน่ง) ให้ทุกคนที่ยังไม่มีคำถามของตัวเอง — ไม่แทนที่คำถามที่สร้าง/แก้ไว้แล้ว</div>
+  <button class="qe-add" onclick="adminGenerateDefaultQuestions()">🤖 สร้างคำถามอัตโนมัติให้ทุกคน</button>
 </div>
 
 <!-- VOTE -->
@@ -698,7 +700,7 @@ function saveApiUrl(){
 const ADMIN_API_ACTIONS = new Set([
   'deleteWish','setLbRange','addCustomQuestion','updateCustomQuestion','deleteCustomQuestion',
   'bulkAddCustomQuestions','uploadPhoto','seedPersons','getAuditLog','changePassword','logout',
-  'toggleHideWish','setActiveMonths','resetPoints','resetWishes'
+  'toggleHideWish','setActiveMonths','resetPoints','resetWishes','generateDefaultQuestions'
 ]);
 function getAdminToken(){ return sessionStorage.getItem('sml_admin_token') || ''; }
 function setAdminToken(token){ if(token) sessionStorage.setItem('sml_admin_token', token); }
@@ -1352,6 +1354,17 @@ async function adminResetWishes(){
   }
 }
 
+async function adminGenerateDefaultQuestions(){
+  if(!confirm('สร้างคำถามแฟนพันธุ์แท้ 3 ข้อ/คน (เดือนเกิด/แผนก/ตำแหน่ง) จากข้อมูลพนักงานจริง ให้ทุกคนที่ยังไม่มีคำถามของตัวเอง?\nคนที่มีคำถาม/แอดมินแก้ไว้แล้วจะไม่ถูกแทนที่')) return;
+  const r = await apiGet({action:'generateDefaultQuestions'});
+  if(r && r.ok){
+    showToast(`🤖 สร้างคำถามให้ ${r.employees} คน (${r.questions} ข้อ) แล้ว`);
+    if (curEmp) { await loadCustomQuestions(curEmp.code||curEmp.name); renderCustomQList(); }
+  } else {
+    showToast('❌ สร้างคำถามอัตโนมัติไม่สำเร็จ','warn');
+  }
+}
+
 // ── HIDE / SHOW WISH ─────────────────────────────────────────────────
 async function toggleHideWish(wid, btn){
   const result=await apiGet({action:'toggleHideWish', wid});
@@ -1895,11 +1908,11 @@ function importQuestionsFromExcel(evt) {
 // generateQuestions merges auto-generated and custom questions
 function generateQuestions(emp) {
   const empKey = emp ? (emp.code||emp.name) : '';
-  const custom = getCustomQuestions(empKey).slice(0,5).map(q => ({
+  const custom = getCustomQuestions(empKey).slice(0,3).map(q => ({
     ...q,
     opts: [...q.opts].sort(()=>Math.random()-.5), // shuffle options
   }));
-  // ถ้ามีคำถามแฟนพันธุ์แท้ (custom) ของคนนี้แล้ว ใช้เฉพาะชุดนั้น ไม่ปนคำถาม auto (สูงสุด 5 ข้อ)
+  // ถ้ามีคำถามแฟนพันธุ์แท้ (custom) ของคนนี้แล้ว ใช้เฉพาะชุดนั้น ไม่ปนคำถาม auto (สูงสุด 3 ข้อ)
   if (custom.length) return custom.sort(()=>Math.random()-.5);
   return generateAutoQuestions(emp).sort(()=>Math.random()-.5);
 }
