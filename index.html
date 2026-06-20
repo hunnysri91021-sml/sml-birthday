@@ -1992,8 +1992,8 @@ async function loadMonthlyLeaderboard() {
   const el = document.getElementById('lbList');
   if (!el) return;
   const params = v === 'cum'
-    ? {action:'getMonthlyLeaderboard', start:lbRange.start, end:lbRange.end, limit:10}
-    : {action:'getMonthlyLeaderboard', month:v, limit:10};
+    ? {action:'getMonthlyLeaderboard', start:lbRange.start, end:lbRange.end}
+    : {action:'getMonthlyLeaderboard', month:v};
   const res = await apiGet(params);
   const board = (res && Array.isArray(res.board)) ? res.board : [];
   if (!board.length) {

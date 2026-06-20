@@ -1167,7 +1167,8 @@ function getMonthlyLeaderboard(p) {
   var hasRange = p.start !== undefined && p.end !== undefined && p.start !== '' && p.end !== '';
   var start = hasRange ? parseInt(p.start, 10) : parseInt(p.month || (new Date().getMonth() + 1), 10);
   var end   = hasRange ? parseInt(p.end, 10)   : start;
-  var limit = parseInt(p.limit || '10', 10);
+  // ไม่ใส่ limit ตายตัว — ต้องแสดงคนที่เกิดในช่วงเดือนนี้ครบทุกคน ไม่ใช่แค่ top N
+  var limit = p.limit ? parseInt(p.limit, 10) : Infinity;
 
   var persons = getPersons().filter(function(pp){ return pp.active; });
   var birthdayPersons = persons.filter(function(pp){
