@@ -2151,30 +2151,30 @@ function findPersonPhoto(name) {
   return person.photo || localStorage.getItem('photo_'+(person.code||person.name));
 }
 
-function renderTop10Chart() {
-  const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
-  const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
+// Top 10 ดึงจากกระดานคะแนนกลางบนเซิร์ฟเวอร์ (ตาม Points จริง) จึงเหมือนกันทุกหน้าคนเกิด
+async function renderTop10Chart() {
   const el = document.getElementById('top10Chart');
   const badge = document.getElementById('top10Badge');
   if (!el) return;
+  const res = await apiGet({action:'getMonthlyLeaderboard', start:lbRange.start, end:lbRange.end, limit:10});
+  const board = (res && Array.isArray(res.board)) ? res.board : [];
   if (badge) badge.textContent = board.length + ' คน';
   if (!board.length) {
     el.innerHTML = '<div class="top10-empty">ยังไม่มีผู้เข้าร่วม</div>';
     return;
   }
-  const top = [...board].sort((a,b)=>b.score-a.score).slice(0,10);
-  const maxScore = Math.max(1, top[0].score||1);
+  const maxScore = Math.max(1, board[0].totalPts||1);
   const medals = ['🥇','🥈','🥉'];
-  el.innerHTML = top.map((r,i)=>{
-    const photo = findPersonPhoto(r.name);
-    const pct = Math.max(4, Math.round((r.score/maxScore)*100));
+  el.innerHTML = board.map((r,i)=>{
+    const photo = r.photo || findPersonPhoto(r.name);
+    const pct = Math.max(4, Math.round((r.totalPts/maxScore)*100));
     const ava = photo ? `<img src="${photo}" alt="">` : escHtml(r.name.substring(0,2));
     return `
     <div class="top10-row">
       <div class="top10-rank">${medals[i]||'#'+(i+1)}</div>
       <div class="top10-ava">${ava}</div>
       <div class="top10-bar-wrap">
-        <div class="top10-name"><b>${escHtml(r.name)}</b><span class="top10-score">${r.score} แต้ม</span></div>
+        <div class="top10-name"><b>${escHtml(r.name)}</b><span class="top10-score">${r.totalPts} แต้ม</span></div>
         <div class="top10-bar-track"><div class="top10-bar-fill" style="width:${pct}%"></div></div>
       </div>
     </div>`;
