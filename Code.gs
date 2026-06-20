@@ -3,7 +3,7 @@
 // เพิ่มใหม่: Points, Monthly_Stats, QR, ยอดสะสม มิ.ย.-ธ.ค. 2569
 // ============================================================
 // Sheet ID เดิม — ไม่ต้องเปลี่ยน
-var SHEET_ID      = '1rpJKzrWoBQwJAM9OiByecs1CYLB-CSumkdXg6ldJ0JU'; // TODO: ใส่รหัส Google Sheet ID ของคุณ
+var SHEET_ID      = 'ใส่รหัส Google Sheet ID ของคุณ'; // TODO: ใส่รหัส Google Sheet ID ของคุณ
 var SHEET_WISHES  = 'Wishes';
 var SHEET_PERSONS = 'Persons';
 var SHEET_POINTS  = 'Points';        // ใหม่
