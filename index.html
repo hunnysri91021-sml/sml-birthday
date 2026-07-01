@@ -2534,22 +2534,21 @@ async function doLogin(){
   const pw = inp.value.trim();
   if(!pw){ showToast('กรุณาใส่รหัสผ่าน Admin','warn'); return; }
 
-  // ตรวจสอบรหัสผ่านใน JS โดยตรง ไม่ผ่าน Apps Script (ป้องกัน CORS และ unknown action)
-  const ADMIN_PASS = 'sml2569';
-  if(pw === ADMIN_PASS){
-    setAdminToken('sml_local_admin_' + Date.now()); // token ชั่วคราวใน sessionStorage
+  const res = await apiGet({action:'login', password: pw});
+  if(res && res.ok && res.token){
+    setAdminToken(res.token); // session token จริงจาก Apps Script (บันทึกใน Sheet Sessions)
     inp.value='';
     const modal = document.getElementById('loginModal');
     if(modal) modal.style.display='none';
     enterAdmin();
     showToast('เข้าสู่ระบบ Admin สำเร็จ ✅');
   } else {
-    console.warn('Login failed: wrong password');
+    console.warn('Login failed:', res);
     inp.style.borderColor='#ff6b9d';
     inp.value='';
-    inp.placeholder = 'รหัสผ่านไม่ถูกต้อง';
+    inp.placeholder = (res && res.msg) ? res.msg : 'รหัสผ่านไม่ถูกต้อง';
     setTimeout(()=>{ inp.style.borderColor=''; inp.placeholder='ใส่รหัส Admin...'; },2500);
-    showToast('รหัสผ่านไม่ถูกต้อง','warn');
+    showToast((res && res.msg) || 'รหัสผ่านไม่ถูกต้อง','warn');
   }
 }
 
