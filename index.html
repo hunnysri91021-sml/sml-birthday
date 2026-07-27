@@ -682,7 +682,7 @@ let pendingQueue = JSON.parse(localStorage.getItem('sml_pending') || '[]');
 
 // ─── API ───────────────────────────────────────────────────
 // Worker proxy ที่ปลอดภัยให้เปิดเผยได้ (ซ่อน URL จริงของ Apps Script ไว้เป็น secret หลัง Worker)
-const DEFAULT_API_URL = 'https://sml-birthday-proxy.hunnysri91021.workers.dev/';
+const DEFAULT_API_URL = 'https://sml-birthday.hunnysri91021.workers.dev/';
 function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim() || DEFAULT_API_URL; }
 function saveApiUrl(){
   const url = document.getElementById('apiUrl').value.trim();
