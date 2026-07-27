@@ -698,6 +698,11 @@ const ADMIN_API_ACTIONS = new Set([
 function getAdminToken(){ return sessionStorage.getItem('sml_admin_token') || ''; }
 function setAdminToken(token){ if(token) sessionStorage.setItem('sml_admin_token', token); }
 function clearAdminToken(){ sessionStorage.removeItem('sml_admin_token'); }
+
+// localStorage พร้อม expiry (สำหรับข้อมูลส่วนตัวเช่น ชื่อ/รหัสพนักงาน)
+function lsSet(key, val, days){ localStorage.setItem(key, JSON.stringify({v:val, exp:Date.now()+days*864e5})); }
+function lsGet(key){ try{ const d=JSON.parse(localStorage.getItem(key)||'null'); if(!d) return null; if(Date.now()>d.exp){ localStorage.removeItem(key); return null; } return d.v; }catch(e){ return localStorage.getItem(key)||null; } }
+function lsRemove(key){ localStorage.removeItem(key); }
 function addTokenIfNeeded(obj){
   const copy = Object.assign({}, obj || {});
   if(ADMIN_API_ACTIONS.has(copy.action) && !copy.token){
@@ -1136,8 +1141,8 @@ async function submitWish(){
 
   // Auto-save game score with this name if not saved yet
   if (name) {
-    localStorage.setItem('playerName', name);
-    localStorage.setItem('playerEmpId', senderEmpId);
+    lsSet('playerName', name, 30);
+    lsSet('playerEmpId', senderEmpId, 30);
     localStorage.setItem('sml_my_empid', senderEmpId); // ใช้สำหรับ Reaction
     const empKey = curEmp ? (curEmp.code||curEmp.name) : 'general';
     const board = JSON.parse(localStorage.getItem('lbGame_'+empKey)||'[]');
@@ -1474,8 +1479,8 @@ async function adminResetPoints(){
   if(r && r.ok){
     // ล้างแคชผู้ร่วมตอบคำถาม/ชื่อผู้เล่นในเครื่องนี้ด้วย ไม่ให้ชื่อเก่าค้างอยู่
     Object.keys(localStorage).filter(k=>k.startsWith('lbGame_')).forEach(k=>localStorage.removeItem(k));
-    localStorage.removeItem('playerName');
-    localStorage.removeItem('playerEmpId');
+    lsRemove('playerName');
+    lsRemove('playerEmpId');
     showToast('♻️ รีเซ็ตคะแนนและรายชื่อผู้ตอบแล้ว');
     loadMonthlyLeaderboard();
     renderTop10Chart();
@@ -1682,8 +1687,8 @@ function renderGame() {
   const hint = document.getElementById('gameNameHint');
   const wfName = (document.getElementById('wf-name')||{value:''}).value.trim();
   const wfEmpId = (document.getElementById('wf-empid')||{value:''}).value.trim();
-  const saved = localStorage.getItem('playerName');
-  const savedEmpId = localStorage.getItem('playerEmpId');
+  const saved = lsGet('playerName');
+  const savedEmpId = lsGet('playerEmpId');
   if(hint) hint.style.display = (!wfName && !saved) || (!wfEmpId && !savedEmpId) ? 'block' : 'none';
   const qs = gameState.questions;
   if (!qs.length) { body.innerHTML='<div style="text-align:center;color:rgba(74,51,88,.3);padding:1rem">ไม่มีคำถาม</div>'; return; }
@@ -1693,13 +1698,13 @@ function renderGame() {
     const msg = s===total?'เก่งมาก! 🏆':s>total/2?'ดีมาก! 👍':'ลองใหม่นะ 😊';
     // Auto-get name/empid from wish form (no extra input needed)
     const wishFormName = (document.getElementById('wf-name')||{value:''}).value.trim();
-    const savedName = wishFormName || localStorage.getItem('playerName') || '';
+    const savedName = wishFormName || lsGet('playerName') || '';
     const wishFormEmpId = (document.getElementById('wf-empid')||{value:''}).value.trim();
-    const savedSenderEmpId = wishFormEmpId || localStorage.getItem('playerEmpId') || '';
+    const savedSenderEmpId = wishFormEmpId || lsGet('playerEmpId') || '';
     const validSenderEmpId = savedSenderEmpId && calPersons.find(p=>String(p.code)===savedSenderEmpId) ? savedSenderEmpId : '';
     if (savedName && validSenderEmpId) {
-      localStorage.setItem('playerName', savedName);
-      localStorage.setItem('playerEmpId', validSenderEmpId);
+      lsSet('playerName', savedName, 30);
+      lsSet('playerEmpId', validSenderEmpId, 30);
       saveGameScore(savedName, s, total);
       const empKey = curEmp.code||curEmp.name;
       apiGet({action:'addQuizPoint', name:savedName, senderEmpId:validSenderEmpId, empId:empKey, month:curEmp.month+1, score:s, total}).then(()=>loadMonthlyLeaderboard());
@@ -2246,9 +2251,9 @@ function renderLeaderboard() {
 
 function doSaveScore(s, total) {
   const inp = document.getElementById('lbNameInput');
-  const name = inp ? inp.value.trim() : localStorage.getItem('playerName');
+  const name = inp ? inp.value.trim() : lsGet('playerName');
   if (name) {
-    localStorage.setItem('playerName', name);
+    lsSet('playerName', name, 30);
     saveGameScore(name, s, total);
     showToast('บันทึกคะแนนแล้ว! ดู 🏆 กระดานด้านล่าง');
   }
@@ -2484,7 +2489,7 @@ async function doLogin(){
   const pw = inp.value.trim();
   if(!pw){ showToast('กรุณาใส่รหัสผ่าน Admin','warn'); return; }
 
-  const res = await apiGet({action:'login', password: pw});
+  const res = await apiPostJson({action:'login', password: pw});
   if(res && res.ok && res.token){
     setAdminToken(res.token); // session token จริงจาก Apps Script (บันทึกใน Sheet Sessions)
     inp.value='';
