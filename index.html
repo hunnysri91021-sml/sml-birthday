@@ -1215,7 +1215,7 @@ async function loadPersonsFromSheet(){
   const statusEl = document.getElementById('syncStatus');
   if(statusEl) statusEl.textContent = 'กำลังโหลดข้อมูลพนักงาน...';
   try{
-    const data = await apiGet({action:'getPersons'});
+    const data = await apiGet({action:'getPersonsPublic'});
     if(!data || !Array.isArray(data) || data.length === 0) return false;
     // Convert sheet format → calPersons format
     // Sheet: {code, name(fname+lname), pos, faction, day, month(0-based)}

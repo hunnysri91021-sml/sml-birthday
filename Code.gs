@@ -28,7 +28,7 @@ var ADMIN_ONLY_ACTIONS = [
   'deleteCustomQuestion', 'bulkAddCustomQuestions', 'uploadPhoto',
   'seedPersons', 'getAuditLog', 'changePassword',
   'toggleHideWish', 'setActiveMonths', 'resetPoints', 'resetWishes',
-  'generateDefaultQuestions'
+  'generateDefaultQuestions', 'getPersons'
 ];
 
 function checkAuth(action, p) {
@@ -81,6 +81,7 @@ function doGet(e) {
     else if (action === 'getActiveMonths') result = getActiveMonths();
     else if (action === 'setActiveMonths') result = setActiveMonths(p);
     else if (action === 'getPersons')     result = getPersons();
+    else if (action === 'getPersonsPublic') result = getPersonsPublic();
     else if (action === 'addWishPoint')   result = addWishPoint(p);
     else if (action === 'addQuizPoint')   result = addQuizPoint(p);
     else if (action === 'getMonthlyLeaderboard') result = getMonthlyLeaderboard(p);
@@ -1005,6 +1006,25 @@ function getPersons() {
     });
   }
   return persons;
+}
+
+// สำหรับผู้ใช้ทั่วไป (ไม่ต้อง login) — คืนเฉพาะข้อมูลที่จำเป็นสำหรับแสดงปฏิทิน
+// ไม่มีวันที่เกิดที่แน่ชัด (day) เพื่อลดความเสี่ยง PDPA
+function getPersonsPublic() {
+  var full = getPersons();
+  return full
+    .filter(function(p) { return p.active; })
+    .map(function(p) {
+      return {
+        code:    p.code,
+        name:    p.name,
+        pos:     p.pos,
+        faction: p.faction,
+        month:   p.month,
+        day:     p.day,
+        photo:   p.photo
+      };
+    });
 }
 
 // ============================================================

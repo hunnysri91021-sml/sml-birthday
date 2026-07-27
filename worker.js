@@ -24,8 +24,15 @@ export default {
       });
     }
 
+    const allowedOrigins = [
+      'https://hunnysri91021-sml.github.io',
+      'http://localhost',
+      'http://127.0.0.1',
+    ];
+    const origin = request.headers.get('Origin') || '';
+    const isAllowed = allowedOrigins.some(o => origin === o || origin.startsWith(o + ':'));
     const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': isAllowed ? origin : allowedOrigins[0],
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     };
