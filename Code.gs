@@ -130,7 +130,9 @@ function doPost(e) {
     if (!auth.ok) return jsonOut({error: 'unauthorized', detail: auth.error});
 
     var result;
-    if (action === 'uploadPhoto') result = uploadPhoto(p);
+    if (action === 'addWish')         result = addWish(p);
+    else if (action === 'addWishPoint') result = addWishPoint(p);
+    else if (action === 'uploadPhoto') result = uploadPhoto(p);
     else if (action === 'addCustomQuestion')     result = addCustomQuestion(p);
     else if (action === 'updateCustomQuestion')  result = updateCustomQuestion(p);
     else if (action === 'deleteCustomQuestion')  result = deleteCustomQuestion(p);

@@ -1128,7 +1128,7 @@ async function submitWish(){
   localStorage.setItem('sml_wishes',JSON.stringify(localWishes));
 
   // Try API
-  const result=await apiPost(wish);
+  const result=await apiPostJson(wish);
   if(!result||result.error){
     // Queue for later
     pendingQueue.push(wish);
@@ -1151,7 +1151,7 @@ async function submitWish(){
       // Mark as participant even without playing game
       saveGameScore(name, 0, 0);
     }
-    apiGet({action:'addWishPoint', name, senderEmpId, empId, month:curEmp.month+1}).then(()=>loadMonthlyLeaderboard());
+    apiPostJson({action:'addWishPoint', name, senderEmpId, empId, month:curEmp.month+1}).then(()=>loadMonthlyLeaderboard());
   }
   // UI
   document.getElementById('wf-name').value='';
