@@ -2428,7 +2428,12 @@ async function exportBirthdayCardsPDF() {
 
     const photo = person.photo || localStorage.getItem('photo_'+empKey) || '';
     let photoB64 = '';
-    if (photo) {
+    if (photo.indexOf('data:') === 0) {
+      // รูปเป็น base64 อยู่แล้ว (จาก getPersons/Photos sheet) ใช้ได้ทันที ไม่ติด CORS
+      photoB64 = photo;
+    } else if (photo) {
+      // รูปเก่าที่เป็นลิงก์ Drive (ก่อนมี base64 ในชีท) — ลองแปลงเป็น base64
+      // หมายเหตุ: Drive thumbnail มักไม่ส่ง CORS header จึงอาจแปลงไม่สำเร็จ
       try {
         photoB64 = await new Promise(resolve => {
           const tmpImg = new Image(); tmpImg.crossOrigin = 'anonymous';
