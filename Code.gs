@@ -160,9 +160,11 @@ function ensurePhotosSheet(ss) {
   var ws = ss.getSheetByName(SHEET_PHOTOS);
   if (!ws) {
     ws = ss.insertSheet(SHEET_PHOTOS);
-    ws.appendRow(['Code', 'PhotoUrl', 'FileId', 'UpdatedAt']);
+    ws.appendRow(['Code', 'PhotoUrl', 'FileId', 'UpdatedAt', 'PhotoData']);
     ws.setFrozenRows(1);
-    ws.getRange(1, 1, 1, 4).setBackground('#7BDFF2').setFontColor('#fff').setFontWeight('bold');
+    ws.getRange(1, 1, 1, 5).setBackground('#7BDFF2').setFontColor('#fff').setFontWeight('bold');
+  } else if (ws.getLastColumn() < 5) {
+    ws.getRange(1, 5).setValue('PhotoData').setBackground('#7BDFF2').setFontColor('#fff').setFontWeight('bold');
   }
   return ws;
 }
@@ -222,17 +224,21 @@ function uploadPhoto(p) {
   }
 
   var fileId = file.getId();
-  var photoUrl = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000';
+  var driveUrl = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w1000';
   var now = new Date();
 
+  // เก็บ base64 (photo ที่ resize มาแล้วจาก client, ~200px) ไว้ในชีทด้วย
+  // เพราะ Drive thumbnail URL ไม่ส่ง CORS header ทำให้ฝัง<canvas>/PDF ไม่ได้
+  // (ต้อง fetch ข้าม origin แบบ crossOrigin='anonymous' ซึ่ง Drive ไม่รองรับ)
+  // ใช้ base64 ตรงนี้แสดงผล/แปะลง PDF ได้ทันทีโดยไม่ติด CORS เลย
   if (rowIdx > 0) {
-    ws.getRange(rowIdx, 1, 1, 4).setValues([[code, photoUrl, fileId, now]]);
+    ws.getRange(rowIdx, 1, 1, 5).setValues([[code, driveUrl, fileId, now, photo]]);
   } else {
-    ws.appendRow([code, photoUrl, fileId, now]);
+    ws.appendRow([code, driveUrl, fileId, now, photo]);
   }
 
-  logAudit('admin', 'uploadPhoto', code, photoUrl, 'ok');
-  return {ok: true, photoUrl: photoUrl, fileId: fileId};
+  logAudit('admin', 'uploadPhoto', code, driveUrl, 'ok');
+  return {ok: true, photoUrl: photo, driveUrl: driveUrl, fileId: fileId};
 }
 
 function getPhotosMap() {
@@ -243,7 +249,9 @@ function getPhotosMap() {
   for (var i = 1; i < rows.length; i++) {
     var r = rows[i];
     if (!r[0]) continue;
-    map[String(r[0])] = r[1] || '';
+    // ใช้ base64 (คอลัมน์ PhotoData) เป็นหลัก เพื่อไม่ให้ติด CORS ตอน export PDF
+    // ถ้าเป็นข้อมูลเก่าที่อัปโหลดก่อนมีคอลัมน์นี้ ให้ fallback ไปใช้ Drive URL แทน
+    map[String(r[0])] = r[4] || r[1] || '';
   }
   return map;
 }
