@@ -2427,8 +2427,24 @@ async function exportBirthdayCardsPDF() {
     } catch(e){}
 
     const photo = person.photo || localStorage.getItem('photo_'+empKey) || '';
-    const photoHtml = photo
-      ? `<img src="${photo}" style="width:160px;height:160px;border-radius:50%;object-fit:cover;border:6px solid #fff;box-shadow:0 8px 24px rgba(0,90,160,.25)">`
+    let photoB64 = '';
+    if (photo) {
+      try {
+        photoB64 = await new Promise(resolve => {
+          const tmpImg = new Image(); tmpImg.crossOrigin = 'anonymous';
+          tmpImg.onload = () => {
+            const c = document.createElement('canvas');
+            c.width = tmpImg.naturalWidth || 160; c.height = tmpImg.naturalHeight || 160;
+            c.getContext('2d').drawImage(tmpImg, 0, 0);
+            try { resolve(c.toDataURL('image/jpeg', 0.9)); } catch(e){ resolve(''); }
+          };
+          tmpImg.onerror = () => resolve('');
+          tmpImg.src = photo;
+        });
+      } catch(e){}
+    }
+    const photoHtml = photoB64
+      ? `<img src="${photoB64}" style="width:160px;height:160px;border-radius:50%;object-fit:cover;border:6px solid #fff;box-shadow:0 8px 24px rgba(0,90,160,.25)">`
       : `<div style="width:160px;height:160px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:64px;border:6px solid #fff">🎂</div>`;
 
     const wishesHtml = wishes.length
