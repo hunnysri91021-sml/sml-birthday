@@ -1848,6 +1848,12 @@ function fixMojibakeNames() {
   var ss = SpreadsheetApp.openById(SHEET_ID);
 
   var candidates = {};
+  // ชื่อที่ยืนยันแล้วจากรอบตรวจสอบก่อนหน้า (เทียบกับ log จริงที่รันได้) — ใส่ไว้เผื่อ
+  // การไล่หาชื่อ "สะอาด" จากชีตอื่นๆ ข้างล่างพลาดไปบางกรณี (เช่น ชื่อไปอยู่ในรูปแบบ/
+  // คอลัมน์ที่คาดไม่ถึง) ยังคงเทียบด้วยการจำลองบั๊กแบบเดียวกันทุกประการ ไม่ใช่การ
+  // เทียบ string เพี้ยนตรงๆ จึงไม่เสี่ยงจากปัญหาตัวอักษรเพี้ยนซ้ำระหว่างขั้นตอน
+  ['สกุล', 'สุรกิจ', 'พรรณเชษฐ์', 'เหมียวๆ', 'ปุณยนุช  ม่วงศรี', 'ดลลดา ใจแก้ว']
+    .forEach(function(n) { candidates[n] = true; });
   function addCandidate(name) {
     name = String(name || '').trim();
     if (name && /[฀-๿]/.test(name) && !looksCorrupted(name)) candidates[name] = true;
