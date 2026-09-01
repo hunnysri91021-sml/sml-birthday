@@ -132,6 +132,8 @@ function doPost(e) {
     var result;
     if (action === 'addWish')         result = addWish(p);
     else if (action === 'addWishPoint') result = addWishPoint(p);
+    else if (action === 'saveGameScore') result = saveGameScore(p);
+    else if (action === 'addQuizPoint') result = addQuizPoint(p);
     else if (action === 'uploadPhoto') result = uploadPhoto(p);
     else if (action === 'addCustomQuestion')     result = addCustomQuestion(p);
     else if (action === 'updateCustomQuestion')  result = updateCustomQuestion(p);
@@ -1093,7 +1095,8 @@ function addWishPoint(p) {
   return {ok: true, earned: 1, totalPts: 1 + quizPts};
 }
 
-// GET: ?action=addQuizPoint&name=สมใจ&senderEmpId=90123&empId=90245&month=6&score=3&total=3
+// POST (JSON body): {action:'addQuizPoint', name, senderEmpId, empId, month, score, total}
+// (เดิมเรียกผ่าน GET query string แต่ทำให้ชื่อภาษาไทยเพี้ยน จึงเปลี่ยนมาใช้ POST JSON)
 function addQuizPoint(p) {
   var name        = (p.name  || '').trim();
   var senderEmpId = String(p.senderEmpId || '').trim();
@@ -1538,7 +1541,8 @@ function ensureGameScoresSheet(ss) {
   return ws;
 }
 
-// GET: ?action=saveGameScore&empId=90245&playerName=สมใจ&score=2&total=3
+// POST (JSON body): {action:'saveGameScore', empId, playerName, score, total}
+// (เดิมเรียกผ่าน GET query string แต่ทำให้ชื่อภาษาไทยเพี้ยน จึงเปลี่ยนมาใช้ POST JSON)
 // Upserts a row keyed by (EmpId, PlayerName).
 function saveGameScore(p) {
   var empId      = String(p.empId      || '').trim();
