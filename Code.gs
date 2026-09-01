@@ -1812,45 +1812,108 @@ function resetAdminPasswordToDefault() {
 // ยังมีชื่อเพี้ยนค้างอยู่ในชีต ฟังก์ชันนี้แก้เฉพาะคอลัมน์ชื่อ (Name / PlayerName)
 // เท่านั้น — ไม่แตะคอลัมน์คะแนน/สถิติใดๆ เลย จึงมั่นใจได้ว่าคะแนนเดิมไม่เปลี่ยน
 //
+// v2: แทนที่จะ hardcode ข้อความเพี้ยน (ซึ่งเสี่ยงเพี้ยนซ้ำระหว่างขั้นตอน copy/paste
+// เข้า Apps Script) ฟังก์ชันนี้จะ:
+//   1. รวบรวม "ชื่อที่ถูกต้อง" ทั้งหมดที่มีอยู่แล้วในชีต (Persons, Wishes, และ
+//      แถวที่ยังไม่เพี้ยนใน Points/GameScores เอง)
+//   2. จำลองการเพี้ยนแบบเดียวกับบั๊กจริง (ไบต์ UTF-8 ช่วง 0x80–0x9F หายไประหว่าง
+//      decode) กับชื่อแต่ละชื่อ แล้วเทียบกับข้อความเพี้ยนจริงในเซลล์ ณ ขณะรัน
+//   3. ถ้าตรงกันเป๊ะ ถึงจะแก้ — ไม่เดา ไม่เขียนทับอะไรที่ไม่ชัวร์
+// ถ้ายังมีแถวเพี้ยนที่จับคู่ไม่ได้ จะ log รายการไว้ให้ดูใน View > Logs
+//
 // วิธีรัน: เปิด Apps Script editor (Extensions > Apps Script) เลือกฟังก์ชันนี้
 // จาก dropdown แล้วกด Run ครั้งเดียว ดูผลลัพธ์ได้ที่ View > Logs
 function fixMojibakeNames() {
-  var NAME_FIXES = {
-    'à¸ªà¸¸à¸à¸´à¸©à¸²': 'สุนิษา',
-    'à¸ªà¸à¸¸à¸¥': 'สกุล',
-    'à¸à¹à¸­à¸à¸à¸´à¸¥à¹à¸¡': 'น้องฟิล์ม',
-    'à¸ªà¸¸à¸£à¸à¸´à¸': 'สุรกิจ',
-    'à¸à¸£à¸£à¸à¹à¸à¸©à¸à¹': 'พรรณเชษฐ์',
-    'à¹à¸à¸ªà¸´à¸à¸²': 'โชสิญา'
-  };
+  // จำลองบั๊ก: เข้ารหัส UTF-8 แล้วทิ้งไบต์ต่อเนื่องที่มีค่า 0x80–0x9F ทิ้งไป
+  // จากนั้นตีความไบต์ที่เหลือเป็น Latin-1 (มายืนยันสูตรนี้แล้วว่าตรงกับของจริง 100%)
+  function simulateCorruption(name) {
+    var bytes = Utilities.newBlob(name, 'text/plain', 'x').getBytes();
+    var chars = [];
+    for (var i = 0; i < bytes.length; i++) {
+      var b = bytes[i] & 0xFF;
+      if (b >= 0x80 && b <= 0x9F) continue; // ไบต์ที่หายไปตามบั๊กจริง
+      chars.push(String.fromCharCode(b));
+    }
+    return chars.join('');
+  }
+
+  // ข้อความเพี้ยนจะไม่มีอักษรไทยจริงเหลืออยู่เลย แต่จะมีอักษร Latin-1 supplement
+  // (เช่น à, ¸, ¹, ª ฯลฯ) ปนอยู่ — ใช้เป็นตัวชี้วัดว่า "นี่คือแถวที่เพี้ยน"
+  function looksCorrupted(s) {
+    if (!s) return false;
+    if (/[฀-๿]/.test(s)) return false; // มีอักษรไทยจริง = ไม่เพี้ยน
+    return /[-ÿ]/.test(s);
+  }
 
   var ss = SpreadsheetApp.openById(SHEET_ID);
-  var report = [];
+
+  var candidates = {};
+  function addCandidate(name) {
+    name = String(name || '').trim();
+    if (name && /[฀-๿]/.test(name) && !looksCorrupted(name)) candidates[name] = true;
+  }
+
+  var personsWs = ss.getSheetByName(SHEET_PERSONS);
+  if (personsWs) {
+    var pRows = personsWs.getDataRange().getValues();
+    for (var pi = 1; pi < pRows.length; pi++) {
+      addCandidate(pRows[pi][1]); // คอลัมน์ "ชื่อ" อย่างเดียว
+      if (pRows[pi][1] && pRows[pi][2]) addCandidate(pRows[pi][1] + ' ' + pRows[pi][2]); // "ชื่อ นามสกุล"
+    }
+  }
+
+  var wishesWs = ss.getSheetByName(SHEET_WISHES);
+  if (wishesWs) {
+    var wRows = wishesWs.getDataRange().getValues();
+    var wIdx = makeIdx(wRows[0]);
+    // คอลัมน์ "Name" ในชีต Wishes คือชื่อผู้ส่งคำอวยพร (ดู ensureWishesSheet)
+    if (wIdx['Name'] !== undefined) {
+      for (var wi = 1; wi < wRows.length; wi++) addCandidate(wRows[wi][wIdx['Name']]);
+    }
+  }
 
   var pointsWs = ensurePointsSheet(ss);
   var pointsRows = pointsWs.getDataRange().getValues();
   var pointsIdx = makeIdx(pointsRows[0]);
-  var nameCol = pointsIdx['Name'] + 1; // 1-based column for setValue
-  for (var i = 1; i < pointsRows.length; i++) {
-    var name = String(pointsRows[i][pointsIdx['Name']]);
-    if (NAME_FIXES.hasOwnProperty(name)) {
-      pointsWs.getRange(i + 1, nameCol).setValue(NAME_FIXES[name]); // เฉพาะคอลัมน์ Name
-      report.push('Points!' + (i + 1) + ': "' + name + '" -> "' + NAME_FIXES[name] + '"');
-    }
-  }
+  for (var pj = 1; pj < pointsRows.length; pj++) addCandidate(pointsRows[pj][pointsIdx['Name']]);
 
   var gsWs = ensureGameScoresSheet(ss);
   var gsRows = gsWs.getDataRange().getValues();
   var gsIdx = makeIdx(gsRows[0]);
-  var playerNameCol = gsIdx['PlayerName'] + 1;
+  for (var gj = 1; gj < gsRows.length; gj++) addCandidate(gsRows[gj][gsIdx['PlayerName']]);
+
+  var sigMap = {}; // ลายเซ็นแบบเพี้ยน -> ชื่อที่ถูกต้อง
+  for (var cname in candidates) sigMap[simulateCorruption(cname)] = cname;
+
+  var report = [];
+  var unmatched = [];
+
+  for (var i = 1; i < pointsRows.length; i++) {
+    var name = String(pointsRows[i][pointsIdx['Name']]);
+    if (!looksCorrupted(name)) continue;
+    if (sigMap.hasOwnProperty(name)) {
+      pointsWs.getRange(i + 1, pointsIdx['Name'] + 1).setValue(sigMap[name]); // เฉพาะคอลัมน์ Name
+      report.push('Points!' + (i + 1) + ': "' + name + '" -> "' + sigMap[name] + '"');
+    } else {
+      unmatched.push('Points!' + (i + 1) + ': "' + name + '"');
+    }
+  }
+
   for (var j = 1; j < gsRows.length; j++) {
     var pname = String(gsRows[j][gsIdx['PlayerName']]);
-    if (NAME_FIXES.hasOwnProperty(pname)) {
-      gsWs.getRange(j + 1, playerNameCol).setValue(NAME_FIXES[pname]); // เฉพาะคอลัมน์ PlayerName
-      report.push('GameScores!' + (j + 1) + ': "' + pname + '" -> "' + NAME_FIXES[pname] + '"');
+    if (!looksCorrupted(pname)) continue;
+    if (sigMap.hasOwnProperty(pname)) {
+      gsWs.getRange(j + 1, gsIdx['PlayerName'] + 1).setValue(sigMap[pname]); // เฉพาะคอลัมน์ PlayerName
+      report.push('GameScores!' + (j + 1) + ': "' + pname + '" -> "' + sigMap[pname] + '"');
+    } else {
+      unmatched.push('GameScores!' + (j + 1) + ': "' + pname + '"');
     }
   }
 
   Logger.log(report.length + ' rows fixed:\n' + report.join('\n'));
-  return report;
+  if (unmatched.length) {
+    Logger.log(unmatched.length + ' corrupted rows found but could not be auto-matched ' +
+      '(no clean version of this name exists elsewhere in the sheet yet):\n' + unmatched.join('\n'));
+  }
+  return {fixed: report, unmatched: unmatched};
 }
