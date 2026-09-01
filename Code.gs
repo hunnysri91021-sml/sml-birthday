@@ -1804,3 +1804,53 @@ function resetAdminPasswordToDefault() {
 
   Logger.log('Admin password reset to: sml2569');
 }
+
+// ============================================================
+// ── ONE-TIME CLEANUP: แก้ชื่อภาษาไทยที่เพี้ยน (mojibake) ในชีต Points/GameScores ──
+// เกิดจากบั๊กเก่าที่ saveGameScore/addQuizPoint เคยส่งชื่อผ่าน GET query string
+// (แก้ไปแล้วใน commit ก่อนหน้า — เปลี่ยนเป็น POST JSON) แต่แถวที่บันทึกไปก่อนแก้
+// ยังมีชื่อเพี้ยนค้างอยู่ในชีต ฟังก์ชันนี้แก้เฉพาะคอลัมน์ชื่อ (Name / PlayerName)
+// เท่านั้น — ไม่แตะคอลัมน์คะแนน/สถิติใดๆ เลย จึงมั่นใจได้ว่าคะแนนเดิมไม่เปลี่ยน
+//
+// วิธีรัน: เปิด Apps Script editor (Extensions > Apps Script) เลือกฟังก์ชันนี้
+// จาก dropdown แล้วกด Run ครั้งเดียว ดูผลลัพธ์ได้ที่ View > Logs
+function fixMojibakeNames() {
+  var NAME_FIXES = {
+    'à¸ªà¸¸à¸à¸´à¸©à¸²': 'สุนิษา',
+    'à¸ªà¸à¸¸à¸¥': 'สกุล',
+    'à¸à¹à¸­à¸à¸à¸´à¸¥à¹à¸¡': 'น้องฟิล์ม',
+    'à¸ªà¸¸à¸£à¸à¸´à¸': 'สุรกิจ',
+    'à¸à¸£à¸£à¸à¹à¸à¸©à¸à¹': 'พรรณเชษฐ์',
+    'à¹à¸à¸ªà¸´à¸à¸²': 'โชสิญา'
+  };
+
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var report = [];
+
+  var pointsWs = ensurePointsSheet(ss);
+  var pointsRows = pointsWs.getDataRange().getValues();
+  var pointsIdx = makeIdx(pointsRows[0]);
+  var nameCol = pointsIdx['Name'] + 1; // 1-based column for setValue
+  for (var i = 1; i < pointsRows.length; i++) {
+    var name = String(pointsRows[i][pointsIdx['Name']]);
+    if (NAME_FIXES.hasOwnProperty(name)) {
+      pointsWs.getRange(i + 1, nameCol).setValue(NAME_FIXES[name]); // เฉพาะคอลัมน์ Name
+      report.push('Points!' + (i + 1) + ': "' + name + '" -> "' + NAME_FIXES[name] + '"');
+    }
+  }
+
+  var gsWs = ensureGameScoresSheet(ss);
+  var gsRows = gsWs.getDataRange().getValues();
+  var gsIdx = makeIdx(gsRows[0]);
+  var playerNameCol = gsIdx['PlayerName'] + 1;
+  for (var j = 1; j < gsRows.length; j++) {
+    var pname = String(gsRows[j][gsIdx['PlayerName']]);
+    if (NAME_FIXES.hasOwnProperty(pname)) {
+      gsWs.getRange(j + 1, playerNameCol).setValue(NAME_FIXES[pname]); // เฉพาะคอลัมน์ PlayerName
+      report.push('GameScores!' + (j + 1) + ': "' + pname + '" -> "' + NAME_FIXES[pname] + '"');
+    }
+  }
+
+  Logger.log(report.length + ' rows fixed:\n' + report.join('\n'));
+  return report;
+}
