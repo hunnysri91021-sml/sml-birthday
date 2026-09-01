@@ -1707,7 +1707,7 @@ function renderGame() {
       lsSet('playerEmpId', validSenderEmpId, 30);
       saveGameScore(savedName, s, total);
       const empKey = curEmp.code||curEmp.name;
-      apiGet({action:'addQuizPoint', name:savedName, senderEmpId:validSenderEmpId, empId:empKey, month:curEmp.month+1, score:s, total}).then(()=>loadMonthlyLeaderboard());
+      apiPostJson({action:'addQuizPoint', name:savedName, senderEmpId:validSenderEmpId, empId:empKey, month:curEmp.month+1, score:s, total}).then(()=>loadMonthlyLeaderboard());
     }
     const hasName = !!(savedName && validSenderEmpId);
     body.innerHTML = `<div class="qi-result">
@@ -2191,7 +2191,8 @@ function saveGameScore(playerName, score, total) {
   if(ws) ws.style.display='block';
   renderTop10Chart();
   // Fire-and-forget push to server so scores persist across devices
-  apiGet({action:'saveGameScore', empId:empKey, playerName, score, total}).catch(()=>{});
+  // ใช้ apiPostJson (ไม่ใช่ GET query string) เพื่อไม่ให้ชื่อภาษาไทยเพี้ยน
+  apiPostJson({action:'saveGameScore', empId:empKey, playerName, score, total}).catch(()=>{});
 }
 
 // Fetch the per-employee game leaderboard from the server and merge it
