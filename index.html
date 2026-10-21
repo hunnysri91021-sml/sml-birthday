@@ -686,6 +686,14 @@ const DEFAULT_API_URL = 'https://sml-birthday.hunnysri91021.workers.dev/';
 function getApiUrl(){ return (localStorage.getItem('sml_api_url')||'').trim() || DEFAULT_API_URL; }
 function saveApiUrl(){
   const url = document.getElementById('apiUrl').value.trim();
+  // กันพิมพ์/วาง URL ของเว็บเองผิดเข้ามาแทน URL ของ API (เคยเกิดขึ้นจริงจน login ไม่ได้
+  // ด้วย 405 เพราะ GitHub Pages ไม่รับ POST) เช็คแค่ hostname ให้ครอบคลุมทุก path
+  try{
+    if(url && new URL(url).hostname === location.hostname){
+      showToast('นี่คือ URL ของเว็บนี้เอง ไม่ใช่ URL ของ Apps Script/API — ไม่บันทึกให้','warn');
+      return;
+    }
+  }catch(e){ /* url พิมพ์ไม่ครบ/ไม่ใช่ URL ที่ถูกต้อง ปล่อยให้ apiGet ไปเจอ error เอง */ }
   localStorage.setItem('sml_api_url', url);
   setApiStatus('pending','ยังไม่ได้ทดสอบ');
 }
@@ -1421,13 +1429,10 @@ function showAdminPrompt(){
   if(document.body.classList.contains('admin-mode')){
     exitAdmin(); return;
   }
-  if(!(localStorage.getItem('sml_api_url')||'').trim()){
-    const url=(window.prompt('ใส่ Google Apps Script Web App URL ก่อนเข้าสู่ Admin\n(ดูได้จาก Deploy > Manage deployments)','')||'').trim();
-    if(!url){ showToast('ต้องใส่ Script URL ก่อนถึงจะเข้า Admin ได้','warn'); return; }
-    localStorage.setItem('sml_api_url', url);
-    const apiUrlInp=document.getElementById('apiUrl');
-    if(apiUrlInp) apiUrlInp.value=url;
-  }
+  // getApiUrl() ใช้ DEFAULT_API_URL อยู่แล้วถ้ายังไม่เคยตั้งค่าเอง จึงไม่ต้องถามหา URL
+  // ก่อนเข้า Admin อีกต่อไป (เคยมีปัญหาคนกรอก URL ผิด เช่น เอา URL ของเว็บเองมาใส่
+  // แทน URL ของ API ทำให้ login ไม่ได้) ใครต้องการเปลี่ยน API URL จริงๆ ยังแก้ได้
+  // ในหน้า Admin Settings ตามปกติ
   showAdminLoginModal();
 }
 
